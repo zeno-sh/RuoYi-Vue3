@@ -1,11 +1,16 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="skuId" prop="skuId">
-        <el-input v-model="queryParams.skuId" placeholder="请输入skuId" clearable @keyup.enter="handleQuery" />
+      <el-form-item label="SKU" prop="skuId">
+        <el-input v-model="queryParams.skuId" placeholder="请输入SKU" clearable @keyup.enter="handleQuery" />
       </el-form-item>
       <el-form-item label="产品名称" prop="skuName">
         <el-input v-model="queryParams.skuName" placeholder="请输入产品名称" clearable @keyup.enter="handleQuery" />
+      </el-form-item>
+      <el-form-item label="售卖状态" prop="saleStatus">
+        <el-select v-model="queryParams.saleStatus" placeholder="请选择售卖状态" clearable>
+          <el-option v-for="dict in dm_product_sale_status" :key="dict.value" :label="dict.label" :value="dict.value" />
+        </el-select>
       </el-form-item>
       <el-form-item label="类目" prop="categoryId">
         <el-input v-model="queryParams.categoryId" placeholder="请输入类目" clearable @keyup.enter="handleQuery" />
@@ -15,8 +20,12 @@
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
-          <el-option v-for="dict in sys_common_status" :key="dict.value" :label="dict.label" :value="dict.value" />
+          <el-option v-for="dict in record_status" :key="dict.value" :label="dict.label" :value="dict.value" />
         </el-select>
+      </el-form-item>
+      <el-form-item label="创建时间" style="width: 308px">
+        <el-date-picker v-model="daterangeCreateTime" value-format="YYYY-MM-DD" type="daterange" range-separator="-"
+          start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -45,24 +54,30 @@
 
     <el-table v-loading="loading" :data="productList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="主键" align="center" prop="id" />
-      <el-table-column label="skuId" align="center" prop="skuId" />
+      <el-table-column label="图片" align="center" prop="pictureUrl" width="100">
+        <template #default="scope">
+          <image-preview :src="scope.row.pictureUrl" :width="50" :height="50" />
+        </template>
+      </el-table-column>
+      <el-table-column label="SKU" align="center" prop="skuId" />
       <el-table-column label="产品名称" align="center" prop="skuName" />
       <el-table-column label="规格说明" align="center" prop="specification" />
-      <el-table-column label="合并的标志" align="center" prop="modelNumber" />
+      <el-table-column label="型号(SPU)" width="100" align="center" prop="modelNumber" />
       <el-table-column label="单位" align="center" prop="unit" />
-      <el-table-column label="售卖状态" align="center" prop="saleStatus" />
+      <el-table-column label="售卖状态" align="center" prop="saleStatus">
+        <template #default="scope">
+          <dict-tag :options="dm_product_sale_status" :value="scope.row.saleStatus" />
+        </template>
+      </el-table-column>
       <el-table-column label="类目" align="center" prop="categoryId" />
       <el-table-column label="品牌" align="center" prop="brandId" />
       <el-table-column label="标签" align="center" prop="flagId" />
-      <el-table-column label="图片" align="center" prop="pictureUrl" />
-      <el-table-column label="产品描述" align="center" prop="description" />
-      <el-table-column label="价格策略" align="center" prop="priceStrategyId" />
       <el-table-column label="状态" align="center" prop="status">
         <template #default="scope">
-          <dict-tag :options="sys_common_status" :value="scope.row.status" />
+          <dict-tag :options="record_status" :value="scope.row.status" />
         </template>
       </el-table-column>
+      <el-table-column label="竞品链接" align="center" prop="competitorLink" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template #default="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
@@ -87,22 +102,29 @@
       @pagination="getList" />
 
     <!-- 添加或修改产品信息对话框 -->
-    <el-dialog :title="title" v-model="open" width="500px" append-to-body>
-      <el-form ref="productRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="skuId" prop="skuId">
-          <el-input v-model="form.skuId" placeholder="请输入skuId" />
-        </el-form-item>
+    <el-dialog :title="title" v-model="open" width="1200px" append-to-body>
+      <el-form ref="productRef" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="产品名称" prop="skuName">
           <el-input v-model="form.skuName" placeholder="请输入产品名称" />
         </el-form-item>
+        <el-form-item label="SKU" prop="skuId">
+          <el-input v-model="form.skuId" placeholder="请输入SKU" />
+        </el-form-item>
+        
         <el-form-item label="规格说明" prop="specification">
           <el-input v-model="form.specification" placeholder="请输入规格说明" />
         </el-form-item>
-        <el-form-item label="合并的标志" prop="modelNumber">
-          <el-input v-model="form.modelNumber" placeholder="请输入合并的标志" />
+        <el-form-item label="型号(SPU)" prop="modelNumber">
+          <el-input v-model="form.modelNumber" placeholder="请输入型号(SPU)" />
         </el-form-item>
         <el-form-item label="单位" prop="unit">
           <el-input v-model="form.unit" placeholder="请输入单位" />
+        </el-form-item>
+        <el-form-item label="售卖状态" prop="saleStatus">
+          <el-radio-group v-model="form.saleStatus">
+            <el-radio v-for="dict in dm_product_sale_status" :key="dict.value"
+              :label="parseInt(dict.value)">{{ dict.label }}</el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item label="类目" prop="categoryId">
           <el-input v-model="form.categoryId" placeholder="请输入类目" />
@@ -114,21 +136,15 @@
           <el-input v-model="form.flagId" placeholder="请输入标签" />
         </el-form-item>
         <el-form-item label="图片" prop="pictureUrl">
-          <el-input v-model="form.pictureUrl" placeholder="请输入图片" />
+          <image-upload v-model="form.pictureUrl" />
         </el-form-item>
         <el-form-item label="产品描述" prop="description">
           <el-input v-model="form.description" type="textarea" placeholder="请输入内容" />
         </el-form-item>
-        <el-form-item label="价格策略" prop="priceStrategyId">
-          <el-input v-model="form.priceStrategyId" placeholder="请输入价格策略" />
+        <el-form-item label="竞品链接" prop="competitorLink">
+          <el-input v-model="form.competitorLink" type="textarea" placeholder="请输入内容" />
         </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio v-for="dict in sys_common_status" :key="dict.value"
-              :label="parseInt(dict.value)">{{ dict.label }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-divider content-position="center">海关信息信息</el-divider>
+        <el-divider content-position="center">海关信息</el-divider>
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
             <el-button type="primary" icon="Plus" @click="handleAddDmProductCustoms">添加</el-button>
@@ -201,7 +217,7 @@
 import { listProduct, getProduct, delProduct, addProduct, updateProduct } from "@/api/erp/product";
 
 const { proxy } = getCurrentInstance();
-const { sys_common_status, sys_yes_no } = proxy.useDict('sys_common_status', 'sys_yes_no');
+const { dm_product_sale_status, record_status, sys_yes_no } = proxy.useDict('dm_product_sale_status', 'record_status', 'sys_yes_no');
 
 const productList = ref([]);
 const dmProductCustomsList = ref([]);
@@ -214,6 +230,7 @@ const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
 const title = ref("");
+const daterangeCreateTime = ref([]);
 
 const data = reactive({
   form: {},
@@ -225,30 +242,22 @@ const data = reactive({
     saleStatus: null,
     categoryId: null,
     brandId: null,
-    pictureUrl: null,
     status: null,
+    competitorLink: null,
+    createTime: null,
   },
   rules: {
     skuId: [
-      { required: true, message: "skuId不能为空", trigger: "blur" }
+      { required: true, message: "SKU不能为空", trigger: "blur" }
     ],
     skuName: [
       { required: true, message: "产品名称不能为空", trigger: "blur" }
     ],
     modelNumber: [
-      { required: true, message: "合并的标志不能为空", trigger: "blur" }
-    ],
-    categoryId: [
-      { required: true, message: "类目不能为空", trigger: "blur" }
+      { required: true, message: "型号(SPU)不能为空", trigger: "blur" }
     ],
     pictureUrl: [
       { required: true, message: "图片不能为空", trigger: "blur" }
-    ],
-    priceStrategyId: [
-      { required: true, message: "价格策略不能为空", trigger: "blur" }
-    ],
-    status: [
-      { required: true, message: "状态不能为空", trigger: "change" }
     ],
   }
 });
@@ -258,6 +267,11 @@ const { queryParams, form, rules } = toRefs(data);
 /** 查询产品信息列表 */
 function getList() {
   loading.value = true;
+  queryParams.value.params = {};
+  if (null != daterangeCreateTime && '' != daterangeCreateTime) {
+    queryParams.value.params["beginCreateTime"] = daterangeCreateTime.value[0];
+    queryParams.value.params["endCreateTime"] = daterangeCreateTime.value[1];
+  }
   listProduct(queryParams.value).then(response => {
     productList.value = response.rows;
     total.value = response.total;
@@ -289,6 +303,7 @@ function reset() {
     description: null,
     priceStrategyId: null,
     status: null,
+    competitorLink: null,
     createBy: null,
     createTime: null,
     updateTime: null
@@ -305,6 +320,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
+  daterangeCreateTime.value = [];
   proxy.resetForm("queryRef");
   handleQuery();
 }
