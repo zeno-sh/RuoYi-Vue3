@@ -77,11 +77,11 @@
       <el-form ref="supplierRef" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="产品" prop="productId">
           <el-select v-model="form.productId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
-          remote-show-suffix :remote-method="getProduct">
-          <el-option v-for="item in productList" :key="item.id" :label="item.skuName" :value="item.id" />
-        </el-select>
+            remote-show-suffix :remote-method="getProduct">
+            <el-option v-for="item in productList" :key="item.id" :label="item.skuName" :value="item.id" />
+          </el-select>
         </el-form-item>
-        
+
         <el-form-item label="供应商名称" prop="supplierName">
           <el-input v-model="form.supplierName" placeholder="请输入供应商名称" />
         </el-form-item>
@@ -131,17 +131,39 @@
           @selection-change="handleDmProductPurchaseSelectionChange" ref="dmProductPurchase">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column label="序号" align="center" prop="index" width="50" />
+          <el-table-column label="产品ID" prop="productId" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.productId" disabled placeholder="请输入产品ID" />
+            </template>
+          </el-table-column>
           <el-table-column label="箱规名称" prop="cartonSizeName" width="150">
             <template #default="scope">
               <el-input v-model="scope.row.cartonSizeName" placeholder="请输入箱规名称" />
             </template>
           </el-table-column>
-          <el-table-column label="单品长" prop="length" width="150">
+          <el-table-column label="外箱规格cm" width="150">
             <template #default="scope">
-              <el-input v-model="scope.row.length" placeholder="请输入单品长" />
+              <el-input v-model="scope.row.boxLength" placeholder="长" />
+              <el-input v-model="scope.row.boxWidth" placeholder="宽" />
+              <el-input v-model="scope.row.boxHeight" placeholder="高" />
             </template>
           </el-table-column>
-          <el-table-column label="单品宽" prop="width" width="150">
+          <el-table-column label="单箱数量pcs" prop="quantityPerBox" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.quantityPerBox" placeholder="单箱数量pcs" />
+            </template>
+          </el-table-column>
+          <el-table-column label="包装规格cm" width="120px">
+            <template #default="scope">
+              <div display="inline-block">
+                <el-input v-model="scope.row.length" placeholder="长" />
+                <el-input v-model="scope.row.width" placeholder="宽" />
+                <el-input v-model="scope.row.height" placeholder="高" />
+              </div>
+
+            </template>
+          </el-table-column>
+          <!-- <el-table-column label="单品宽" prop="width" width="150">
             <template #default="scope">
               <el-input v-model="scope.row.width" placeholder="请输入单品宽" />
             </template>
@@ -150,10 +172,20 @@
             <template #default="scope">
               <el-input v-model="scope.row.height" placeholder="请输入单品高" />
             </template>
-          </el-table-column>
-          <el-table-column label="单品净重量" prop="netWeight" width="150">
+          </el-table-column> -->
+          <el-table-column label="单箱重量g" prop="boxWeight" width="150">
             <template #default="scope">
-              <el-input v-model="scope.row.netWeight" placeholder="请输入单品净重量" />
+              <el-input v-model="scope.row.boxWeight" placeholder="单箱重量g" />
+            </template>
+          </el-table-column>
+          <el-table-column label="单品净重g" prop="netWeight" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.netWeight" placeholder="单品净重g" />
+            </template>
+          </el-table-column>
+          <el-table-column label="单品毛重g" prop="grossWeight" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.grossWeight" placeholder="单品毛重g" />
             </template>
           </el-table-column>
           <el-table-column label="产品材质" prop="material" width="150">
@@ -161,52 +193,10 @@
               <el-input v-model="scope.row.material" placeholder="请输入产品材质" />
             </template>
           </el-table-column>
-          <el-table-column label="箱规长" prop="boxLength" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.boxLength" placeholder="请输入箱规长" />
-            </template>
-          </el-table-column>
-          <el-table-column label="箱规宽" prop="boxWidth" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.boxWidth" placeholder="请输入箱规宽" />
-            </template>
-          </el-table-column>
-          <el-table-column label="箱规高" prop="boxHeight" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.boxHeight" placeholder="请输入箱规高" />
-            </template>
-          </el-table-column>
-          <el-table-column label="每箱子的产品数" prop="quantityPerBox" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.quantityPerBox" placeholder="请输入每箱子的产品数" />
-            </template>
-          </el-table-column>
-          <el-table-column label="单品包装长" prop="packageLength" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.packageLength" placeholder="请输入单品包装长" />
-            </template>
-          </el-table-column>
-          <el-table-column label="单品包装宽" prop="packageWidth" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.packageWidth" placeholder="请输入单品包装宽" />
-            </template>
-          </el-table-column>
-          <el-table-column label="单品包装高" prop="packageHeight" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.packageHeight" placeholder="请输入单品包装高" />
-            </template>
-          </el-table-column>
-          <el-table-column label="箱重" prop="boxWeight" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.boxWeight" placeholder="请输入箱重" />
-            </template>
-          </el-table-column>
-          <el-table-column label="单品毛重量" prop="grossWeight" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.grossWeight" placeholder="请输入单品毛重量" />
-            </template>
-          </el-table-column>
-          <el-table-column label="虚拟单品长" prop="fakerLength" width="150">
+
+         
+         
+          <!-- <el-table-column label="虚拟单品长" prop="fakerLength" width="150">
             <template #default="scope">
               <el-input v-model="scope.row.fakerLength" placeholder="请输入虚拟单品长" />
             </template>
@@ -225,7 +215,7 @@
             <template #default="scope">
               <el-input v-model="scope.row.fakerNetWeight" placeholder="请输入虚拟单品净重量" />
             </template>
-          </el-table-column>
+          </el-table-column> -->
         </el-table>
       </el-form>
       <template #footer>
@@ -241,6 +231,9 @@
 <script setup name="Supplier">
 import { listSupplier, getSupplier, delSupplier, addSupplier, updateSupplier } from "@/api/erp/supplier";
 import { listProduct } from "@/api/erp/product";
+import useUserStore from '@/store/modules/user'
+
+const deptId = useUserStore().deptId;
 
 const { proxy } = getCurrentInstance();
 const { dm_currency_code, dm_boolean } = proxy.useDict('dm_currency_code', 'dm_boolean');
@@ -258,6 +251,7 @@ const total = ref(0);
 const title = ref("");
 const daterangeCreateTime = ref([]);
 const productList = ref([]);
+const globalProductId = ref(0);
 
 const data = reactive({
   form: {},
@@ -271,17 +265,8 @@ const data = reactive({
     createTime: null,
   },
   rules: {
-    tenantId: [
-      { required: true, message: "租户不能为空", trigger: "blur" }
-    ],
-    supplierCode: [
-      { required: true, message: "供应商代码不能为空", trigger: "blur" }
-    ],
-    createTime: [
-      { required: true, message: "$comment不能为空", trigger: "blur" }
-    ],
-    updateTime: [
-      { required: true, message: "$comment不能为空", trigger: "blur" }
+    productId: [
+      { required: true, message: "产品不能为空", trigger: "blur" }
     ]
   }
 });
@@ -301,6 +286,7 @@ function getProduct(skuId) {
     listProduct(queryParams.value).then(response => {
       productList.value = response.rows;
       queryParams.productId = productList.value[0].id;
+      globalProductId.value = productList.value[0].id;
     });
   }
 
@@ -431,7 +417,8 @@ function rowDmProductPurchaseIndex({ row, rowIndex }) {
 /** 采购信息添加按钮操作 */
 function handleAddDmProductPurchase() {
   let obj = {};
-  obj.productId = "";
+  obj.productId = globalProductId;
+  obj.tenantId = null;
   obj.cartonSizeName = "";
   obj.length = "";
   obj.width = "";
@@ -442,9 +429,6 @@ function handleAddDmProductPurchase() {
   obj.boxWidth = "";
   obj.boxHeight = "";
   obj.quantityPerBox = "";
-  obj.packageLength = "";
-  obj.packageWidth = "";
-  obj.packageHeight = "";
   obj.boxWeight = "";
   obj.grossWeight = "";
   obj.fakerLength = "";
