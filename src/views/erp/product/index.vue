@@ -104,46 +104,78 @@
     <!-- 添加或修改产品信息对话框 -->
     <el-dialog :title="title" v-model="open" width="1200px" append-to-body>
       <el-form ref="productRef" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="产品名称" prop="skuName">
-          <el-input v-model="form.skuName" placeholder="请输入产品名称" />
-        </el-form-item>
-        <el-form-item label="SKU" prop="skuId">
-          <el-input v-model="form.skuId" placeholder="请输入SKU" />
-        </el-form-item>
-        
-        <el-form-item label="规格说明" prop="specification">
-          <el-input v-model="form.specification" placeholder="请输入规格说明" />
-        </el-form-item>
-        <el-form-item label="型号(SPU)" prop="modelNumber">
-          <el-input v-model="form.modelNumber" placeholder="请输入型号(SPU)" />
-        </el-form-item>
-        <el-form-item label="单位" prop="unit">
-          <el-input v-model="form.unit" placeholder="请输入单位" />
-        </el-form-item>
-        <el-form-item label="售卖状态" prop="saleStatus">
-          <el-radio-group v-model="form.saleStatus">
-            <el-radio v-for="dict in dm_product_sale_status" :key="dict.value"
-              :label="parseInt(dict.value)">{{ dict.label }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="类目" prop="categoryId">
-          <el-input v-model="form.categoryId" placeholder="请输入类目" />
-        </el-form-item>
-        <el-form-item label="品牌" prop="brandId">
-          <el-input v-model="form.brandId" placeholder="请输入品牌" />
-        </el-form-item>
-        <el-form-item label="标签" prop="flagId">
-          <el-input v-model="form.flagId" placeholder="请输入标签" />
-        </el-form-item>
         <el-form-item label="图片" prop="pictureUrl">
           <image-upload v-model="form.pictureUrl" />
         </el-form-item>
-        <el-form-item label="产品描述" prop="description">
-          <el-input v-model="form.description" type="textarea" placeholder="请输入内容" />
+        <el-form-item label="产品名称" prop="skuName">
+          <el-input v-model="form.skuName" placeholder="请输入产品名称" />
         </el-form-item>
-        <el-form-item label="竞品链接" prop="competitorLink">
-          <el-input v-model="form.competitorLink" type="textarea" placeholder="请输入内容" />
+        <el-row type="flex">
+          <el-col :span="8">
+            <el-form-item label="SKU" prop="skuId">
+              <el-input v-model="form.skuId" placeholder="请输入SKU" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="型号(SPU)" prop="modelNumber">
+              <el-input v-model="form.modelNumber" placeholder="请输入型号(SPU)" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="单位" prop="unit">
+              <el-input v-model="form.unit" placeholder="请输入单位" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row type="flex">
+          <el-col :span="8">
+            <el-form-item label="类目" prop="categoryId">
+              <el-input v-model="form.categoryId" placeholder="请输入类目" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="品牌" prop="brandId">
+              <el-input v-model="form.brandId" placeholder="请输入品牌" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="标签" prop="flagId">
+              <el-input v-model="form.flagId" placeholder="请输入标签" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+
+        <el-form-item label="规格说明" prop="specification">
+          <el-input v-model="form.specification" type="textarea" placeholder="请输入规格说明" />
         </el-form-item>
+
+
+        <el-form-item label="售卖状态" prop="saleStatus">
+          <el-radio-group v-model="form.saleStatus">
+            <el-radio v-for="dict in dm_product_sale_status" :key="dict.value" :label="parseInt(dict.value)">{{ dict.label
+            }}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+
+        <el-row type="flex">
+          <el-col :span="12">
+            <el-form-item label="产品描述" prop="description">
+              <el-input v-model="form.description" type="textarea" placeholder="请输入内容" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="竞品链接" prop="competitorLink">
+              <el-input v-model="form.competitorLink" type="textarea" placeholder="请输入内容" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+
+
+
         <el-divider content-position="center">海关信息</el-divider>
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
