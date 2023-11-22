@@ -42,3 +42,4 @@ export function delProduct(id) {
     method: 'delete'
   })
 }
+
