@@ -4,8 +4,8 @@
       <el-form-item label="选品计划名称" prop="planName">
         <el-input v-model="queryParams.planName" placeholder="请输入选品计划名称" clearable @keyup.enter="handleQuery" />
       </el-form-item>
-      <el-form-item label="SKU" prop="skuId">
-        <el-input v-model="queryParams.skuId" placeholder="请输入SKU" clearable @keyup.enter="handleQuery" />
+      <el-form-item label="SKU" prop="planSkuId">
+        <el-input v-model="queryParams.planSkuId" placeholder="请输入SKU" clearable @keyup.enter="handleQuery" />
       </el-form-item>
       <el-form-item label="创建时间" style="width: 308px">
         <el-date-picker v-model="daterangeCreateTime" value-format="YYYY-MM-DD" type="daterange" range-separator="-"
@@ -44,7 +44,7 @@
     <el-table v-loading="loading" :data="planList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="选品计划名称" align="center" prop="planName" />
-      <el-table-column label="SKU" align="center" prop="skuId" />
+      <el-table-column label="SKU" align="center" prop="planSkuId" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template #default="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
@@ -79,9 +79,9 @@
         <el-form-item label="选品计划名称" prop="planName">
           <el-input v-model="form.planName" placeholder="请输入选品计划名称" />
         </el-form-item>
-        <el-form-item label="SKU" prop="skuId">
-          <!-- <el-input v-model="form.skuId" placeholder="请输入SKU" /> -->
-          <el-select v-model="form.skuId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
+        <el-form-item label="SKU" prop="planSkuId">
+          <!-- <el-input v-model="form.planSkuId" placeholder="请输入SKU" /> -->
+          <el-select v-model="form.planSkuId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
             remote-show-suffix :remote-method="getProduct">
             <el-option v-for="item in productList" :key="item.skuId" :label="`${item.skuName}` + ' / ' + `${item.skuId}`"
               :value="item.skuId">
@@ -128,7 +128,7 @@ const data = reactive({
     pageNum: 1,
     pageSize: 10,
     planName: null,
-    skuId: null,
+    planSkuId: null,
     createTime: null,
     status: null
   },
@@ -136,7 +136,7 @@ const data = reactive({
     planName: [
       { required: true, message: "选品计划名称不能为空", trigger: "blur" }
     ],
-    skuId: [
+    planSkuId: [
       { required: true, message: "SKU不能为空", trigger: "blur" }
     ]
   }
@@ -144,9 +144,9 @@ const data = reactive({
 
 const { queryParams, form, rules } = toRefs(data);
 
-function getProduct(skuId) {
-  if (skuId != null && '' != skuId) {
-    queryParams.value.skuId = skuId;
+function getProduct(planSkuId) {
+  if (planSkuId != null && '' != planSkuId) {
+    queryParams.value.skuId = planSkuId;
     listProduct(queryParams.value).then(response => {
       productList.value = response.rows;
     });
@@ -181,7 +181,7 @@ function reset() {
     tenantId: null,
     planCode: null,
     planName: null,
-    skuId: null,
+    planSkuId: null,
     createTime: null,
     updateTime: null,
     status: null
