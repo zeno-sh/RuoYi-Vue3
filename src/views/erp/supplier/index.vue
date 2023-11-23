@@ -75,60 +75,76 @@
     <!-- 添加或修改供应商报价对话框 -->
     <el-dialog :title="title" v-model="open" width="1200px" append-to-body>
       <el-form ref="supplierRef" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="产品" prop="skuId">
-          <el-select v-model="form.skuId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
-            remote-show-suffix :remote-method="getProduct">
-            <el-option v-for="item in productList" :key="item.skuId" :label="`${item.skuName}`+' / ' +`${item.skuId}`" :value="item.skuId">
-              <span style="float: left">{{ item.skuName }}</span>
-              <span style="
-          float: right;
-          color: var(--el-text-color-secondary);
-          font-size: 13px;
-        ">{{ item.skuId }}</span>
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="供应商名称" prop="supplierName">
-          <el-select v-model="form.supplierName" :multiple="false" filterable remote reserve-keyword placeholder="支持模糊搜索"
-            remote-show-suffix :remote-method="getSupplierInfo">
-            <el-option v-for="item in factoryList" :key="item.supplierCode" :label="`${item.supplierName}`+' / ' +`${item.supplierCode}`"
-              :value="item.supplierCode">
-              <span style="float: left">{{ item.supplierName }}</span>
-              <span style="
-          float: right;
-          color: var(--el-text-color-secondary);
-          font-size: 13px;
-        ">{{ item.supplierCode }}</span>
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="币种" prop="currency">
-          <el-select v-model="form.currency" placeholder="请选择币种">
-            <el-option v-for="dict in dm_currency_code" :key="dict.value" :label="`${dict.label}`+' / ' +`${dict.remark}`"
-              :value="parseInt(dict.value)">
-              <span style="float: left">{{ dict.label }}</span>
-              <span style="
-          float: right;
-          color: var(--el-text-color-secondary);
-          font-size: 13px;
-        ">{{ dict.remark }}</span>
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="是否含税" prop="tax">
-          <el-radio-group v-model="form.tax">
-            <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value">{{ dict.label }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="税率" prop="taxRate">
-          <el-input v-model="form.taxRate" placeholder="请输入税率" />
-        </el-form-item>
-        <el-form-item label="报价" prop="price">
-          <el-input v-model="form.price" placeholder="请输入报价" />
-        </el-form-item>
-        <el-form-item label="起订数量" prop="orderNumber">
-          <el-input v-model="form.orderNumber" placeholder="请输入起订数量" />
-        </el-form-item>
+
+        <el-row type="flex">
+          <el-col :span="12">
+            <el-form-item label="产品" prop="skuId">
+              <el-select v-model="form.skuId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
+                remote-show-suffix :remote-method="getProduct">
+                <el-option v-for="item in productList" :key="item.skuId"
+                  :label="`${item.skuName}` + ' / ' + `${item.skuId}`" :value="item.skuId">
+                  <span style="float: left">{{ item.skuName }}</span>
+                  <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; ">{{ item.skuId
+                  }}</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="供应商" prop="supplierCode">
+              <el-select v-model="form.supplierCode" :multiple="false" filterable remote reserve-keyword
+                placeholder="支持模糊搜索" remote-show-suffix :remote-method="getSupplierInfo">
+                <el-option v-for="item in factoryList" :key="item.supplierCode"
+                  :label="`${item.supplierName}` + ' / ' + `${item.supplierCode}`" :value="item.supplierCode">
+                  <span style="float: left">{{ item.supplierName }}</span>
+                  <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; ">{{
+                    item.supplierCode }}</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row type="flex">
+          <el-col :span="12">
+            <el-form-item label="币种" prop="currency">
+              <el-select v-model="form.currency" placeholder="请选择币种">
+                <el-option v-for="dict in dm_currency_code" :key="dict.value"
+                  :label="`${dict.label}` + ' / ' + `${dict.remark}`" :value="parseInt(dict.value)">
+                  <span style="float: left">{{ dict.label }}</span>
+                  <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; ">{{ dict.remark
+                  }}</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="是否含税" prop="tax">
+              <el-radio-group v-model="form.tax">
+                <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value">{{ dict.label }}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="税率" prop="taxRate">
+              <el-input v-model="form.taxRate" placeholder="请输入税率" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row type="flex">
+          <el-col :span="12">
+            <el-form-item label="报价" prop="price">
+              <el-input v-model="form.price" placeholder="请输入报价" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="起订数量" prop="orderNumber">
+              <el-input-number :min="0" v-model="form.orderNumber" placeholder="请输入起订数量" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
         <el-form-item label="采购链接" prop="link">
           <el-input v-model="form.link" type="textarea" placeholder="请输入内容" />
         </el-form-item>
@@ -248,9 +264,9 @@ const data = reactive({
     supplierName: null,
     currency: null,
     tax: null,
-    taxRate: null,
+    taxRate: 0.0,
     price: null,
-    orderNumber: null,
+    orderNumber: 0,
     link: null,
     createTime: null,
   },
@@ -269,7 +285,6 @@ function getProduct(skuId) {
     listProduct(queryParams.value).then(response => {
       productList.value = response.rows;
       queryParams.skuId = productList.value[0].skuId;
-      globalSkuId.value = productList.value[0].skuId;
     });
   }
 }
@@ -357,6 +372,7 @@ function handleUpdate(row) {
     dmProductPurchaseList.value = response.data.dmProductPurchaseList;
     open.value = true;
     title.value = "修改供应商报价";
+    globalSkuId.value = form.value.skuId;
   });
 }
 
