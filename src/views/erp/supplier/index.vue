@@ -7,9 +7,9 @@
       <el-form-item label="供应商代码" prop="supplierCode">
         <el-input v-model="queryParams.supplierCode" placeholder="请输入供应商代码" clearable @keyup.enter="handleQuery" />
       </el-form-item>
-      <el-form-item label="供应商名称" prop="supplierName">
+      <!-- <el-form-item label="供应商名称" prop="supplierName">
         <el-input v-model="queryParams.supplierName" placeholder="请输入供应商名称" clearable @keyup.enter="handleQuery" />
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="创建时间" style="width: 308px">
         <el-date-picker v-model="daterangeCreateTime" value-format="YYYY-MM-DD" type="daterange" range-separator="-"
           start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
@@ -78,19 +78,41 @@
         <el-form-item label="产品" prop="skuId">
           <el-select v-model="form.skuId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
             remote-show-suffix :remote-method="getProduct">
-            <el-option v-for="item in productList" :key="item.skuId" :label="item.skuName" :value="item.skuId" />
+            <el-option v-for="item in productList" :key="item.skuId" :label="`${item.skuName}`+' / ' +`${item.skuId}`" :value="item.skuId">
+              <span style="float: left">{{ item.skuName }}</span>
+              <span style="
+          float: right;
+          color: var(--el-text-color-secondary);
+          font-size: 13px;
+        ">{{ item.skuId }}</span>
+            </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="供应商代码" prop="supplierCode">
-          <el-input disabled v-model="form.supplierCode" placeholder="请输入供应商代码" />
-        </el-form-item>
         <el-form-item label="供应商名称" prop="supplierName">
-          <el-input v-model="form.supplierName" placeholder="请输入供应商名称" />
+          <el-select v-model="form.supplierName" :multiple="false" filterable remote reserve-keyword placeholder="支持模糊搜索"
+            remote-show-suffix :remote-method="getSupplierInfo">
+            <el-option v-for="item in factoryList" :key="item.supplierCode" :label="`${item.supplierName}`+' / ' +`${item.supplierCode}`"
+              :value="item.supplierCode">
+              <span style="float: left">{{ item.supplierName }}</span>
+              <span style="
+          float: right;
+          color: var(--el-text-color-secondary);
+          font-size: 13px;
+        ">{{ item.supplierCode }}</span>
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="币种" prop="currency">
           <el-select v-model="form.currency" placeholder="请选择币种">
-            <el-option v-for="dict in dm_currency_code" :key="dict.value" :label="dict.label"
-              :value="parseInt(dict.value)"></el-option>
+            <el-option v-for="dict in dm_currency_code" :key="dict.value" :label="`${dict.label}`+' / ' +`${dict.remark}`"
+              :value="parseInt(dict.value)">
+              <span style="float: left">{{ dict.label }}</span>
+              <span style="
+          float: right;
+          color: var(--el-text-color-secondary);
+          font-size: 13px;
+        ">{{ dict.remark }}</span>
+            </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="是否含税" prop="tax">
@@ -158,16 +180,6 @@
 
             </template>
           </el-table-column>
-          <!-- <el-table-column label="单品宽" prop="width" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.width" placeholder="请输入单品宽" />
-            </template>
-          </el-table-column>
-          <el-table-column label="单品高" prop="height" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.height" placeholder="请输入单品高" />
-            </template>
-          </el-table-column> -->
           <el-table-column label="单箱重量g" prop="boxWeight" width="150">
             <template #default="scope">
               <el-input v-model="scope.row.boxWeight" placeholder="单箱重量g" />
@@ -203,6 +215,8 @@
 <script setup name="Supplier">
 import { listSupplier, getSupplier, delSupplier, addSupplier, updateSupplier } from "@/api/erp/supplier";
 import { listProduct } from "@/api/erp/product";
+import { listFactory } from "@/api/erp/factory";
+
 
 const { proxy } = getCurrentInstance();
 const { sys_yes_no, dm_currency_code } = proxy.useDict('sys_yes_no', 'dm_currency_code');
@@ -220,6 +234,7 @@ const total = ref(0);
 const title = ref("");
 const daterangeCreateTime = ref([]);
 const productList = ref([]);
+const factoryList = ref([]);
 const globalSkuId = ref("");
 
 const data = reactive({
@@ -257,7 +272,15 @@ function getProduct(skuId) {
       globalSkuId.value = productList.value[0].skuId;
     });
   }
+}
 
+function getSupplierInfo(name) {
+  if (name != null && '' != name) {
+    queryParams.value.supplierName = name;
+    listFactory(queryParams.value).then(response => {
+      factoryList.value = response.rows;
+    });
+  }
 }
 
 /** 查询供应商报价列表 */
@@ -285,7 +308,7 @@ function reset() {
     supplierCode: null,
     supplierName: null,
     currency: null,
-    tax: null,
+    tax: "N",
     taxRate: null,
     price: null,
     orderNumber: null,

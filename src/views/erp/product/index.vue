@@ -196,7 +196,7 @@
           </el-table-column>
           <el-table-column label="报关名称中文" prop="customsZh" width="150">
             <template #default="scope">
-              <el-input v-model="scope.row.customsZh" placeholder="请输入报关名称中文" />
+              <el-input v-model="scope.row.customsZh" placeholder="请输入报关名称中文" /> 
             </template>
           </el-table-column>
           <el-table-column label="材质" prop="material" width="150">
@@ -254,7 +254,7 @@ const { dm_product_sale_status, record_status, sys_yes_no } = proxy.useDict('dm_
 const productList = ref([]);
 const dmProductCustomsList = ref([]);
 const open = ref(false);
-const noAdd = ref(dmProductCustomsList.size != 0);
+const noAdd = ref(true);
 const loading = ref(true);
 const showSearch = ref(true);
 const ids = ref([]);
@@ -264,6 +264,7 @@ const multiple = ref(true);
 const total = ref(0);
 const title = ref("");
 const daterangeCreateTime = ref([]);
+
 
 const data = reactive({
   form: {},
@@ -370,6 +371,7 @@ function handleAdd() {
   reset();
   open.value = true;
   title.value = "添加产品信息";
+  noAdd.value = false;
 }
 
 /** 修改按钮操作 */
@@ -381,8 +383,10 @@ function handleUpdate(row) {
     dmProductCustomsList.value = response.data.dmProductCustomsList;
     open.value = true;
     title.value = "修改产品信息";
+    
     if (dmProductCustomsList.value.length > 0) {
       noAdd.value == true;
+      console.log(`按钮状态：${noAdd.value}`);
     }
   });
 }
@@ -429,11 +433,11 @@ function rowDmProductCustomsIndex({ row, rowIndex }) {
 function handleAddDmProductCustoms() {
   let obj = {};
   obj.customsEn = "";
-  obj.customsZh = "";
+  obj.customsZh = form.value.skuName;
   obj.material = "";
-  obj.hasBattery = "";
-  obj.hasLiquid = "";
-  obj.hasTextile = "";
+  obj.hasBattery = "N";
+  obj.hasLiquid = "N";
+  obj.hasTextile = "N";
   obj.price = "";
   dmProductCustomsList.value.push(obj);
   if (dmProductCustomsList.value.length > 0) {
