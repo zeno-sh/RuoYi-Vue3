@@ -49,6 +49,9 @@
         <el-button type="warning" plain icon="Download" @click="handleExport"
           v-hasPermi="['erp:product:export']">导出</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button type="primary" plain icon="Plus" @click="handlePlan" v-hasPermi="['erp:plan:add']">生成选品计划</el-button>
+      </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -179,7 +182,7 @@
         <el-divider content-position="center">海关信息</el-divider>
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
-            <el-button type="primary" :disabled="noAdd" icon="Plus" @click="handleAddDmProductCustoms" >添加</el-button>
+            <el-button type="primary" :disabled="noAdd" icon="Plus" @click="handleAddDmProductCustoms">添加</el-button>
           </el-col>
           <el-col :span="1.5">
             <el-button type="danger" icon="Delete" @click="handleDeleteDmProductCustoms">删除</el-button>
@@ -196,7 +199,7 @@
           </el-table-column>
           <el-table-column label="报关名称中文" prop="customsZh" width="150">
             <template #default="scope">
-              <el-input v-model="scope.row.customsZh" placeholder="请输入报关名称中文" /> 
+              <el-input v-model="scope.row.customsZh" placeholder="请输入报关名称中文" />
             </template>
           </el-table-column>
           <el-table-column label="材质" prop="material" width="150">
@@ -242,11 +245,32 @@
         </div>
       </template>
     </el-dialog>
+
+
+    <!-- 添加或修改选品计划对话框 -->
+    <el-dialog :title="titlePlan" v-model="openPlan" width="600px" append-to-body>
+      <el-form ref="planRef" :model="formPlan" :rules="rules" label-width="120px">
+        <el-form-item label="选品计划名称" prop="planName">
+          <el-input v-model="formPlan.planName" placeholder="请输入选品计划名称" />
+        </el-form-item>
+
+        <el-form-item label="SKU" prop="planSkuId">
+          <el-input disabled v-model="formPlan.planSkuId" type="textarea" placeholder="" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="submitFormPlan">确 定</el-button>
+          <el-button @click="cancelPlan">取 消</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup name="Product">
 import { listProduct, getProduct, delProduct, addProduct, updateProduct } from "@/api/erp/product";
+import { addPlan } from "@/api/erp/plan";
 
 const { proxy } = getCurrentInstance();
 const { dm_product_sale_status, record_status, sys_yes_no } = proxy.useDict('dm_product_sale_status', 'record_status', 'sys_yes_no');
@@ -258,16 +282,20 @@ const noAdd = ref(true);
 const loading = ref(true);
 const showSearch = ref(true);
 const ids = ref([]);
+const planSkuId = ref([]);
 const checkedDmProductCustoms = ref([]);
 const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
 const title = ref("");
+const titlePlan = ref("");
 const daterangeCreateTime = ref([]);
+const openPlan = ref(false);
 
 
 const data = reactive({
   form: {},
+  formPlan: {},
   queryParams: {
     pageNum: 1,
     pageSize: 10,
@@ -296,7 +324,7 @@ const data = reactive({
   }
 });
 
-const { queryParams, form, rules } = toRefs(data);
+const { queryParams, form, rules, formPlan } = toRefs(data);
 
 /** 查询产品信息列表 */
 function getList() {
@@ -362,6 +390,7 @@ function resetQuery() {
 // 多选框选中数据
 function handleSelectionChange(selection) {
   ids.value = selection.map(item => item.id);
+  planSkuId.value = selection.map(item => item.skuId);
   single.value = selection.length != 1;
   multiple.value = !selection.length;
 }
@@ -383,10 +412,9 @@ function handleUpdate(row) {
     dmProductCustomsList.value = response.data.dmProductCustomsList;
     open.value = true;
     title.value = "修改产品信息";
-    
+
     if (dmProductCustomsList.value.length > 0) {
       noAdd.value == true;
-      console.log(`按钮状态：${noAdd.value}`);
     }
   });
 }
@@ -471,6 +499,51 @@ function handleExport() {
   proxy.download('erp/product/export', {
     ...queryParams.value
   }, `product_${new Date().getTime()}.xlsx`)
+}
+
+// 表单重置
+function resetPlan() {
+  form.value = {
+    planName: null,
+    planSkuId: []
+  };
+  proxy.resetForm("planRef");
+}
+
+//生成选品计划
+function handlePlan() {
+  resetPlan();
+  openPlan.value = true;
+  titlePlan.value = "添加选品计划";
+  formPlan.value.planSkuId = planSkuId.value;
+}
+
+// 取消按钮
+function cancelPlan() {
+  openPlan.value = false;
+  resetPlan();
+}
+
+/** 提交按钮 */
+function submitFormPlan() {
+  proxy.$refs["planRef"].validate(valid => {
+    
+    if (formPlan.value.planSkuId.length == 0) {
+      proxy.$modal.msgError("生成计划时 SKU不能为空");
+    } else {
+      if (valid) {
+        // console.log(`planSkuId:${formPlan.value.planSkuId}`);
+        formPlan.value.planSkuId = formPlan.value.planSkuId.join(",");
+        console.log(formPlan.value.planSkuId);
+        addPlan(formPlan.value).then(response => {
+          proxy.$modal.msgSuccess("生成计划成功");
+          openPlan.value = false;
+        });
+      } else {
+        proxy.$modal.msgError("生成计划失败");
+      }
+    }
+  });
 }
 
 getList();
