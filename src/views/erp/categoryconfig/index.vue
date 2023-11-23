@@ -1,6 +1,9 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="类目ID" prop="categoryId">
+        <el-input v-model="queryParams.categoryId" placeholder="请输入类目ID" clearable @keyup.enter="handleQuery" />
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
         <el-button icon="Refresh" @click="resetQuery">重置</el-button>
@@ -9,34 +12,34 @@
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['erp:shopconfig:add']">新增</el-button>
+        <el-button type="primary" plain icon="Plus" @click="handleAdd"
+          v-hasPermi="['erp:categoryconfig:add']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate"
-          v-hasPermi="['erp:shopconfig:edit']">修改</el-button>
+          v-hasPermi="['erp:categoryconfig:edit']">修改</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete"
-          v-hasPermi="['erp:shopconfig:remove']">删除</el-button>
+          v-hasPermi="['erp:categoryconfig:remove']">删除</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="warning" plain icon="Download" @click="handleExport"
-          v-hasPermi="['erp:shopconfig:export']">导出</el-button>
+          v-hasPermi="['erp:categoryconfig:export']">导出</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="shopconfigList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="categoryconfigList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="店铺税率" align="center" prop="storeRate" />
-      <el-table-column label="银行提现税率" align="center" prop="bankRate" />
-      <el-table-column label="最后一公里税率" align="center" prop="lastMileRate" />
+      <el-table-column label="类目ID" align="center" prop="categoryId" />
+      <el-table-column label="类目佣金" align="center" prop="categoryCommission" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
-            v-hasPermi="['erp:shopconfig:edit']">修改</el-button>
+            v-hasPermi="['erp:categoryconfig:edit']">修改</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"
-            v-hasPermi="['erp:shopconfig:remove']">删除</el-button>
+            v-hasPermi="['erp:categoryconfig:remove']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -44,17 +47,14 @@
     <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize"
       @pagination="getList" />
 
-    <!-- 添加或修改成本配置对话框 -->
+    <!-- 添加或修改类目成本配置对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
-      <el-form ref="shopconfigRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="店铺税率" prop="storeRate">
-          <el-input v-model="form.storeRate" placeholder="请输入店铺税率" />
+      <el-form ref="categoryconfigRef" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="类目ID" prop="categoryId">
+          <el-input v-model="form.categoryId" placeholder="请输入类目ID" />
         </el-form-item>
-        <el-form-item label="银行提现税率" prop="bankRate">
-          <el-input v-model="form.bankRate" placeholder="请输入银行提现税率" />
-        </el-form-item>
-        <el-form-item label="最后一公里税率" prop="lastMileRate">
-          <el-input v-model="form.lastMileRate" placeholder="请输入最后一公里税率" />
+        <el-form-item label="类目佣金" prop="categoryCommission">
+          <el-input v-model="form.categoryCommission" placeholder="请输入类目佣金" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -67,12 +67,12 @@
   </div>
 </template>
 
-<script setup name="Shopconfig">
-import { listShopconfig, getShopconfig, delShopconfig, addShopconfig, updateShopconfig } from "@/api/erp/shopconfig";
+<script setup name="Categoryconfig">
+import { listCategoryconfig, getCategoryconfig, delCategoryconfig, addCategoryconfig, updateCategoryconfig } from "@/api/erp/categoryconfig";
 
 const { proxy } = getCurrentInstance();
 
-const shopconfigList = ref([]);
+const categoryconfigList = ref([]);
 const open = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
@@ -87,6 +87,7 @@ const data = reactive({
   queryParams: {
     pageNum: 1,
     pageSize: 10,
+    categoryId: null,
   },
   rules: {
   }
@@ -94,11 +95,11 @@ const data = reactive({
 
 const { queryParams, form, rules } = toRefs(data);
 
-/** 查询成本配置列表 */
+/** 查询类目成本配置列表 */
 function getList() {
   loading.value = true;
-  listShopconfig(queryParams.value).then(response => {
-    shopconfigList.value = response.rows;
+  listCategoryconfig(queryParams.value).then(response => {
+    categoryconfigList.value = response.rows;
     total.value = response.total;
     loading.value = false;
   });
@@ -114,11 +115,10 @@ function cancel() {
 function reset() {
   form.value = {
     id: null,
-    storeRate: null,
-    bankRate: null,
-    lastMileRate: null
+    categoryId: null,
+    categoryCommission: null
   };
-  proxy.resetForm("shopconfigRef");
+  proxy.resetForm("categoryconfigRef");
 }
 
 /** 搜索按钮操作 */
@@ -144,32 +144,32 @@ function handleSelectionChange(selection) {
 function handleAdd() {
   reset();
   open.value = true;
-  title.value = "添加成本配置";
+  title.value = "添加类目成本配置";
 }
 
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
   const _id = row.id || ids.value
-  getShopconfig(_id).then(response => {
+  getCategoryconfig(_id).then(response => {
     form.value = response.data;
     open.value = true;
-    title.value = "修改成本配置";
+    title.value = "修改类目成本配置";
   });
 }
 
 /** 提交按钮 */
 function submitForm() {
-  proxy.$refs["shopconfigRef"].validate(valid => {
+  proxy.$refs["categoryconfigRef"].validate(valid => {
     if (valid) {
       if (form.value.id != null) {
-        updateShopconfig(form.value).then(response => {
+        updateCategoryconfig(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
           getList();
         });
       } else {
-        addShopconfig(form.value).then(response => {
+        addCategoryconfig(form.value).then(response => {
           proxy.$modal.msgSuccess("新增成功");
           open.value = false;
           getList();
@@ -182,8 +182,8 @@ function submitForm() {
 /** 删除按钮操作 */
 function handleDelete(row) {
   const _ids = row.id || ids.value;
-  proxy.$modal.confirm('是否确认删除成本配置编号为"' + _ids + '"的数据项？').then(function () {
-    return delShopconfig(_ids);
+  proxy.$modal.confirm('是否确认删除类目成本配置编号为"' + _ids + '"的数据项？').then(function () {
+    return delCategoryconfig(_ids);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");
@@ -192,9 +192,9 @@ function handleDelete(row) {
 
 /** 导出按钮操作 */
 function handleExport() {
-  proxy.download('erp/shopconfig/export', {
+  proxy.download('erp/categoryconfig/export', {
     ...queryParams.value
-  }, `shopconfig_${new Date().getTime()}.xlsx`)
+  }, `categoryconfig_${new Date().getTime()}.xlsx`)
 }
 
 getList();
