@@ -179,7 +179,7 @@
         <el-divider content-position="center">海关信息</el-divider>
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
-            <el-button type="primary" icon="Plus" @click="handleAddDmProductCustoms">添加</el-button>
+            <el-button type="primary" :disabled="noAdd" icon="Plus" @click="handleAddDmProductCustoms" >添加</el-button>
           </el-col>
           <el-col :span="1.5">
             <el-button type="danger" icon="Delete" @click="handleDeleteDmProductCustoms">删除</el-button>
@@ -254,6 +254,7 @@ const { dm_product_sale_status, record_status, sys_yes_no } = proxy.useDict('dm_
 const productList = ref([]);
 const dmProductCustomsList = ref([]);
 const open = ref(false);
+const noAdd = ref(dmProductCustomsList.size != 0);
 const loading = ref(true);
 const showSearch = ref(true);
 const ids = ref([]);
@@ -380,6 +381,9 @@ function handleUpdate(row) {
     dmProductCustomsList.value = response.data.dmProductCustomsList;
     open.value = true;
     title.value = "修改产品信息";
+    if (dmProductCustomsList.value.length > 0) {
+      noAdd.value == true;
+    }
   });
 }
 
@@ -432,6 +436,9 @@ function handleAddDmProductCustoms() {
   obj.hasTextile = "";
   obj.price = "";
   dmProductCustomsList.value.push(obj);
+  if (dmProductCustomsList.value.length > 0) {
+    noAdd.value = true;
+  }
 }
 
 /** 海关信息删除按钮操作 */
@@ -444,6 +451,9 @@ function handleDeleteDmProductCustoms() {
     dmProductCustomsList.value = dmProductCustomss.filter(function (item) {
       return checkedDmProductCustomss.indexOf(item.index) == -1
     });
+    if (dmProductCustomsList.value.length == 0) {
+      noAdd.value = false;
+    }
   }
 }
 

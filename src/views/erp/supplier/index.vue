@@ -41,7 +41,7 @@
 
     <el-table v-loading="loading" :data="supplierList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="产品ID" align="center" prop="productId" />
+      <el-table-column label="SKU" align="center" prop="skuId" />
       <el-table-column label="供应商代码" align="center" prop="supplierCode" />
       <el-table-column label="供应商名称" align="center" prop="supplierName" />
       <el-table-column label="币种" align="center" prop="currency">
@@ -51,7 +51,7 @@
       </el-table-column>
       <el-table-column label="是否含税" align="center" prop="tax">
         <template #default="scope">
-          <dict-tag :options="dm_boolean" :value="scope.row.tax" />
+          <dict-tag :options="sys_yes_no" :value="scope.row.tax" />
         </template>
       </el-table-column>
       <el-table-column label="税率" align="center" prop="taxRate" />
@@ -74,33 +74,28 @@
 
     <!-- 添加或修改供应商报价对话框 -->
     <el-dialog :title="title" v-model="open" width="1200px" append-to-body>
-      <el-form ref="supplierRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="产品" prop="productId">
-          <el-select v-model="form.productId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
+      <el-form ref="supplierRef" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="产品" prop="skuId">
+          <el-select v-model="form.skuId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
             remote-show-suffix :remote-method="getProduct">
-            <el-option v-for="item in productList" :key="item.id" :label="item.skuName" :value="item.id" />
+            <el-option v-for="item in productList" :key="item.skuId" :label="item.skuName" :value="item.skuId" />
           </el-select>
         </el-form-item>
-
+        <el-form-item label="供应商代码" prop="supplierCode">
+          <el-input disabled v-model="form.supplierCode" placeholder="请输入供应商代码" />
+        </el-form-item>
         <el-form-item label="供应商名称" prop="supplierName">
           <el-input v-model="form.supplierName" placeholder="请输入供应商名称" />
         </el-form-item>
         <el-form-item label="币种" prop="currency">
           <el-select v-model="form.currency" placeholder="请选择币种">
             <el-option v-for="dict in dm_currency_code" :key="dict.value" :label="dict.label"
-              :value="parseInt(dict.value)">
-              <span style="float: left">{{ dict.label }}</span>
-              <span style="
-          float: right;
-          color: var(--el-text-color-secondary);
-          font-size: 13px;
-        ">{{ dict.remark }}</span> </el-option>
+              :value="parseInt(dict.value)"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="是否含税" prop="tax">
           <el-radio-group v-model="form.tax">
-            <el-radio v-for="dict in dm_boolean" :key="dict.value" :label="parseInt(dict.value)">{{ dict.label
-            }}</el-radio>
+            <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value">{{ dict.label }}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="税率" prop="taxRate">
@@ -131,9 +126,9 @@
           @selection-change="handleDmProductPurchaseSelectionChange" ref="dmProductPurchase">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column label="序号" align="center" prop="index" width="50" />
-          <el-table-column label="产品ID" prop="productId" width="150">
+          <el-table-column label="SKU" prop="skuId" width="150">
             <template #default="scope">
-              <el-input v-model="scope.row.productId" disabled placeholder="请输入产品ID" />
+              <el-input disabled v-model="scope.row.skuId" placeholder="请输入SKU" />
             </template>
           </el-table-column>
           <el-table-column label="箱规名称" prop="cartonSizeName" width="150">
@@ -193,29 +188,6 @@
               <el-input v-model="scope.row.material" placeholder="请输入产品材质" />
             </template>
           </el-table-column>
-
-         
-         
-          <!-- <el-table-column label="虚拟单品长" prop="fakerLength" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.fakerLength" placeholder="请输入虚拟单品长" />
-            </template>
-          </el-table-column>
-          <el-table-column label="虚拟单品宽" prop="fakerWidth" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.fakerWidth" placeholder="请输入虚拟单品宽" />
-            </template>
-          </el-table-column>
-          <el-table-column label="虚拟单品高" prop="fakerHeight" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.fakerHeight" placeholder="请输入虚拟单品高" />
-            </template>
-          </el-table-column>
-          <el-table-column label="虚拟单品净重量" prop="fakerNetWeight" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.fakerNetWeight" placeholder="请输入虚拟单品净重量" />
-            </template>
-          </el-table-column> -->
         </el-table>
       </el-form>
       <template #footer>
@@ -231,12 +203,9 @@
 <script setup name="Supplier">
 import { listSupplier, getSupplier, delSupplier, addSupplier, updateSupplier } from "@/api/erp/supplier";
 import { listProduct } from "@/api/erp/product";
-import useUserStore from '@/store/modules/user'
-
-const deptId = useUserStore().deptId;
 
 const { proxy } = getCurrentInstance();
-const { dm_currency_code, dm_boolean } = proxy.useDict('dm_currency_code', 'dm_boolean');
+const { sys_yes_no, dm_currency_code } = proxy.useDict('sys_yes_no', 'dm_currency_code');
 
 const supplierList = ref([]);
 const dmProductPurchaseList = ref([]);
@@ -251,42 +220,41 @@ const total = ref(0);
 const title = ref("");
 const daterangeCreateTime = ref([]);
 const productList = ref([]);
-const globalProductId = ref(0);
+const globalSkuId = ref("");
 
 const data = reactive({
   form: {},
   queryParams: {
     pageNum: 1,
     pageSize: 10,
-    productId: null,
+    tenantId: null,
     skuId: null,
     supplierCode: null,
     supplierName: null,
+    currency: null,
+    tax: null,
+    taxRate: null,
+    price: null,
+    orderNumber: null,
+    link: null,
     createTime: null,
   },
   rules: {
-    productId: [
-      { required: true, message: "产品不能为空", trigger: "blur" }
+    skuId: [
+      { required: true, message: "SKU不能为空", trigger: "blur" }
     ]
   }
 });
 
 const { queryParams, form, rules } = toRefs(data);
 
-function getProductId() {
-  listProduct(queryParams.value).then(response => {
-    productList.value = response.rows;
-    queryParams.productId = productList.value[0].id;
-  });
-}
-
 function getProduct(skuId) {
   if (skuId != null && '' != skuId) {
     queryParams.value.skuId = skuId;
     listProduct(queryParams.value).then(response => {
       productList.value = response.rows;
-      queryParams.productId = productList.value[0].id;
-      globalProductId.value = productList.value[0].id;
+      queryParams.skuId = productList.value[0].skuId;
+      globalSkuId.value = productList.value[0].skuId;
     });
   }
 
@@ -295,11 +263,6 @@ function getProduct(skuId) {
 /** 查询供应商报价列表 */
 function getList() {
   loading.value = true;
-  queryParams.value.params = {};
-  if (null != daterangeCreateTime && '' != daterangeCreateTime) {
-    queryParams.value.params["beginCreateTime"] = daterangeCreateTime.value[0];
-    queryParams.value.params["endCreateTime"] = daterangeCreateTime.value[1];
-  }
   listSupplier(queryParams.value).then(response => {
     supplierList.value = response.rows;
     total.value = response.total;
@@ -318,7 +281,7 @@ function reset() {
   form.value = {
     id: null,
     tenantId: null,
-    productId: null,
+    skuId: null,
     supplierCode: null,
     supplierName: null,
     currency: null,
@@ -339,13 +302,11 @@ function reset() {
 /** 搜索按钮操作 */
 function handleQuery() {
   queryParams.value.pageNum = 1;
-  getProductId();
   getList();
 }
 
 /** 重置按钮操作 */
 function resetQuery() {
-  daterangeCreateTime.value = [];
   proxy.resetForm("queryRef");
   handleQuery();
 }
@@ -417,8 +378,7 @@ function rowDmProductPurchaseIndex({ row, rowIndex }) {
 /** 采购信息添加按钮操作 */
 function handleAddDmProductPurchase() {
   let obj = {};
-  obj.productId = globalProductId;
-  obj.tenantId = null;
+  obj.skuId = globalSkuId;
   obj.cartonSizeName = "";
   obj.length = "";
   obj.width = "";
