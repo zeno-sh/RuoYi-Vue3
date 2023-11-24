@@ -57,6 +57,7 @@
 
     <el-table v-loading="loading" :data="productList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
+      <el-table-column type="index" width="50" label="序号" />
       <el-table-column label="图片" align="center" prop="pictureUrl" width="100">
         <template #default="scope">
           <image-preview :src="scope.row.pictureUrl" :width="50" :height="50" />
@@ -67,6 +68,7 @@
       <el-table-column label="规格说明" align="center" prop="specification" />
       <el-table-column label="型号(SPU)" width="100" align="center" prop="modelNumber" />
       <el-table-column label="单位" align="center" prop="unit" />
+      <el-table-column label="预估成本价" align="center" prop="costPrice" />
       <el-table-column label="售卖状态" align="center" prop="saleStatus">
         <template #default="scope">
           <dict-tag :options="dm_product_sale_status" :value="scope.row.saleStatus" />
@@ -132,6 +134,11 @@
         </el-row>
 
         <el-row type="flex">
+          <el-col :span="8">
+            <el-form-item label="预估成本价" prop="costPrice">
+              <el-input v-model="form.costPrice" placeholder="请输入预估成本价" />
+            </el-form-item>
+          </el-col>
           <el-col :span="8">
             <el-form-item label="类目" prop="categoryId">
               <el-input v-model="form.categoryId" placeholder="请输入类目" />
@@ -362,6 +369,7 @@ function reset() {
     brandId: null,
     flagId: null,
     pictureUrl: null,
+    costPrice: null,
     description: null,
     priceStrategyId: null,
     status: null,
@@ -443,7 +451,7 @@ function submitForm() {
 
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const _ids = row.id || ids.value;
+  const _ids = row.skuId || planSkuId.value;
   proxy.$modal.confirm('是否确认删除产品信息编号为"' + _ids + '"的数据项？').then(function () {
     return delProduct(_ids);
   }).then(() => {
@@ -527,7 +535,7 @@ function cancelPlan() {
 /** 提交按钮 */
 function submitFormPlan() {
   proxy.$refs["planRef"].validate(valid => {
-    
+
     if (formPlan.value.planSkuId.length == 0) {
       proxy.$modal.msgError("生成计划时 SKU不能为空");
     } else {
