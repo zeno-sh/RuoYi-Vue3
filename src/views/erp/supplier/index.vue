@@ -84,7 +84,7 @@
                 <el-option v-for="item in productList" :key="item.skuId"
                   :label="`${item.skuName}` + ' / ' + `${item.skuId}`" :value="item.skuId">
                   <span style="float: left">{{ item.skuName }}</span>
-                  <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; ">{{ item.skuId
+                  <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{ item.skuId
                   }}</span>
                 </el-option>
               </el-select>
@@ -97,7 +97,7 @@
                 <el-option v-for="item in factoryList" :key="item.supplierCode"
                   :label="`${item.supplierName}` + ' / ' + `${item.supplierCode}`" :value="item.supplierCode">
                   <span style="float: left">{{ item.supplierName }}</span>
-                  <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; ">{{
+                  <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{
                     item.supplierCode }}</span>
                 </el-option>
               </el-select>
@@ -251,7 +251,6 @@ const title = ref("");
 const daterangeCreateTime = ref([]);
 const productList = ref([]);
 const factoryList = ref([]);
-const globalSkuId = ref("");
 
 const data = reactive({
   form: {},
@@ -284,7 +283,6 @@ function getProduct(skuId) {
     queryParams.value.skuId = skuId;
     listProduct(queryParams.value).then(response => {
       productList.value = response.rows;
-      queryParams.skuId = productList.value[0].skuId;
     });
   }
 }
@@ -372,7 +370,6 @@ function handleUpdate(row) {
     dmProductPurchaseList.value = response.data.dmProductPurchaseList;
     open.value = true;
     title.value = "修改供应商报价";
-    globalSkuId.value = form.value.skuId;
   });
 }
 
@@ -417,7 +414,7 @@ function rowDmProductPurchaseIndex({ row, rowIndex }) {
 /** 采购信息添加按钮操作 */
 function handleAddDmProductPurchase() {
   let obj = {};
-  obj.skuId = globalSkuId;
+  obj.skuId = form.value.skuId;
   obj.cartonSizeName = "";
   obj.length = "";
   obj.width = "";

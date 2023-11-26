@@ -1,6 +1,6 @@
 <template>
   <div class="app-container home">
-    <el-row :gutter="20">
+    <!-- <el-row :gutter="20">
       <el-col :sm="24" :lg="24">
         <blockquote class="text-warning" style="font-size: 14px">
           领取阿里云通用云产品1888优惠券
@@ -36,8 +36,8 @@
 
         <hr />
       </el-col>
-    </el-row>
-    <el-row :gutter="20">
+    </el-row> -->
+    <!-- <el-row :gutter="20">
       <el-col :sm="24" :lg="12" style="padding-left: 20px">
         <h2>若依后台管理框架</h2>
         <p>
@@ -99,9 +99,9 @@
           </el-col>
         </el-row>
       </el-col>
-    </el-row>
+    </el-row> -->
     <el-divider />
-    <el-row :gutter="20">
+    <!-- <el-row :gutter="20">
       <el-col :xs="24" :sm="24" :md="12" :lg="8">
         <el-card class="update-log">
           <template v-slot:header>
@@ -940,7 +940,7 @@
           </div>
         </el-card>
       </el-col>
-    </el-row>
+    </el-row> -->
   </div>
 </template>
 

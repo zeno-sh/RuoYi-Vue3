@@ -91,7 +91,15 @@
             </el-option>
           </el-select>
         </el-form-item>
-
+        <el-form-item label="价格计划" prop="priceId">
+          <el-input v-model="form.priceId" placeholder="请输入价格计划" />
+        </el-form-item>
+        <el-form-item label="供应商报价" prop="supplierPriceOfferId">
+          <el-input v-model="form.supplierPriceOfferId" placeholder="请输入供应商报价" />
+        </el-form-item>
+        <el-form-item label="货代报价" prop="forwarderPrice">
+          <el-input v-model="form.forwarderPrice" placeholder="请输入货代报价" />
+        </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -129,6 +137,9 @@ const data = reactive({
     pageSize: 10,
     planName: null,
     planSkuId: null,
+    priceId: null,
+    supplierPriceOfferId: null,
+    forwarderPrice: null,
     createTime: null,
     status: null
   },
@@ -182,6 +193,9 @@ function reset() {
     planCode: null,
     planName: null,
     planSkuId: null,
+    priceId: null,
+    supplierPriceOfferId: null,
+    forwarderPrice: null,
     createTime: null,
     updateTime: null,
     status: null

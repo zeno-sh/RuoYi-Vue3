@@ -63,10 +63,11 @@
           <image-preview :src="scope.row.pictureUrl" :width="50" :height="50" />
         </template>
       </el-table-column>
-      <el-table-column label="SKU" align="center" prop="skuId" />
-      <el-table-column label="产品名称" align="center" prop="skuName" />
-      <el-table-column label="规格说明" align="center" prop="specification" />
       <el-table-column label="型号(SPU)" width="100" align="center" prop="modelNumber" />
+      <el-table-column label="SKU" width="180" align="center" prop="skuId" />
+      <el-table-column label="产品名称" width="180" align="center" prop="skuName" />
+      <!-- <el-table-column label="规格说明" align="center" prop="specification" /> -->
+      
       <el-table-column label="单位" align="center" prop="unit" />
       <el-table-column label="预估成本价" align="center" prop="costPrice" />
       <el-table-column label="售卖状态" align="center" prop="saleStatus">
@@ -82,7 +83,7 @@
           <dict-tag :options="record_status" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column label="竞品链接" align="center" prop="competitorLink" />
+      <!-- <el-table-column label="竞品链接" align="center" prop="competitorLink" /> -->
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template #default="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
@@ -93,7 +94,7 @@
           <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['erp:product:edit']">修改</el-button>
@@ -451,8 +452,9 @@ function submitForm() {
 
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const _ids = row.skuId || planSkuId.value;
-  proxy.$modal.confirm('是否确认删除产品信息编号为"' + _ids + '"的数据项？').then(function () {
+  const _ids = row.id || ids.value;
+  const _skuIds = row.skuId || planSkuId.value;
+  proxy.$modal.confirm('是否确认删除产品信息编号为"' + _skuIds + '"的数据项？').then(function () {
     return delProduct(_ids);
   }).then(() => {
     getList();
