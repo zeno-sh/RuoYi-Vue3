@@ -67,7 +67,7 @@
       <el-table-column label="SKU" width="180" align="center" prop="skuId" />
       <el-table-column label="产品名称" width="180" align="center" prop="skuName" />
       <!-- <el-table-column label="规格说明" align="center" prop="specification" /> -->
-      
+
       <el-table-column label="单位" align="center" prop="unit" />
       <el-table-column label="预估成本价" align="center" prop="costPrice" />
       <el-table-column label="售卖状态" align="center" prop="saleStatus">
@@ -76,6 +76,7 @@
         </template>
       </el-table-column>
       <el-table-column label="类目" align="center" prop="categoryId" />
+      <el-table-column label="类目佣金" align="center" prop="categoryCommission" />
       <el-table-column label="品牌" align="center" prop="brandId" />
       <el-table-column label="标签" align="center" prop="flagId" />
       <el-table-column label="状态" align="center" prop="status">
@@ -157,6 +158,19 @@
           </el-col>
         </el-row>
 
+        <el-form-item label="类目佣金" prop="categoryCommission">
+          <!-- <el-input v-model="form.categoryCommission" placeholder="请输入类目佣金" /> -->
+          <el-select v-model="form.categoryCommission" :multiple="false" filterable remote reserve-keyword
+            placeholder="请输入SKU" remote-show-suffix :remote-method="getCategorCommission">
+            <el-option v-for="item in categoryCommissionList" :key="item.id"
+              :label="`${item.platformName}` + ' / ' + `${item.rate}` + '%'" :value="item.rate">
+              <span style="float: left">{{ item.platformName }}</span>
+              <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{
+                item.rate
+              }}{{ '%' }}</span>
+            </el-option>
+          </el-select>
+        </el-form-item>
 
         <el-form-item label="规格说明" prop="specification">
           <el-input v-model="form.specification" type="textarea" placeholder="请输入规格说明" />
@@ -279,6 +293,8 @@
 <script setup name="Product">
 import { listProduct, getProduct, delProduct, addProduct, updateProduct } from "@/api/erp/product";
 import { addPlan } from "@/api/erp/plan";
+import { listCommission } from "@/api/erp/commission";
+
 
 const { proxy } = getCurrentInstance();
 const { dm_product_sale_status, record_status, sys_yes_no } = proxy.useDict('dm_product_sale_status', 'record_status', 'sys_yes_no');
@@ -299,11 +315,15 @@ const title = ref("");
 const titlePlan = ref("");
 const daterangeCreateTime = ref([]);
 const openPlan = ref(false);
+const categoryCommissionList = ref([]);
 
 
 const data = reactive({
   form: {},
   formPlan: {},
+  categoryCommissionQueryParams: {
+    platformName: ""
+  },
   queryParams: {
     pageNum: 1,
     pageSize: 10,
@@ -333,6 +353,14 @@ const data = reactive({
 });
 
 const { queryParams, form, rules, formPlan } = toRefs(data);
+
+/** 查询类目佣金列表 */
+function getCategorCommission() {
+  loading.value = true;
+  listCommission(queryParams.value).then(response => {
+    categoryCommissionList.value = response.rows;
+  });
+}
 
 /** 查询产品信息列表 */
 function getList() {
@@ -372,6 +400,7 @@ function reset() {
     pictureUrl: null,
     costPrice: null,
     description: null,
+    categoryCommission: null,
     priceStrategyId: null,
     status: null,
     competitorLink: null,
