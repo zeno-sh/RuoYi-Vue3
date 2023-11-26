@@ -41,10 +41,94 @@
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="planList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="选品计划名称" align="center" prop="planName" />
-      <el-table-column label="SKU" align="center" prop="planSkuId" />
+    <el-table v-loading="loading" :data="planList" @selection-change="handleSelectionChange" border>
+      <el-table-column type="selection" align="center" />
+      <el-table-column label="选品计划名称" align="center" prop="planName" fixed width="120" />
+      <el-table-column label="图片" align="center" prop="productInfo.skuPicture" fixed>
+        <template #default="scope">
+          <image-preview :src="scope.row.productInfo.skuPicture" :width="50" :height="50" />
+        </template>
+      </el-table-column>
+      <el-table-column label="SKU" align="center" prop="planSkuId" fixed width="190" />
+      <el-table-column label="产品名称" align="center" prop="productInfo.skuName" width="120" />
+      <el-table-column label="商品规格" align="center">
+        <el-table-column label="箱规" align="center" width="150"
+          prop="productInfo.specification.boxLength,specification.boxLength.boxWidth">
+          <template #default="scope">
+            <span>{{ scope.row.productInfo.specification.boxLength }}*
+              {{ scope.row.productInfo.specification.boxWidth }}*
+              {{ scope.row.productInfo.specification.boxHeight }} cm
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="PCS" align="center" prop="productInfo.specification.quantityPerBox" width="70" />
+        <el-table-column label="箱重" align="center" prop="productInfo.specification.boxWeight">
+          <template #default="scope">
+            <span>{{ scope.row.productInfo.specification.boxWeight / 1000 }} kg
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="包装规格" align="center" width="150" prop="productInfo.specification.length">
+          <template #default="scope">
+            <span>{{ scope.row.productInfo.specification.length }}*
+              {{ scope.row.productInfo.specification.width }}*
+              {{ scope.row.productInfo.specification.height }} cm
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="单品毛重" align="center" prop="productInfo.specification.grossWeight">
+          <template #default="scope">
+            <span>{{ scope.row.productInfo.specification.grossWeight }}g
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="单品净重" align="center" prop="productInfo.specification.netWeight">
+          <template #default="scope">
+            <span>{{ scope.row.productInfo.specification.netWeight }}g
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="体积" align="center" prop="productInfo.volume" />
+        <el-table-column label="体积升" align="center" prop="productInfo.volumeRise" />
+      </el-table-column>
+
+
+      <el-table-column label="成本明细（人民币）" align="center">
+        <el-table-column label="国内成本" align="center">
+          <el-table-column label="采购价" align="center" prop="productCost.purchasePrice" />
+          <el-table-column label="货代头程" align="center" prop="productCost.firstLegPrice" />
+        </el-table-column>
+        <el-table-column label="海外仓成本" align="center">
+          <el-table-column label="卸货费" align="center" prop="productCost.fbsUnloadPrice" />
+          <el-table-column label="上架费" align="center" prop="productCost.fbsShelfPrice" />
+          <el-table-column label="订单操作费" align="center" prop="productCost.fbsOrderPrice" width="100" />
+          <el-table-column label="送货费" align="center" prop="productCost.fbsDeliveryPrice" />
+        </el-table-column>
+        <el-table-column label="平台成本" align="center">
+          <el-table-column label="类目佣金" align="center" prop="productCostConfig.categoryRate" />
+          <el-table-column label="ozon转运费" align="center" prop="productCost.ozonDeliveryPrice" width="100" />
+          <el-table-column label="最后一公里" align="center" prop="productCost.lastMilePrice" width="100" />
+        </el-table-column>
+      </el-table-column>
+
+
+      <el-table-column label="利润预估" align="center" >
+        <el-table-column label="前端原价" align="center" prop="productPrice.originalPrice" width="100">
+          <template #default="scope">
+            <span>{{ scope.row.productPrice.originalPrice }} 卢布</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="前端定价" align="center" prop="productPrice.sellingPrice" width="100">
+          <template #default="scope">
+            <span>{{ scope.row.productPrice.sellingPrice }} 卢布</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="结算价" align="center" prop="settlementPrice" width="100" />
+        <el-table-column label="预估利润" align="center" prop="profitPrice" width="100" />
+        <el-table-column label="毛利率" align="center" prop="grossProfitRate" width="100" />
+        <el-table-column label="ROI" align="center" prop="roiRate" width="100" />
+      </el-table-column>
+
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template #default="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
@@ -60,7 +144,7 @@
           <dict-tag :options="record_status" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="180">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['erp:plan:edit']">修改</el-button>
