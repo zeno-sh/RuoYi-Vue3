@@ -112,7 +112,7 @@
       </el-table-column>
 
 
-      <el-table-column label="利润预估" align="center" >
+      <el-table-column label="利润预估" align="center">
         <el-table-column label="前端原价" align="center" prop="productPrice.originalPrice" width="100">
           <template #default="scope">
             <span>{{ scope.row.productPrice.originalPrice }} 卢布</span>
@@ -176,7 +176,16 @@
           </el-select>
         </el-form-item>
         <el-form-item label="价格计划" prop="priceId">
-          <el-input v-model="form.priceId" placeholder="请输入价格计划" />
+          <!-- <el-input v-model="form.priceId" placeholder="请输入价格计划" /> -->
+          <el-select v-model="form.priceId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
+            remote-show-suffix :remote-method="getPriceList" >
+            <el-option v-for="item in priceList" :key="item.id"
+              :label="`${item.priceStrategyName}` + ' / ' + `${item.sellingPrice}`" :value="item.id">
+              <span style="float: left">{{ item.priceStrategyName }}</span>
+              <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; ">{{ item.sellingPrice
+              }}</span>
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="供应商报价" prop="supplierPriceOfferId">
           <el-input v-model="form.supplierPriceOfferId" placeholder="请输入供应商报价" />
@@ -198,6 +207,7 @@
 <script setup name="Plan">
 import { listPlan, getPlan, delPlan, addPlan, updatePlan } from "@/api/erp/plan";
 import { listProduct } from "@/api/erp/product";
+import { listPrice, getPrice } from "@/api/erp/price";
 
 const { proxy } = getCurrentInstance();
 const { record_status } = proxy.useDict('record_status');
@@ -213,6 +223,7 @@ const total = ref(0);
 const title = ref("");
 const daterangeCreateTime = ref([]);
 const productList = ref([]);
+const priceList = ref([]);
 
 const data = reactive({
   form: {},
@@ -226,6 +237,9 @@ const data = reactive({
     forwarderPrice: null,
     createTime: null,
     status: null
+  },
+  priceQueryParams: {
+    skuId: null
   },
   rules: {
     planName: [
@@ -244,6 +258,26 @@ function getProduct(planSkuId) {
     queryParams.value.skuId = planSkuId;
     listProduct(queryParams.value).then(response => {
       productList.value = response.rows;
+    });
+    getPriceList(planSkuId);
+  }
+}
+
+function getPriceInfo(priceId) {
+  console.log(`getPriceInfo:${priceId}`);
+  if (priceId != null && '' != priceId) {
+    console.log(222);
+    getPrice(priceId).then(response => {
+      priceList.value.push(response.data);
+    });
+  }
+}
+
+function getPriceList(planSkuId) {
+  if (planSkuId != null && '' != planSkuId) {
+    queryParams.value.skuId = planSkuId;
+    listPrice(queryParams.value).then(response => {
+      priceList.value = response.rows;
     });
   }
 }
@@ -323,6 +357,7 @@ function handleUpdate(row) {
     open.value = true;
     title.value = "修改选品计划";
   });
+  getPriceInfo(row.productPrice.id);
 }
 
 /** 提交按钮 */

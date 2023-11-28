@@ -41,7 +41,7 @@
 
     <el-table v-loading="loading" :data="supplierList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="SKU" align="center" prop="skuId" />
+      <el-table-column label="SKU" align="center" prop="skuId" width="180"/>
       <el-table-column label="供应商代码" align="center" prop="supplierCode" />
       <el-table-column label="供应商名称" align="center" prop="supplierName" />
       <el-table-column label="币种" align="center" prop="currency">
@@ -57,9 +57,9 @@
       <el-table-column label="税率" align="center" prop="taxRate" />
       <el-table-column label="报价" align="center" prop="price" />
       <el-table-column label="起订数量" align="center" prop="orderNumber" />
-      <el-table-column label="采购链接" align="center" prop="link" />
-      <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <!-- <el-table-column label="采购链接" align="center" prop="link" /> -->
+      <!-- <el-table-column label="备注" align="center" prop="remark" /> -->
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="180">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['erp:supplier:edit']">修改</el-button>
@@ -80,7 +80,7 @@
           <el-col :span="12">
             <el-form-item label="产品" prop="skuId">
               <el-select v-model="form.skuId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
-                remote-show-suffix :remote-method="getProduct">
+                remote-show-suffix :remote-method="getProduct" clearable>
                 <el-option v-for="item in productList" :key="item.skuId"
                   :label="`${item.skuName}` + ' / ' + `${item.skuId}`" :value="item.skuId">
                   <span style="float: left">{{ item.skuName }}</span>
@@ -93,7 +93,7 @@
           <el-col :span="12">
             <el-form-item label="供应商" prop="supplierCode">
               <el-select v-model="form.supplierCode" :multiple="false" filterable remote reserve-keyword
-                placeholder="支持模糊搜索" remote-show-suffix :remote-method="getSupplierInfo">
+                placeholder="支持模糊搜索" remote-show-suffix :remote-method="getSupplierInfo" clearable>
                 <el-option v-for="item in factoryList" :key="item.supplierCode"
                   :label="`${item.supplierName}` + ' / ' + `${item.supplierCode}`" :value="item.supplierCode">
                   <span style="float: left">{{ item.supplierName }}</span>
