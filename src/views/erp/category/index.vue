@@ -42,9 +42,6 @@
         <el-form-item label="类目名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入类目名称" />
         </el-form-item>
-        <el-form-item label="租户Id" prop="tenantId">
-          <el-input v-model="form.tenantId" placeholder="请输入租户Id" />
-        </el-form-item>
         <el-form-item label="父级" prop="parentId">
           <el-tree-select v-model="form.parentId" :data="categoryOptions"
             :props="{ value: 'id', label: 'name', children: 'children' }" value-key="id" placeholder="请选择父级"

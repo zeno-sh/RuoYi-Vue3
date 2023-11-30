@@ -18,6 +18,11 @@
       <el-form-item label="品牌" prop="brandId">
         <el-input v-model="queryParams.brandId" placeholder="请输入品牌" clearable @keyup.enter="handleQuery" />
       </el-form-item>
+      <el-form-item label="标签" prop="flagId">
+        <el-select v-model="queryParams.flagId" placeholder="请选择标签" clearable>
+          <el-option v-for="dict in dm_product_flag" :key="dict.value" :label="dict.label" :value="dict.value" />
+        </el-select>
+      </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
           <el-option v-for="dict in record_status" :key="dict.value" :label="dict.label" :value="dict.value" />
@@ -69,16 +74,28 @@
       <!-- <el-table-column label="规格说明" align="center" prop="specification" /> -->
 
       <el-table-column label="单位" align="center" prop="unit" />
-      <el-table-column label="预估成本价" align="center" prop="costPrice" />
+      <el-table-column label="预估成本价" align="center" prop="costPrice" width="90">
+        <template #default="scope">
+          ￥{{ scope.row.costPrice }}
+        </template>
+      </el-table-column>
       <el-table-column label="售卖状态" align="center" prop="saleStatus">
         <template #default="scope">
           <dict-tag :options="dm_product_sale_status" :value="scope.row.saleStatus" />
         </template>
       </el-table-column>
       <el-table-column label="类目" align="center" prop="categoryId" />
-      <el-table-column label="类目佣金" align="center" prop="categoryCommission" />
+      <el-table-column label="类目佣金" align="center" prop="categoryCommission">
+        <template #default="scope">
+          {{ scope.row.categoryCommission }}%
+        </template>
+      </el-table-column>
       <el-table-column label="品牌" align="center" prop="brandId" />
-      <el-table-column label="标签" align="center" prop="flagId" />
+      <el-table-column label="标签" align="center" prop="flagId">
+        <template #default="scope">
+          <dict-tag :options="dm_product_flag" :value="scope.row.flagId" />
+        </template>
+      </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
         <template #default="scope">
           <dict-tag :options="record_status" :value="scope.row.status" />
@@ -151,26 +168,35 @@
               <el-input v-model="form.brandId" placeholder="请输入品牌" />
             </el-form-item>
           </el-col>
+
+        </el-row>
+        <el-row type="fles">
           <el-col :span="8">
             <el-form-item label="标签" prop="flagId">
-              <el-input v-model="form.flagId" placeholder="请输入标签" />
+              <el-select v-model="form.flagId" placeholder="请选择标签">
+                <el-option v-for="dict in dm_product_flag" :key="dict.value" :label="dict.label"
+                  :value="parseInt(dict.value)"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
+          <el-row :span="8">
+            <el-form-item label="类目佣金" prop="categoryCommission">
+              <!-- <el-input v-model="form.categoryCommission" placeholder="请输入类目佣金" /> -->
+              <el-select v-model="form.categoryCommission" :multiple="false" filterable remote reserve-keyword
+                placeholder="请输入SKU" remote-show-suffix :remote-method="getCategorCommission">
+                <el-option v-for="item in categoryCommissionList" :key="item.id"
+                  :label="`${item.platformName}` + ' / ' + `${item.rate}` + '%'" :value="item.rate">
+                  <span style="float: left">{{ item.platformName }}</span>
+                  <span
+                    style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{
+                      item.rate
+                    }}{{ '%' }}</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-row>
         </el-row>
 
-        <el-form-item label="类目佣金" prop="categoryCommission">
-          <!-- <el-input v-model="form.categoryCommission" placeholder="请输入类目佣金" /> -->
-          <el-select v-model="form.categoryCommission" :multiple="false" filterable remote reserve-keyword
-            placeholder="请输入SKU" remote-show-suffix :remote-method="getCategorCommission">
-            <el-option v-for="item in categoryCommissionList" :key="item.id"
-              :label="`${item.platformName}` + ' / ' + `${item.rate}` + '%'" :value="item.rate">
-              <span style="float: left">{{ item.platformName }}</span>
-              <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{
-                item.rate
-              }}{{ '%' }}</span>
-            </el-option>
-          </el-select>
-        </el-form-item>
 
         <el-form-item label="规格说明" prop="specification">
           <el-input v-model="form.specification" type="textarea" placeholder="请输入规格说明" />
@@ -297,7 +323,7 @@ import { listCommission } from "@/api/erp/commission";
 
 
 const { proxy } = getCurrentInstance();
-const { dm_product_sale_status, record_status, sys_yes_no } = proxy.useDict('dm_product_sale_status', 'record_status', 'sys_yes_no');
+const { dm_product_sale_status, record_status, sys_yes_no, dm_product_flag } = proxy.useDict('dm_product_sale_status', 'record_status', 'sys_yes_no', 'dm_product_flag');
 
 const productList = ref([]);
 const dmProductCustomsList = ref([]);
