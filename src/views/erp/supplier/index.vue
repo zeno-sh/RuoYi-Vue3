@@ -41,7 +41,7 @@
 
     <el-table v-loading="loading" :data="supplierList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="SKU" align="center" prop="skuId" width="180"/>
+      <el-table-column label="SKU" align="center" prop="skuId" width="180" />
       <el-table-column label="供应商代码" align="center" prop="supplierCode" />
       <el-table-column label="供应商名称" align="center" prop="supplierName" />
       <el-table-column label="币种" align="center" prop="currency">
@@ -80,12 +80,14 @@
           <el-col :span="12">
             <el-form-item label="产品" prop="skuId">
               <el-select v-model="form.skuId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
-                remote-show-suffix :remote-method="getProduct" clearable>
+                remote-show-suffix :remote-method="getProduct" clearable >
                 <el-option v-for="item in productList" :key="item.skuId"
                   :label="`${item.skuName}` + ' / ' + `${item.skuId}`" :value="item.skuId">
                   <span style="float: left">{{ item.skuName }}</span>
-                  <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{ item.skuId
-                  }}</span>
+                  <span
+                    style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{
+                      item.skuId
+                    }}</span>
                 </el-option>
               </el-select>
             </el-form-item>
@@ -97,8 +99,9 @@
                 <el-option v-for="item in factoryList" :key="item.supplierCode"
                   :label="`${item.supplierName}` + ' / ' + `${item.supplierCode}`" :value="item.supplierCode">
                   <span style="float: left">{{ item.supplierName }}</span>
-                  <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{
-                    item.supplierCode }}</span>
+                  <span
+                    style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{
+                      item.supplierCode }}</span>
                 </el-option>
               </el-select>
             </el-form-item>
@@ -296,6 +299,15 @@ function getSupplierInfo(name) {
   }
 }
 
+function getSupplierInfoByCode(code) {
+  if (code != null && '' != code) {
+    queryParams.value.supplierCode = code;
+    listFactory(queryParams.value).then(response => {
+      factoryList.value = response.rows;
+    });
+  }
+}
+
 /** 查询供应商报价列表 */
 function getList() {
   loading.value = true;
@@ -370,6 +382,8 @@ function handleUpdate(row) {
     dmProductPurchaseList.value = response.data.dmProductPurchaseList;
     open.value = true;
     title.value = "修改供应商报价";
+    getSupplierInfoByCode(form.value.supplierCode);
+    getProduct(form.value.skuId);
   });
 }
 

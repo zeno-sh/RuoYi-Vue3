@@ -73,7 +73,7 @@
       <el-table-column label="产品名称" width="180" align="center" prop="skuName" />
       <!-- <el-table-column label="规格说明" align="center" prop="specification" /> -->
 
-      <el-table-column label="单位" align="center" prop="unit" />
+      <!-- <el-table-column label="单位" align="center" prop="unit" /> -->
       <el-table-column label="预估成本价" align="center" prop="costPrice" width="90">
         <template #default="scope">
           ￥{{ scope.row.costPrice }}
@@ -84,18 +84,40 @@
           <dict-tag :options="dm_product_sale_status" :value="scope.row.saleStatus" />
         </template>
       </el-table-column>
+      <el-table-column label="品牌" align="center" prop="brandId" />
       <el-table-column label="类目" align="center" prop="categoryId" />
       <el-table-column label="类目佣金" align="center" prop="categoryCommission">
         <template #default="scope">
           {{ scope.row.categoryCommission }}%
         </template>
       </el-table-column>
-      <el-table-column label="品牌" align="center" prop="brandId" />
       <el-table-column label="标签" align="center" prop="flagId">
         <template #default="scope">
           <dict-tag :options="dm_product_flag" :value="scope.row.flagId" />
         </template>
       </el-table-column>
+      <el-table-column label="竞品趋势" align="center" width="250">
+        <template #default="scope">
+          <div v-for="trend in scope.row.dmProductPlatformTrendList" :key="trend.id">
+            <div>skuId:{{ trend.competitorSkuId }}  销量：{{ trend.competitorSaleNumber }}</div>
+            <div>价格：{{ trend.competitorSalePrice }}  份额：{{ parseInt(trend.competitorSalePrice * trend.competitorSaleNumber) }}</div>
+          </div>
+        </template>
+      </el-table-column>
+      <!-- <el-table-column label="竞品价格" align="center">
+        <template #default="scope">
+          <span v-for="trend in scope.row.dmProductPlatformTrendList" :key="trend.id">
+            {{ trend.competitorSalePrice }}
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column label="竞品份额" align="center">
+        <template #default="scope">
+          <span v-for="trend in scope.row.dmProductPlatformTrendList" :key="trend.id">
+            {{ parseInt(trend.competitorSalePrice * trend.competitorSaleNumber) }}
+          </span>
+        </template>
+      </el-table-column> -->
       <el-table-column label="状态" align="center" prop="status">
         <template #default="scope">
           <dict-tag :options="record_status" :value="scope.row.status" />
@@ -183,7 +205,7 @@
             <el-form-item label="类目佣金" prop="categoryCommission">
               <!-- <el-input v-model="form.categoryCommission" placeholder="请输入类目佣金" /> -->
               <el-select v-model="form.categoryCommission" :multiple="false" filterable remote reserve-keyword
-                placeholder="请输入SKU" remote-show-suffix :remote-method="getCategorCommission">
+                placeholder="请输入SKU" remote-show-suffix :remote-method="getCategorCommission" clearable>
                 <el-option v-for="item in categoryCommissionList" :key="item.id"
                   :label="`${item.platformName}` + ' / ' + `${item.rate}` + '%'" :value="item.rate">
                   <span style="float: left">{{ item.platformName }}</span>
@@ -197,12 +219,6 @@
           </el-row>
         </el-row>
 
-
-        <el-form-item label="规格说明" prop="specification">
-          <el-input v-model="form.specification" type="textarea" placeholder="请输入规格说明" />
-        </el-form-item>
-
-
         <el-form-item label="售卖状态" prop="saleStatus">
           <el-radio-group v-model="form.saleStatus">
             <el-radio v-for="dict in dm_product_sale_status" :key="dict.value" :label="parseInt(dict.value)">{{ dict.label
@@ -210,22 +226,64 @@
           </el-radio-group>
         </el-form-item>
 
-
         <el-row type="flex">
+          <el-col :span="12">
+            <el-form-item label="规格说明" prop="specification">
+              <el-input v-model="form.specification" type="textarea" placeholder="请输入规格说明" />
+            </el-form-item>
+          </el-col>
           <el-col :span="12">
             <el-form-item label="产品描述" prop="description">
               <el-input v-model="form.description" type="textarea" placeholder="请输入内容" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="竞品链接" prop="competitorLink">
-              <el-input v-model="form.competitorLink" type="textarea" placeholder="请输入内容" />
-            </el-form-item>
-          </el-col>
         </el-row>
 
 
+        <el-divider content-position="center">产品销量趋势信息</el-divider>
+        <el-row :gutter="10" class="mb8">
+          <el-col :span="1.5">
+            <el-button type="primary" icon="Plus" @click="handleAddDmProductPlatformTrend">添加</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button type="danger" icon="Delete" @click="handleDeleteDmProductPlatformTrend">删除</el-button>
+          </el-col>
+        </el-row>
 
+        <el-table :data="dmProductPlatformTrendList" :row-class-name="rowDmProductPlatformTrendIndex"
+          @selection-change="handleDmProductPlatformTrendSelectionChange" ref="dmProductPlatformTrend">
+          <el-table-column type="selection" width="50" align="center" />
+          <el-table-column label="序号" align="center" prop="index" width="50" />
+          <el-table-column label="平台" prop="platformId" width="150">
+            <template #default="scope">
+              <el-select v-model="scope.row.platformId" placeholder="请选择平台">
+                <el-option v-for="dict in dm_platform" :key="dict.value" :label="dict.label"
+                  :value="parseInt(dict.value)"></el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column label="竞品链接" prop="competitorLink" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.competitorLink" placeholder="请输入竞品竞品链接" />
+            </template>
+          </el-table-column>
+          <el-table-column label="竞品产品Id" prop="competitorSkuId" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.competitorSkuId" placeholder="请输入竞品产品Id" />
+            </template>
+          </el-table-column>
+          <el-table-column label="竞品销量" prop="competitorSaleNumber" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.competitorSaleNumber" placeholder="请输入竞品销量" />
+            </template>
+          </el-table-column>
+
+          <el-table-column label="竞品价格" prop="competitorSalePrice" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.competitorSalePrice" placeholder="请输入竞品价格" />
+            </template>
+          </el-table-column>
+        </el-table>
 
         <el-divider content-position="center">海关信息</el-divider>
         <el-row :gutter="10" class="mb8">
@@ -323,12 +381,12 @@ import { listCommission } from "@/api/erp/commission";
 
 
 const { proxy } = getCurrentInstance();
-const { dm_product_sale_status, record_status, sys_yes_no, dm_product_flag } = proxy.useDict('dm_product_sale_status', 'record_status', 'sys_yes_no', 'dm_product_flag');
+const { dm_product_sale_status, record_status, sys_yes_no, dm_product_flag, dm_platform } = proxy.useDict('dm_product_sale_status', 'record_status', 'sys_yes_no', 'dm_product_flag', 'dm_platform');
 
 const productList = ref([]);
 const dmProductCustomsList = ref([]);
 const open = ref(false);
-const noAdd = ref(true);
+const noAdd = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
 const ids = ref([]);
@@ -342,6 +400,8 @@ const titlePlan = ref("");
 const daterangeCreateTime = ref([]);
 const openPlan = ref(false);
 const categoryCommissionList = ref([]);
+const dmProductPlatformTrendList = ref([]);
+const checkedDmProductPlatformTrend = ref([]);
 
 
 const data = reactive({
@@ -419,7 +479,7 @@ function reset() {
     specification: null,
     modelNumber: null,
     unit: null,
-    saleStatus: null,
+    saleStatus: 0,
     categoryId: null,
     brandId: null,
     flagId: null,
@@ -435,6 +495,7 @@ function reset() {
     updateTime: null
   };
   dmProductCustomsList.value = [];
+  dmProductPlatformTrendList.value = [];
   proxy.resetForm("productRef");
 }
 
@@ -474,10 +535,12 @@ function handleUpdate(row) {
   getProduct(_id).then(response => {
     form.value = response.data;
     dmProductCustomsList.value = response.data.dmProductCustomsList;
+    dmProductPlatformTrendList.value = response.data.dmProductPlatformTrendList;
     open.value = true;
     title.value = "修改产品信息";
-
-    if (dmProductCustomsList.value.length > 0) {
+    console.log(dmProductCustomsList.value.length);
+    if (dmProductCustomsList.value.length >= 1) {
+      console.log(1111);
       noAdd.value == true;
     }
   });
@@ -488,6 +551,7 @@ function submitForm() {
   proxy.$refs["productRef"].validate(valid => {
     if (valid) {
       form.value.dmProductCustomsList = dmProductCustomsList.value;
+      form.value.dmProductPlatformTrendList = dmProductPlatformTrendList.value;
       if (form.value.id != null) {
         updateProduct(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
@@ -587,6 +651,40 @@ function handlePlan() {
 function cancelPlan() {
   openPlan.value = false;
   resetPlan();
+}
+
+/** 产品销量趋势添加按钮操作 */
+function handleAddDmProductPlatformTrend() {
+  let obj = {};
+  obj.platformId = "";
+  obj.competitorSaleNumber = "";
+  obj.competitorLink = "";
+  obj.competitorSkuId = "";
+  obj.competitorSalePrice = "";
+  dmProductPlatformTrendList.value.push(obj);
+}
+
+/** 产品销量趋势删除按钮操作 */
+function handleDeleteDmProductPlatformTrend() {
+  if (checkedDmProductPlatformTrend.value.length == 0) {
+    proxy.$modal.msgError("请先选择要删除的产品销量趋势数据");
+  } else {
+    const dmProductPlatformTrends = dmProductPlatformTrendList.value;
+    const checkedDmProductPlatformTrends = checkedDmProductPlatformTrend.value;
+    dmProductPlatformTrendList.value = dmProductPlatformTrends.filter(function (item) {
+      return checkedDmProductPlatformTrends.indexOf(item.index) == -1
+    });
+  }
+}
+
+/** 产品销量趋势序号 */
+function rowDmProductPlatformTrendIndex({ row, rowIndex }) {
+  row.index = rowIndex + 1;
+}
+
+/** 复选框选中数据 */
+function handleDmProductPlatformTrendSelectionChange(selection) {
+  checkedDmProductPlatformTrend.value = selection.map(item => item.index)
 }
 
 /** 提交按钮 */
