@@ -99,8 +99,9 @@
       <el-table-column label="竞品趋势" align="center" width="250">
         <template #default="scope">
           <div v-for="trend in scope.row.dmProductPlatformTrendList" :key="trend.id">
-            <div>skuId:{{ trend.competitorSkuId }}  销量：{{ trend.competitorSaleNumber }}</div>
-            <div>价格：{{ trend.competitorSalePrice }}  份额：{{ parseInt(trend.competitorSalePrice * trend.competitorSaleNumber) }}</div>
+            <div>skuId:{{ trend.competitorSkuId }} 销量：{{ trend.competitorSaleNumber }}</div>
+            <div>价格：{{ trend.competitorSalePrice }} 份额：{{ parseInt(trend.competitorSalePrice * trend.competitorSaleNumber)
+            }}</div>
           </div>
         </template>
       </el-table-column>
@@ -343,7 +344,164 @@
             </template>
           </el-table-column>
         </el-table>
+
+
+        <el-divider content-position="center">采购信息信息</el-divider>
+        <el-row :gutter="10" class="mb8">
+          <el-col :span="1.5">
+            <el-button type="primary" icon="Plus" @click="handleAddDmProductPurchase">添加</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button type="danger" icon="Delete" @click="handleDeleteDmProductPurchase">删除</el-button>
+          </el-col>
+        </el-row>
+        <el-table :data="dmProductPurchaseList" :row-class-name="rowDmProductPurchaseIndex"
+          @selection-change="handleDmProductPurchaseSelectionChange" ref="dmProductPurchase">
+          <el-table-column type="selection" width="50" align="center" />
+          <el-table-column label="序号" align="center" prop="index" width="50" />
+          <el-table-column label="箱规名称" prop="cartonSizeName" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.cartonSizeName" placeholder="请输入箱规名称" />
+            </template>
+          </el-table-column>
+          <el-table-column label="外箱规格cm" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.boxLength" placeholder="长" />
+              <el-input v-model="scope.row.boxWidth" placeholder="宽" />
+              <el-input v-model="scope.row.boxHeight" placeholder="高" />
+            </template>
+          </el-table-column>
+          <el-table-column label="单箱数量pcs" prop="quantityPerBox" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.quantityPerBox" placeholder="单箱数量pcs" />
+            </template>
+          </el-table-column>
+          <el-table-column label="包装规格cm" width="120px">
+            <template #default="scope">
+              <el-input v-model="scope.row.length" placeholder="长" />
+              <el-input v-model="scope.row.width" placeholder="宽" />
+              <el-input v-model="scope.row.height" placeholder="高" />
+            </template>
+          </el-table-column>
+          <el-table-column label="单箱重量g" prop="boxWeight" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.boxWeight" placeholder="单箱重量g" />
+            </template>
+          </el-table-column>
+          <el-table-column label="单品净重g" prop="netWeight" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.netWeight" placeholder="单品净重g" />
+            </template>
+          </el-table-column>
+          <el-table-column label="单品毛重g" prop="grossWeight" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.grossWeight" placeholder="单品毛重g" />
+            </template>
+          </el-table-column>
+          <el-table-column label="产品材质" prop="material" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.material" placeholder="请输入产品材质" />
+            </template>
+          </el-table-column>
+          <el-table-column label="首选" prop="firstChoice" width="150">
+            <template #default="scope">
+              <el-select v-model="scope.row.firstChoice" placeholder="请选择首选">
+                <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
+                  :value="dict.value"></el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+        </el-table>
+
+
+        <el-divider content-position="center">供应商报价信息</el-divider>
+        <el-row :gutter="10" class="mb8">
+          <el-col :span="1.5">
+            <el-button type="primary" icon="Plus" @click="handleAddDmSupplierPriceOffer">添加</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button type="danger" icon="Delete" @click="handleDeleteDmSupplierPriceOffer">删除</el-button>
+          </el-col>
+        </el-row>
+        <el-table :data="dmSupplierPriceOfferList" :row-class-name="rowDmSupplierPriceOfferIndex"
+          @selection-change="handleDmSupplierPriceOfferSelectionChange" ref="dmSupplierPriceOffer">
+          <el-table-column type="selection" width="50" align="center" />
+          <el-table-column label="序号" align="center" prop="index" width="50" />
+          <el-table-column label="供应商" prop="supplierCode" width="150">
+            <template #default="scope">
+              <!-- <el-input v-model="scope.row.supplierCode" placeholder="请选择供应商" /> -->
+              <el-select v-model="scope.row.supplierCode" :multiple="false" filterable remote placeholder="请选择供应商"
+                remote-show-suffix :remote-method="getSupplierInfo" clearable>
+                <el-option v-for="item in factoryList" :key="item.supplierCode"
+                  :label="`${item.supplierName}` + ' / ' + `${item.supplierCode}`" :value="item.supplierCode">
+                  <span style="float: left">{{ item.supplierName }}</span>
+                  <span
+                    style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{
+                      item.supplierCode }}</span>
+                </el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column label="币种" prop="currency" width="150">
+            <template #default="scope">
+              <!-- <el-input v-model="scope.row.currency" placeholder="请输入币种" /> -->
+              <el-select v-model="scope.row.currency" placeholder="请选择币种">
+                <el-option v-for="dict in dm_currency_code" :key="dict.value"
+                  :label="`${dict.label}` + ' / ' + `${dict.remark}`" :value="parseInt(dict.value)">
+                  <span style="float: left">{{ dict.label }}</span>
+                  <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; ">{{ dict.remark
+                  }}</span>
+                </el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column label="是否含税" prop="tax" width="150">
+            <template #default="scope">
+              <el-select v-model="scope.row.tax" placeholder="请选择是否含税">
+                <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
+                  :value="dict.value"></el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column label="税率" prop="taxRate" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.taxRate" placeholder="请输入税率" />
+            </template>
+          </el-table-column>
+          <el-table-column label="报价" prop="price" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.price" placeholder="请输入报价" />
+            </template>
+          </el-table-column>
+          <el-table-column label="起订数量" prop="orderNumber" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.orderNumber" placeholder="请输入起订数量" />
+            </template>
+          </el-table-column>
+          <el-table-column label="交期" prop="deliveryTime" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.deliveryTime" placeholder="请输入交期" />
+            </template>
+          </el-table-column>
+          <el-table-column label="首选" prop="firstChoice" width="150">
+            <template #default="scope">
+              <el-select v-model="scope.row.firstChoice" placeholder="请选择首选">
+                <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
+                  :value="dict.value"></el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column label="报价时间" prop="offerDate" width="240">
+            <template #default="scope">
+              <el-date-picker clearable v-model="scope.row.offerDate" type="date" value-format="YYYY-MM-DD"
+                placeholder="请选择报价时间">
+              </el-date-picker>
+            </template>
+          </el-table-column>
+        </el-table>
+
       </el-form>
+
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -378,10 +536,11 @@
 import { listProduct, getProduct, delProduct, addProduct, updateProduct } from "@/api/erp/product";
 import { addPlan } from "@/api/erp/plan";
 import { listCommission } from "@/api/erp/commission";
+import { listFactory, queryFactoryByCodes } from "@/api/erp/factory";
 
 
 const { proxy } = getCurrentInstance();
-const { dm_product_sale_status, record_status, sys_yes_no, dm_product_flag, dm_platform } = proxy.useDict('dm_product_sale_status', 'record_status', 'sys_yes_no', 'dm_product_flag', 'dm_platform');
+const { dm_product_sale_status, record_status, sys_yes_no, dm_product_flag, dm_platform, dm_currency_code } = proxy.useDict('dm_product_sale_status', 'record_status', 'sys_yes_no', 'dm_product_flag', 'dm_platform', 'dm_currency_code');
 
 const productList = ref([]);
 const dmProductCustomsList = ref([]);
@@ -403,6 +562,12 @@ const categoryCommissionList = ref([]);
 const dmProductPlatformTrendList = ref([]);
 const checkedDmProductPlatformTrend = ref([]);
 
+const dmProductPurchaseList = ref([]);
+const checkedDmProductPurchase = ref([]);
+const factoryList = ref([]);
+
+const dmSupplierPriceOfferList = ref([]);
+const checkedDmSupplierPriceOffer = ref([]);
 
 const data = reactive({
   form: {},
@@ -422,6 +587,9 @@ const data = reactive({
     competitorLink: null,
     createTime: null,
   },
+  supplierQueryParams: {
+    supplierCode: ''
+  },
   rules: {
     skuId: [
       { required: true, message: "SKU不能为空", trigger: "blur" }
@@ -438,7 +606,7 @@ const data = reactive({
   }
 });
 
-const { queryParams, form, rules, formPlan } = toRefs(data);
+const { queryParams, form, rules, formPlan, supplierQueryParams } = toRefs(data);
 
 /** 查询类目佣金列表 */
 function getCategorCommission() {
@@ -536,13 +704,21 @@ function handleUpdate(row) {
     form.value = response.data;
     dmProductCustomsList.value = response.data.dmProductCustomsList;
     dmProductPlatformTrendList.value = response.data.dmProductPlatformTrendList;
+    dmProductPurchaseList.value = response.data.dmProductPurchaseList;
+    dmSupplierPriceOfferList.value = response.data.dmSupplierPriceOfferList;
     open.value = true;
     title.value = "修改产品信息";
-    console.log(dmProductCustomsList.value.length);
     if (dmProductCustomsList.value.length >= 1) {
-      console.log(1111);
       noAdd.value == true;
     }
+    // if (dmSupplierPriceOfferList.value.length >= 1) {
+    //   let codes = [];
+    //   for (const item of dmSupplierPriceOfferList.value) {
+    //     codes.push(item.supplierCode);
+    //   }
+    //   supplierQueryParams.value.supplierCodes = codes;
+    //   getSupplierInfoByCodes();
+    // }
   });
 }
 
@@ -552,6 +728,8 @@ function submitForm() {
     if (valid) {
       form.value.dmProductCustomsList = dmProductCustomsList.value;
       form.value.dmProductPlatformTrendList = dmProductPlatformTrendList.value;
+      form.value.dmProductPurchaseList = dmProductPurchaseList.value;
+      form.value.dmSupplierPriceOfferList = dmSupplierPriceOfferList.value;
       if (form.value.id != null) {
         updateProduct(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
@@ -695,9 +873,7 @@ function submitFormPlan() {
       proxy.$modal.msgError("生成计划时 SKU不能为空");
     } else {
       if (valid) {
-        // console.log(`planSkuId:${formPlan.value.planSkuId}`);
         formPlan.value.planSkuId = formPlan.value.planSkuId.join(",");
-        console.log(formPlan.value.planSkuId);
         addPlan(formPlan.value).then(response => {
           proxy.$modal.msgSuccess("生成计划成功");
           openPlan.value = false;
@@ -708,6 +884,126 @@ function submitFormPlan() {
     }
   });
 }
+
+/** 采购信息，产品规格 */
+
+/** 采购信息序号 */
+function rowDmProductPurchaseIndex({ row, rowIndex }) {
+  row.index = rowIndex + 1;
+}
+
+function handleAddDmProductPurchase() {
+  let obj = {};
+  obj.cartonSizeName = "";
+  obj.length = "";
+  obj.width = "";
+  obj.height = "";
+  obj.netWeight = "";
+  obj.material = "";
+  obj.boxLength = "";
+  obj.boxWidth = "";
+  obj.boxHeight = "";
+  obj.quantityPerBox = "";
+  obj.boxWeight = "";
+  obj.grossWeight = "";
+  obj.firstChoice = "";
+  dmProductPurchaseList.value.push(obj);
+}
+
+/** 采购信息删除按钮操作 */
+function handleDeleteDmProductPurchase() {
+  if (checkedDmProductPurchase.value.length == 0) {
+    proxy.$modal.msgError("请先选择要删除的采购信息数据");
+  } else {
+    const dmProductPurchases = dmProductPurchaseList.value;
+    console.log(dmProductPurchases);
+    const checkedDmProductPurchases = checkedDmProductPurchase.value;
+    console.log(222);
+    console.log(checkedDmProductPurchases);
+    dmProductPurchaseList.value = dmProductPurchases.filter(function (item) {
+      return checkedDmProductPurchases.indexOf(item.index) == -1
+    });
+  }
+}
+
+/** 复选框选中数据 */
+function handleDmProductPurchaseSelectionChange(selection) {
+  checkedDmProductPurchase.value = selection.map(item => item.index)
+}
+
+
+
+/** 供应商报价序号 */
+function rowDmSupplierPriceOfferIndex({ row, rowIndex }) {
+  row.index = rowIndex + 1;
+}
+
+/** 供应商报价添加按钮操作 */
+function handleAddDmSupplierPriceOffer() {
+  let obj = {};
+  obj.supplierCode = "";
+  obj.currency = "";
+  obj.tax = "";
+  obj.taxRate = "";
+  obj.price = "";
+  obj.orderNumber = "";
+  obj.link = "";
+  obj.deliveryTime = "";
+  obj.firstChoice = "";
+  obj.remark = "";
+  obj.offerDate = "";
+  dmSupplierPriceOfferList.value.push(obj);
+}
+
+/** 供应商报价删除按钮操作 */
+function handleDeleteDmSupplierPriceOffer() {
+  if (checkedDmSupplierPriceOffer.value.length == 0) {
+    proxy.$modal.msgError("请先选择要删除的供应商报价数据");
+  } else {
+    const dmSupplierPriceOffers = dmSupplierPriceOfferList.value;
+    const checkedDmSupplierPriceOffers = checkedDmSupplierPriceOffer.value;
+    dmSupplierPriceOfferList.value = dmSupplierPriceOffers.filter(function (item) {
+      return checkedDmSupplierPriceOffers.indexOf(item.index) == -1
+    });
+  }
+}
+
+/** 复选框选中数据 */
+function handleDmSupplierPriceOfferSelectionChange(selection) {
+  checkedDmSupplierPriceOffer.value = selection.map(item => item.index)
+}
+
+function getSupplierInfo(name) {
+  if (name != null && '' != name) {
+    queryParams.value.supplierName = name;
+    listFactory(queryParams.value).then(response => {
+      factoryList.value = response.rows;
+    });
+  }
+}
+
+function getSupplierInfoByCode(code) {
+  factoryList.value = [];
+  if (code != null && '' != code) {
+    supplierQueryParams.value.supplierCode = code;
+  }
+  listFactory(supplierQueryParams.value).then(response => {
+    factoryList.value = response.rows;
+  });
+}
+
+function getSupplierInfoByCodes() {
+  console.log(supplierQueryParams.value);
+  if (supplierQueryParams.value != null) {
+    queryFactoryByCodes(supplierQueryParams.value).then(response => {
+      factoryList.value = response.rows;
+    });
+  }
+}
+
+onMounted(() => {
+  getSupplierInfoByCode();
+});
 
 getList();
 </script>

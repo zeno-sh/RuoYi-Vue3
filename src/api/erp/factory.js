@@ -9,6 +9,15 @@ export function listFactory(query) {
   })
 }
 
+// 查询供应商信息列表
+export function queryFactoryByCodes(data) {
+  return request({
+    url: '/erp/factory/querySupplier',
+    method: 'post',
+    data: data
+  })
+}
+
 // 查询供应商信息详细
 export function getFactory(id) {
   return request({

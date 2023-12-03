@@ -80,7 +80,7 @@
           <el-col :span="12">
             <el-form-item label="产品" prop="skuId">
               <el-select v-model="form.skuId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
-                remote-show-suffix :remote-method="getProduct" clearable >
+                remote-show-suffix :remote-method="getProduct" clearable>
                 <el-option v-for="item in productList" :key="item.skuId"
                   :label="`${item.skuName}` + ' / ' + `${item.skuId}`" :value="item.skuId">
                   <span style="float: left">{{ item.skuName }}</span>
