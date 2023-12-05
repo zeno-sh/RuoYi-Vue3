@@ -310,10 +310,10 @@
           </el-table-column>
           <el-table-column label="首选" prop="firstChoice" width="150">
             <template #default="scope">
-              <el-select v-model="scope.row.firstChoice" placeholder="请选择首选">
-                <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
-                  :value="dict.value"></el-option>
-              </el-select>
+              <el-radio-group v-model="scope.row.firstChoice">
+                <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
+                  @change="() => updateFirstChoice(scope.row, dmProductPriceList)">{{ dict.label }}</el-radio>
+              </el-radio-group>
             </template>
           </el-table-column>
         </el-table>
@@ -690,7 +690,6 @@ function reset() {
     costPrice: null,
     description: null,
     categoryCommission: null,
-    priceStrategyId: null,
     status: null,
     competitorLink: null,
     createBy: null,
@@ -774,6 +773,7 @@ function handleUpdate(row) {
     dmProductPlatformTrendList.value = response.data.dmProductPlatformTrendList;
     dmProductPurchaseList.value = response.data.dmProductPurchaseList;
     dmSupplierPriceOfferList.value = response.data.dmSupplierPriceOfferList;
+    dmProductPriceList.value = response.data.dmProductPriceList;
     open.value = true;
     title.value = "修改产品信息";
     if (dmProductCustomsList.value.length >= 1) {
@@ -798,6 +798,7 @@ function submitForm() {
       form.value.dmProductPlatformTrendList = dmProductPlatformTrendList.value;
       form.value.dmProductPurchaseList = dmProductPurchaseList.value;
       form.value.dmSupplierPriceOfferList = dmSupplierPriceOfferList.value;
+      form.value.dmProductPriceList = dmProductPriceList.value;
       if (form.value.id != null) {
         updateProduct(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");

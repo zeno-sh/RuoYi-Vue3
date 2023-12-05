@@ -88,7 +88,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="体积" align="center" prop="productInfo.volume" />
+        <el-table-column label="体积m³" align="center" prop="productInfo.volume" />
         <el-table-column label="体积升" align="center" prop="productInfo.volumeRise" />
       </el-table-column>
 
@@ -166,7 +166,7 @@
         <el-form-item label="SKU" prop="planSkuId">
           <!-- <el-input v-model="form.planSkuId" placeholder="请输入SKU" /> -->
           <el-select v-model="form.planSkuId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
-            remote-show-suffix :remote-method="getProduct">
+            remote-show-suffix :remote-method="getProduct" disabled>
             <el-option v-for="item in productList" :key="item.skuId" :label="`${item.skuName}` + ' / ' + `${item.skuId}`"
               :value="item.skuId">
               <span style="float: left">{{ item.skuName }}</span>
@@ -179,11 +179,11 @@
           <!-- <el-input v-model="form.priceId" placeholder="请输入价格计划" /> -->
           <el-select v-model="form.priceId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
             remote-show-suffix :remote-method="getPriceList" >
-            <el-option v-for="item in priceList" :key="item.id"
-              :label="`${item.priceStrategyName}` + ' / ' + `${item.sellingPrice}`" :value="item.id">
+            <el-option v-for="item in priceList" :key="parseInt(item.id)"
+              :label="`${item.priceStrategyName}` + ' / ' + `${item.sellingPrice} RUB`" :value="parseInt(item.id)">
               <span style="float: left">{{ item.priceStrategyName }}</span>
               <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; ">{{ item.sellingPrice
-              }}</span>
+              }} RUB</span>
             </el-option>
           </el-select>
         </el-form-item>
@@ -264,7 +264,6 @@ function getProduct(planSkuId) {
 }
 
 function getPriceInfo(priceId) {
-  console.log(`getPriceInfo:${priceId}`);
   if (priceId != null && '' != priceId) {
     console.log(222);
     getPrice(priceId).then(response => {
@@ -357,7 +356,7 @@ function handleUpdate(row) {
     open.value = true;
     title.value = "修改选品计划";
   });
-  getPriceInfo(row.productPrice.id);
+  getPriceList(row.planSkuId);
 }
 
 /** 提交按钮 */
