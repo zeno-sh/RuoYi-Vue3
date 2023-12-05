@@ -71,9 +71,11 @@
       <el-table-column label="型号(SPU)" width="100" align="center" prop="modelNumber" />
       <el-table-column label="SKU" width="180" align="center" prop="skuId" />
       <el-table-column label="产品名称" width="180" align="center" prop="skuName" />
-      <!-- <el-table-column label="规格说明" align="center" prop="specification" /> -->
-
-      <!-- <el-table-column label="单位" align="center" prop="unit" /> -->
+      <el-table-column label="单位" align="center" prop="unit">
+        <template #default="scope">
+          <dict-tag :options="dm_unit_type" :value="scope.row.unit" />
+        </template>
+      </el-table-column>
       <el-table-column label="预估成本价" align="center" prop="costPrice" width="90">
         <template #default="scope">
           ￥{{ scope.row.costPrice }}
@@ -105,26 +107,11 @@
           </div>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="竞品价格" align="center">
-        <template #default="scope">
-          <span v-for="trend in scope.row.dmProductPlatformTrendList" :key="trend.id">
-            {{ trend.competitorSalePrice }}
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column label="竞品份额" align="center">
-        <template #default="scope">
-          <span v-for="trend in scope.row.dmProductPlatformTrendList" :key="trend.id">
-            {{ parseInt(trend.competitorSalePrice * trend.competitorSaleNumber) }}
-          </span>
-        </template>
-      </el-table-column> -->
       <el-table-column label="状态" align="center" prop="status">
         <template #default="scope">
           <dict-tag :options="record_status" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <!-- <el-table-column label="竞品链接" align="center" prop="competitorLink" /> -->
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template #default="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
@@ -169,8 +156,14 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="单位" prop="unit">
+            <!-- <el-form-item label="单位" prop="unit">
               <el-input v-model="form.unit" placeholder="请输入单位" />
+            </el-form-item> -->
+            <el-form-item label="单位" prop="unit">
+              <el-select v-model="form.unit" placeholder="请选择单位">
+                <el-option v-for="dict in dm_unit_type" :key="dict.value" :label="dict.label"
+                  :value="dict.value"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -230,7 +223,7 @@
         <el-row type="flex">
           <el-col :span="12">
             <el-form-item label="规格说明" prop="specification">
-              <el-input v-model="form.specification" type="textarea" placeholder="请输入规格说明" />
+              <el-input v-model="form.specification" type="textarea" placeholder="请输入规格说明，采购需求。例如：价格区间、中性包装、箱规尺寸、欧规电源、俄语说明书等等" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -405,10 +398,10 @@
           </el-table-column>
           <el-table-column label="首选" prop="firstChoice" width="150">
             <template #default="scope">
-              <el-select v-model="scope.row.firstChoice" placeholder="请选择首选">
-                <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
-                  :value="dict.value"></el-option>
-              </el-select>
+              <el-radio-group v-model="scope.row.firstChoice">
+                <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
+                  @change="() => updateFirstChoice(scope.row, dmProductPurchaseList)">{{ dict.label }}</el-radio>
+              </el-radio-group>
             </template>
           </el-table-column>
         </el-table>
@@ -485,10 +478,10 @@
           </el-table-column>
           <el-table-column label="首选" prop="firstChoice" width="150">
             <template #default="scope">
-              <el-select v-model="scope.row.firstChoice" placeholder="请选择首选">
-                <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
-                  :value="dict.value"></el-option>
-              </el-select>
+              <el-radio-group v-model="scope.row.firstChoice">
+                <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
+                  @change="() => updateFirstChoice(scope.row, dmSupplierPriceOfferList)">{{ dict.label }}</el-radio>
+              </el-radio-group>
             </template>
           </el-table-column>
           <el-table-column label="报价时间" prop="offerDate" width="240">
@@ -540,7 +533,7 @@ import { listFactory, queryFactoryByCodes } from "@/api/erp/factory";
 
 
 const { proxy } = getCurrentInstance();
-const { dm_product_sale_status, record_status, sys_yes_no, dm_product_flag, dm_platform, dm_currency_code } = proxy.useDict('dm_product_sale_status', 'record_status', 'sys_yes_no', 'dm_product_flag', 'dm_platform', 'dm_currency_code');
+const { dm_product_sale_status, record_status, sys_yes_no, dm_product_flag, dm_platform, dm_currency_code, dm_unit_type } = proxy.useDict('dm_product_sale_status', 'record_status', 'sys_yes_no', 'dm_product_flag', 'dm_platform', 'dm_currency_code', 'dm_unit_type');
 
 const productList = ref([]);
 const dmProductCustomsList = ref([]);
@@ -906,7 +899,7 @@ function handleAddDmProductPurchase() {
   obj.quantityPerBox = "";
   obj.boxWeight = "";
   obj.grossWeight = "";
-  obj.firstChoice = "";
+  obj.firstChoice = "N";
   dmProductPurchaseList.value.push(obj);
 }
 
@@ -949,7 +942,7 @@ function handleAddDmSupplierPriceOffer() {
   obj.orderNumber = "";
   obj.link = "";
   obj.deliveryTime = "";
-  obj.firstChoice = "";
+  obj.firstChoice = "N";
   obj.remark = "";
   obj.offerDate = "";
   dmSupplierPriceOfferList.value.push(obj);
@@ -999,6 +992,14 @@ function getSupplierInfoByCodes() {
       factoryList.value = response.rows;
     });
   }
+}
+
+function updateFirstChoice(selectedRow, data) {
+  data.forEach(row => {
+    if (row.id !== selectedRow.id) {
+      row.firstChoice = 'N';
+    }
+  });
 }
 
 onMounted(() => {
