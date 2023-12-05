@@ -223,7 +223,8 @@
         <el-row type="flex">
           <el-col :span="12">
             <el-form-item label="规格说明" prop="specification">
-              <el-input v-model="form.specification" type="textarea" placeholder="请输入规格说明，采购需求。例如：价格区间、中性包装、箱规尺寸、欧规电源、俄语说明书等等" />
+              <el-input v-model="form.specification" type="textarea"
+                placeholder="请输入规格说明，采购需求。例如：价格区间、中性包装、箱规尺寸、欧规电源、俄语说明书等等" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -275,6 +276,44 @@
           <el-table-column label="竞品价格" prop="competitorSalePrice" width="150">
             <template #default="scope">
               <el-input v-model="scope.row.competitorSalePrice" placeholder="请输入竞品价格" />
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <el-divider content-position="center">产品价格策略信息</el-divider>
+        <el-row :gutter="10" class="mb8">
+          <el-col :span="1.5">
+            <el-button type="primary" icon="Plus" @click="handleAddDmProductPrice">添加</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button type="danger" icon="Delete" @click="handleDeleteDmProductPrice">删除</el-button>
+          </el-col>
+        </el-row>
+        <el-table :data="dmProductPriceList" :row-class-name="rowDmProductPriceIndex"
+          @selection-change="handleDmProductPriceSelectionChange" ref="dmProductPrice">
+          <el-table-column type="selection" width="50" align="center" />
+          <el-table-column label="序号" align="center" prop="index" width="50" />
+          <el-table-column label="产品售价" prop="sellingPrice" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.sellingPrice" placeholder="请输入产品售价" />
+            </template>
+          </el-table-column>
+          <el-table-column label="产品原价" prop="originalPrice" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.originalPrice" placeholder="请输入产品原价" />
+            </template>
+          </el-table-column>
+          <el-table-column label="价格策略名称" prop="priceStrategyName" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.priceStrategyName" placeholder="请输入价格策略名称" />
+            </template>
+          </el-table-column>
+          <el-table-column label="首选" prop="firstChoice" width="150">
+            <template #default="scope">
+              <el-select v-model="scope.row.firstChoice" placeholder="请选择首选">
+                <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
+                  :value="dict.value"></el-option>
+              </el-select>
             </template>
           </el-table-column>
         </el-table>
@@ -562,6 +601,9 @@ const factoryList = ref([]);
 const dmSupplierPriceOfferList = ref([]);
 const checkedDmSupplierPriceOffer = ref([]);
 
+const dmProductPriceList = ref([]);
+const checkedDmProductPrice = ref([]);
+
 const data = reactive({
   form: {},
   formPlan: {},
@@ -671,6 +713,39 @@ function resetQuery() {
   daterangeCreateTime.value = [];
   proxy.resetForm("queryRef");
   handleQuery();
+}
+
+/** 产品价格策略序号 */
+function rowDmProductPriceIndex({ row, rowIndex }) {
+  row.index = rowIndex + 1;
+}
+
+/** 产品价格策略添加按钮操作 */
+function handleAddDmProductPrice() {
+  let obj = {};
+  obj.sellingPrice = "";
+  obj.originalPrice = "";
+  obj.priceStrategyName = "";
+  obj.firstChoice = "";
+  dmProductPriceList.value.push(obj);
+}
+
+/** 产品价格策略删除按钮操作 */
+function handleDeleteDmProductPrice() {
+  if (checkedDmProductPrice.value.length == 0) {
+    proxy.$modal.msgError("请先选择要删除的产品价格策略数据");
+  } else {
+    const dmProductPrices = dmProductPriceList.value;
+    const checkedDmProductPrices = checkedDmProductPrice.value;
+    dmProductPriceList.value = dmProductPrices.filter(function (item) {
+      return checkedDmProductPrices.indexOf(item.index) == -1
+    });
+  }
+}
+
+/** 复选框选中数据 */
+function handleDmProductPriceSelectionChange(selection) {
+  checkedDmProductPrice.value = selection.map(item => item.index)
 }
 
 // 多选框选中数据
