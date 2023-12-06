@@ -23,9 +23,9 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
+      <!-- <el-col :span="1.5">
         <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['erp:plan:add']">新增</el-button>
-      </el-col>
+      </el-col> -->
       <el-col :span="1.5">
         <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate"
           v-hasPermi="['erp:plan:edit']">修改</el-button>
@@ -39,7 +39,8 @@
           v-hasPermi="['erp:plan:export']">导出</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="success" plain icon="Edit" @click="handleForwarderPrice" v-hasPermi="['erp:plan:edit']">一键修改货代头程报价</el-button>
+        <el-button type="success" plain icon="Edit" @click="handleForwarderPrice"
+          v-hasPermi="['erp:plan:edit']">一键修改货代头程报价</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -167,7 +168,6 @@
           <el-input v-model="form.planName" placeholder="请输入选品计划名称" />
         </el-form-item>
         <el-form-item label="SKU" prop="planSkuId">
-          <!-- <el-input v-model="form.planSkuId" placeholder="请输入SKU" /> -->
           <el-select v-model="form.planSkuId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
             remote-show-suffix :remote-method="getProduct" disabled>
             <el-option v-for="item in productList" :key="item.skuId" :label="`${item.skuName}` + ' / ' + `${item.skuId}`"
@@ -179,7 +179,6 @@
           </el-select>
         </el-form-item>
         <el-form-item label="价格计划" prop="priceId">
-          <!-- <el-input v-model="form.priceId" placeholder="请输入价格计划" /> -->
           <el-select v-model="form.priceId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
             remote-show-suffix :remote-method="getPriceList">
             <el-option v-for="item in priceList" :key="parseInt(item.id)"
@@ -191,10 +190,22 @@
           </el-select>
         </el-form-item>
         <el-form-item label="供应商报价" prop="supplierPriceOfferId">
-          <el-input v-model="form.supplierPriceOfferId" placeholder="请输入供应商报价" />
+          <!-- <el-input v-model="form.supplierPriceOfferId" placeholder="请输入供应商报价" /> -->
+          <el-select v-model="form.supplierPriceOfferId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
+            remote-show-suffix >
+            <el-option v-for="item in supplierOfferList" :key="parseInt(item.id)"
+              :label="`${item.supplierCode}` + ' / ' + `${item.price} RMB`" :value="parseInt(item.id)">
+              <span style="float: left">{{ item.supplierCode }}</span>
+              <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; ">{{ item.price
+              }} RMB</span>
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="货代报价" prop="forwarderPrice">
           <el-input v-model="form.forwarderPrice" placeholder="请输入货代报价" />
+        </el-form-item>
+        <el-form-item label="预估采购价" prop="forecastPurchasePrice">
+          <el-input v-model="form.forecastPurchasePrice" placeholder="这里可以临时指定采购价" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -230,6 +241,7 @@
 import { listPlan, getPlan, delPlan, addPlan, updatePlan, updateForwarderPrice } from "@/api/erp/plan";
 import { listProduct } from "@/api/erp/product";
 import { listPrice, getPrice } from "@/api/erp/price";
+import { listSupplier, getSupplier } from "@/api/erp/supplier";
 
 const { proxy } = getCurrentInstance();
 const { record_status } = proxy.useDict('record_status');
@@ -250,6 +262,7 @@ const titleForwarderPrice = ref("");
 const openForwarderPrice = ref(false);
 const selectedPlanList = ref([]);
 const selectedSkuIdList = ref([]);
+const supplierOfferList = ref([]);
 
 const data = reactive({
   form: {},
@@ -278,7 +291,7 @@ const data = reactive({
   }
 });
 
-const { queryParams, form, rules, formForwarderPrice } = toRefs(data);
+const { queryParams, form, rules, formForwarderPrice, priceQueryParams } = toRefs(data);
 
 function getProduct(planSkuId) {
   if (planSkuId != null && '' != planSkuId) {
@@ -287,6 +300,7 @@ function getProduct(planSkuId) {
       productList.value = response.rows;
     });
     getPriceList(planSkuId);
+    getSupplierOfferList(planSkuId);
   }
 }
 
@@ -307,6 +321,15 @@ function getPriceList(planSkuId) {
     });
   }
 }
+
+/** 查询供应商报价列表 */
+function getSupplierOfferList(planSkuId) {
+  priceQueryParams.value.skuId = planSkuId;
+  listSupplier(priceQueryParams.value).then(response => {
+    supplierOfferList.value = response.rows;
+  });
+}
+
 
 /** 查询选品计划列表 */
 function getList() {
@@ -340,6 +363,7 @@ function reset() {
     priceId: null,
     supplierPriceOfferId: null,
     forwarderPrice: null,
+    forecastPurchasePrice: null,
     createTime: null,
     updateTime: null,
     status: null
@@ -369,8 +393,6 @@ function handleSelectionChange(selection) {
   //新增选中的记录
   selectedPlanList.value = selection.map(item => item);
   selectedSkuIdList.value = selection.map(item => item.planSkuId);
-  console.log(selectedPlanList.value);
-  console.log(selectedSkuIdList.value);
 }
 
 /** 新增按钮操作 */
@@ -390,6 +412,7 @@ function handleUpdate(row) {
     title.value = "修改选品计划";
   });
   getPriceList(row.planSkuId);
+  getSupplierOfferList(row.planSkuId);
 }
 
 /** 提交按钮 */
