@@ -551,7 +551,10 @@
         </el-form-item>
 
         <el-form-item label="SKU" prop="planSkuId">
-          <el-input disabled v-model="formPlan.planSkuId" type="textarea" placeholder="" />
+          <el-input disabled v-model="formPlan.planSkuId" type="textarea" placeholder="请选择SKU" />
+        </el-form-item>
+        <el-form-item label="货代头程报价" prop="forwarderPrice">
+          <el-input v-model="formPlan.forwarderPrice" placeholder="请输入本次货代头程报价（人民币）" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -881,7 +884,8 @@ function handleExport() {
 function resetPlan() {
   form.value = {
     planName: null,
-    planSkuId: []
+    planSkuId: [],
+    forwarderPrice: 0
   };
   proxy.resetForm("planRef");
 }
@@ -985,10 +989,7 @@ function handleDeleteDmProductPurchase() {
     proxy.$modal.msgError("请先选择要删除的采购信息数据");
   } else {
     const dmProductPurchases = dmProductPurchaseList.value;
-    console.log(dmProductPurchases);
     const checkedDmProductPurchases = checkedDmProductPurchase.value;
-    console.log(222);
-    console.log(checkedDmProductPurchases);
     dmProductPurchaseList.value = dmProductPurchases.filter(function (item) {
       return checkedDmProductPurchases.indexOf(item.index) == -1
     });

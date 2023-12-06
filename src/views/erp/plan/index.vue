@@ -38,6 +38,9 @@
         <el-button type="warning" plain icon="Download" @click="handleExport"
           v-hasPermi="['erp:plan:export']">导出</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button type="success" plain icon="Edit" @click="handleForwarderPrice" v-hasPermi="['erp:plan:edit']">一键修改货代头程报价</el-button>
+      </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -178,7 +181,7 @@
         <el-form-item label="价格计划" prop="priceId">
           <!-- <el-input v-model="form.priceId" placeholder="请输入价格计划" /> -->
           <el-select v-model="form.priceId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
-            remote-show-suffix :remote-method="getPriceList" >
+            remote-show-suffix :remote-method="getPriceList">
             <el-option v-for="item in priceList" :key="parseInt(item.id)"
               :label="`${item.priceStrategyName}` + ' / ' + `${item.sellingPrice} RUB`" :value="parseInt(item.id)">
               <span style="float: left">{{ item.priceStrategyName }}</span>
@@ -201,11 +204,30 @@
         </div>
       </template>
     </el-dialog>
+
+
+    <!-- 批量修改货代头程价格 -->
+    <el-dialog :title="titleForwarderPrice" v-model="openForwarderPrice" width="600px" append-to-body>
+      <el-form ref="forwarderPriceRef" :model="formForwarderPrice" :rules="rules" label-width="120px">
+        <el-form-item label="SKU" prop="skuIdListStr">
+          <el-input disabled v-model="formForwarderPrice.skuIdListStr" type="textarea" placeholder="请选择SKU" />
+        </el-form-item>
+        <el-form-item label="货代头程报价" prop="forwarderPrice">
+          <el-input v-model="formForwarderPrice.forwarderPrice" placeholder="请输入本次货代头程报价（人民币）" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="submitFormForwarderPrice">确 定</el-button>
+          <el-button @click="cancelForwarderPrice">取 消</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup name="Plan">
-import { listPlan, getPlan, delPlan, addPlan, updatePlan } from "@/api/erp/plan";
+import { listPlan, getPlan, delPlan, addPlan, updatePlan, updateForwarderPrice } from "@/api/erp/plan";
 import { listProduct } from "@/api/erp/product";
 import { listPrice, getPrice } from "@/api/erp/price";
 
@@ -224,9 +246,14 @@ const title = ref("");
 const daterangeCreateTime = ref([]);
 const productList = ref([]);
 const priceList = ref([]);
+const titleForwarderPrice = ref("");
+const openForwarderPrice = ref(false);
+const selectedPlanList = ref([]);
+const selectedSkuIdList = ref([]);
 
 const data = reactive({
   form: {},
+  formForwarderPrice: {},
   queryParams: {
     pageNum: 1,
     pageSize: 10,
@@ -242,16 +269,16 @@ const data = reactive({
     skuId: null
   },
   rules: {
-    planName: [
-      { required: true, message: "选品计划名称不能为空", trigger: "blur" }
-    ],
+    // planName: [
+    //   { required: true, message: "选品计划名称不能为空", trigger: "blur" }
+    // ],
     planSkuId: [
       { required: true, message: "SKU不能为空", trigger: "blur" }
     ]
   }
 });
 
-const { queryParams, form, rules } = toRefs(data);
+const { queryParams, form, rules, formForwarderPrice } = toRefs(data);
 
 function getProduct(planSkuId) {
   if (planSkuId != null && '' != planSkuId) {
@@ -338,6 +365,12 @@ function handleSelectionChange(selection) {
   ids.value = selection.map(item => item.id);
   single.value = selection.length != 1;
   multiple.value = !selection.length;
+
+  //新增选中的记录
+  selectedPlanList.value = selection.map(item => item);
+  selectedSkuIdList.value = selection.map(item => item.planSkuId);
+  console.log(selectedPlanList.value);
+  console.log(selectedSkuIdList.value);
 }
 
 /** 新增按钮操作 */
@@ -390,6 +423,52 @@ function handleDelete(row) {
     proxy.$modal.msgSuccess("删除成功");
   }).catch(() => { });
 }
+
+////////一键修改头程报价
+
+// 表单重置
+function resetForwarderPrice() {
+  formForwarderPrice.value = {
+    dmProductSelectionPlanList: [],
+    forwarderPrice: 0
+  };
+  proxy.resetForm("forwarderPriceRef");
+}
+
+function handleForwarderPrice() {
+  resetForwarderPrice();
+  openForwarderPrice.value = true;
+  titleForwarderPrice.value = "批量修改货代头程报价";
+  formForwarderPrice.value.dmProductSelectionPlanList = selectedPlanList.value;
+  formForwarderPrice.value.skuIdListStr = selectedPlanList.value.map(item => item.planSkuId).join(",");
+}
+
+// 取消按钮
+function cancelForwarderPrice() {
+  openForwarderPrice.value = false;
+  resetForwarderPrice();
+}
+
+/** 提交按钮 */
+function submitFormForwarderPrice() {
+  proxy.$refs["forwarderPriceRef"].validate(valid => {
+
+    if (formForwarderPrice.value.length == 0) {
+      proxy.$modal.msgError("批量修改货代头程报价时 SKU不能为空");
+    } else {
+      if (valid) {
+        formForwarderPrice.value.dmProductSelectionPlanList = selectedPlanList.value;
+        updateForwarderPrice(formForwarderPrice.value).then(response => {
+          proxy.$modal.msgSuccess("批量修改货代头程报价成功");
+          openForwarderPrice.value = false;
+        });
+      } else {
+        proxy.$modal.msgError("批量修改货代头程报价失败");
+      }
+    }
+  });
+}
+
 
 /** 导出按钮操作 */
 function handleExport() {

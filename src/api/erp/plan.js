@@ -35,6 +35,15 @@ export function updatePlan(data) {
   })
 }
 
+// 批量修改货代头程报价
+export function updateForwarderPrice(data) {
+  return request({
+    url: '/erp/plan/batchUpdateForwarderPrice',
+    method: 'post',
+    data: data
+  })
+}
+
 // 删除选品计划
 export function delPlan(id) {
   return request({
