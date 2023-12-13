@@ -112,6 +112,9 @@
           <el-table-column label="类目佣金" align="center" prop="productCostConfig.categoryRate" />
           <el-table-column label="ozon转运费" align="center" prop="productCost.ozonDeliveryPrice" width="100" />
           <el-table-column label="最后一公里" align="center" prop="productCost.lastMilePrice" width="100" />
+          <el-table-column label="广告费" align="center" prop="productCost.adPrice" width="100" />
+          <el-table-column label="货损" align="center" prop="productCost.lossPrice" width="100" />
+
         </el-table-column>
       </el-table-column>
 
@@ -205,7 +208,7 @@
           <el-input v-model="form.forwarderPrice" placeholder="请输入货代报价" />
         </el-form-item>
         <el-form-item label="预估采购价" prop="forecastPurchasePrice">
-          <el-input v-model="form.forecastPurchasePrice" placeholder="这里可以临时指定采购价" />
+          <el-input v-model="form.forecastPurchasePrice" placeholder="这里可以临时指定采购价" clearable/>
         </el-form-item>
       </el-form>
       <template #footer>

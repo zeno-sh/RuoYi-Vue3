@@ -293,6 +293,19 @@
           @selection-change="handleDmProductPriceSelectionChange" ref="dmProductPrice">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column label="序号" align="center" prop="index" width="50" />
+          <el-table-column label="首选" prop="firstChoice" width="150">
+            <template #default="scope">
+              <el-radio-group v-model="scope.row.firstChoice">
+                <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
+                  @change="() => updateFirstChoice(scope.row, dmProductPriceList)">{{ dict.label }}</el-radio>
+              </el-radio-group>
+            </template>
+          </el-table-column>
+          <el-table-column label="价格策略名称" prop="priceStrategyName" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.priceStrategyName" placeholder="请输入价格策略名称" />
+            </template>
+          </el-table-column>
           <el-table-column label="产品售价" prop="sellingPrice" width="150">
             <template #default="scope">
               <el-input v-model="scope.row.sellingPrice" placeholder="请输入产品售价" />
@@ -301,19 +314,6 @@
           <el-table-column label="产品原价" prop="originalPrice" width="150">
             <template #default="scope">
               <el-input v-model="scope.row.originalPrice" placeholder="请输入产品原价" />
-            </template>
-          </el-table-column>
-          <el-table-column label="价格策略名称" prop="priceStrategyName" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.priceStrategyName" placeholder="请输入价格策略名称" />
-            </template>
-          </el-table-column>
-          <el-table-column label="首选" prop="firstChoice" width="150">
-            <template #default="scope">
-              <el-radio-group v-model="scope.row.firstChoice">
-                <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
-                  @change="() => updateFirstChoice(scope.row, dmProductPriceList)">{{ dict.label }}</el-radio>
-              </el-radio-group>
             </template>
           </el-table-column>
         </el-table>
@@ -391,6 +391,14 @@
           @selection-change="handleDmProductPurchaseSelectionChange" ref="dmProductPurchase">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column label="序号" align="center" prop="index" width="50" />
+          <el-table-column label="首选" prop="firstChoice" width="150">
+            <template #default="scope">
+              <el-radio-group v-model="scope.row.firstChoice">
+                <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
+                  @change="() => updateFirstChoice(scope.row, dmProductPurchaseList)">{{ dict.label }}</el-radio>
+              </el-radio-group>
+            </template>
+          </el-table-column>
           <el-table-column label="箱规名称" prop="cartonSizeName" width="150">
             <template #default="scope">
               <el-input v-model="scope.row.cartonSizeName" placeholder="请输入箱规名称" />
@@ -435,14 +443,6 @@
               <el-input v-model="scope.row.material" placeholder="请输入产品材质" />
             </template>
           </el-table-column>
-          <el-table-column label="首选" prop="firstChoice" width="150">
-            <template #default="scope">
-              <el-radio-group v-model="scope.row.firstChoice">
-                <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
-                  @change="() => updateFirstChoice(scope.row, dmProductPurchaseList)">{{ dict.label }}</el-radio>
-              </el-radio-group>
-            </template>
-          </el-table-column>
         </el-table>
 
 
@@ -459,6 +459,14 @@
           @selection-change="handleDmSupplierPriceOfferSelectionChange" ref="dmSupplierPriceOffer">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column label="序号" align="center" prop="index" width="50" />
+          <el-table-column label="首选" prop="firstChoice" width="150">
+            <template #default="scope">
+              <el-radio-group v-model="scope.row.firstChoice">
+                <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
+                  @change="() => updateFirstChoice(scope.row, dmSupplierPriceOfferList)">{{ dict.label }}</el-radio>
+              </el-radio-group>
+            </template>
+          </el-table-column>
           <el-table-column label="供应商" prop="supplierCode" width="150">
             <template #default="scope">
               <!-- <el-input v-model="scope.row.supplierCode" placeholder="请选择供应商" /> -->
@@ -515,14 +523,12 @@
               <el-input v-model="scope.row.deliveryTime" placeholder="请输入交期" />
             </template>
           </el-table-column>
-          <el-table-column label="首选" prop="firstChoice" width="150">
+          <el-table-column label="采购链接" prop="link" width="150">
             <template #default="scope">
-              <el-radio-group v-model="scope.row.firstChoice">
-                <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
-                  @change="() => updateFirstChoice(scope.row, dmSupplierPriceOfferList)">{{ dict.label }}</el-radio>
-              </el-radio-group>
+              <el-input v-model="scope.row.link" placeholder="请输入采购链接" />
             </template>
           </el-table-column>
+          
           <el-table-column label="报价时间" prop="offerDate" width="240">
             <template #default="scope">
               <el-date-picker clearable v-model="scope.row.offerDate" type="date" value-format="YYYY-MM-DD"
@@ -728,7 +734,7 @@ function handleAddDmProductPrice() {
   obj.sellingPrice = "";
   obj.originalPrice = "";
   obj.priceStrategyName = "";
-  obj.firstChoice = "";
+  obj.firstChoice = "N";
   dmProductPriceList.value.push(obj);
 }
 
@@ -782,14 +788,14 @@ function handleUpdate(row) {
     if (dmProductCustomsList.value.length >= 1) {
       noAdd.value == true;
     }
-    // if (dmSupplierPriceOfferList.value.length >= 1) {
-    //   let codes = [];
-    //   for (const item of dmSupplierPriceOfferList.value) {
-    //     codes.push(item.supplierCode);
-    //   }
-    //   supplierQueryParams.value.supplierCodes = codes;
-    //   getSupplierInfoByCodes();
-    // }
+    if (dmSupplierPriceOfferList.value.length >= 1) {
+      let codes = [];
+      for (const item of dmSupplierPriceOfferList.value) {
+        codes.push(item.supplierCode);
+      }
+      supplierQueryParams.value.supplierCodes = codes;
+      getSupplierInfoByCodes();
+    }
   });
 }
 
@@ -1053,20 +1059,20 @@ function getSupplierInfo(name) {
 }
 
 function getSupplierInfoByCode(code) {
+  console.log(11111);
   factoryList.value = [];
   if (code != null && '' != code) {
     supplierQueryParams.value.supplierCode = code;
   }
   listFactory(supplierQueryParams.value).then(response => {
-    factoryList.value = response.rows;
+    factoryList.value = response.data;
   });
 }
 
 function getSupplierInfoByCodes() {
-  console.log(supplierQueryParams.value);
   if (supplierQueryParams.value != null) {
     queryFactoryByCodes(supplierQueryParams.value).then(response => {
-      factoryList.value = response.rows;
+      factoryList.value = response.data;
     });
   }
 }
@@ -1080,7 +1086,7 @@ function updateFirstChoice(selectedRow, data) {
 }
 
 onMounted(() => {
-  getSupplierInfoByCode();
+  // getSupplierInfoByCode();
 });
 
 getList();
