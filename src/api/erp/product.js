@@ -17,6 +17,14 @@ export function getProduct(id) {
   })
 }
 
+// 查询产品信息详细
+export function getProductBySkuId(skuId) {
+  return request({
+    url: '/erp/product/sku/' + skuId,
+    method: 'get'
+  })
+}
+
 // 新增产品信息
 export function addProduct(data) {
   return request({

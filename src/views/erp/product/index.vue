@@ -69,7 +69,11 @@
         </template>
       </el-table-column>
       <el-table-column label="型号(SPU)" width="100" align="center" prop="modelNumber" fixed=""/>
-      <el-table-column label="SKU" width="180" align="center" prop="skuId" />
+      <el-table-column label="SKU" width="180" align="center" prop="skuId" >
+        <template #default="scope">
+          <a @click="handleUpdate(scope.row)" class="hover-link">{{ scope.row.skuId }}</a>
+        </template>
+      </el-table-column>
       <el-table-column label="产品名称" width="180" align="center" prop="skuName" />
       <el-table-column label="单位" align="center" prop="unit">
         <template #default="scope">
@@ -574,11 +578,13 @@
 </template>
 
 <script setup name="Product">
-import { listProduct, getProduct, delProduct, addProduct, updateProduct } from "@/api/erp/product";
+import { listProduct, getProduct, delProduct, addProduct, updateProduct,getProductBySkuId } from "@/api/erp/product";
 import { addPlan } from "@/api/erp/plan";
 import { listCommission } from "@/api/erp/commission";
 import { listFactory, queryFactoryByCodes } from "@/api/erp/factory";
+import { useRoute } from 'vue-router';
 
+const { query } = useRoute();
 
 const { proxy } = getCurrentInstance();
 const { dm_product_sale_status, record_status, sys_yes_no, dm_product_flag, dm_platform, dm_currency_code, dm_unit_type } = proxy.useDict('dm_product_sale_status', 'record_status', 'sys_yes_no', 'dm_product_flag', 'dm_platform', 'dm_currency_code', 'dm_unit_type');
@@ -1059,7 +1065,6 @@ function getSupplierInfo(name) {
 }
 
 function getSupplierInfoByCode(code) {
-  console.log(11111);
   factoryList.value = [];
   if (code != null && '' != code) {
     supplierQueryParams.value.supplierCode = code;
@@ -1087,7 +1092,48 @@ function updateFirstChoice(selectedRow, data) {
 
 onMounted(() => {
   // getSupplierInfoByCode();
+  console.log(query.skuId);
+  routeEdit(query.skuId);
 });
+
+function routeEdit(skuId) {
+  reset();
+  getProductBySkuId(skuId).then(response => {
+    form.value = response.data;
+    dmProductCustomsList.value = response.data.dmProductCustomsList;
+    dmProductPlatformTrendList.value = response.data.dmProductPlatformTrendList;
+    dmProductPurchaseList.value = response.data.dmProductPurchaseList;
+    dmSupplierPriceOfferList.value = response.data.dmSupplierPriceOfferList;
+    dmProductPriceList.value = response.data.dmProductPriceList;
+    open.value = true;
+    title.value = "修改产品信息";
+    if (dmProductCustomsList.value.length >= 1) {
+      noAdd.value == true;
+    }
+    if (dmSupplierPriceOfferList.value.length >= 1) {
+      let codes = [];
+      for (const item of dmSupplierPriceOfferList.value) {
+        codes.push(item.supplierCode);
+      }
+      supplierQueryParams.value.supplierCodes = codes;
+      getSupplierInfoByCodes();
+    }
+  });
+}
+
 
 getList();
 </script>
+<style scope>
+/* 在你的组件样式中定义链接的默认和悬停状态 */
+.hover-link {
+  color: #0077cc; /* 浅蓝色 */
+  text-decoration: none; /* 去掉下划线 */
+  transition: color 0.3s; /* 添加过渡效果 */
+}
+
+.hover-link:hover {
+  color: #004499; /* 深蓝色 */
+  text-decoration: underline; /* 显示下划线 */
+}
+</style>

@@ -53,7 +53,11 @@
           <image-preview :src="scope.row.productInfo.skuPicture" :width="50" :height="50" />
         </template>
       </el-table-column>
-      <el-table-column label="SKU" align="center" prop="planSkuId" fixed width="190" />
+      <el-table-column label="SKU" align="center" prop="planSkuId" fixed width="190">
+        <template #default="scope">
+          <a @click="gotoProductEdit(scope.row.planSkuId)" class="hover-link">{{ scope.row.planSkuId }}</a>
+        </template>
+      </el-table-column>
       <el-table-column label="产品名称" align="center" prop="productInfo.skuName" width="120" />
       <el-table-column label="商品规格" align="center">
         <el-table-column label="箱规" align="center" width="150"
@@ -194,8 +198,8 @@
         </el-form-item>
         <el-form-item label="供应商报价" prop="supplierPriceOfferId">
           <!-- <el-input v-model="form.supplierPriceOfferId" placeholder="请输入供应商报价" /> -->
-          <el-select v-model="form.supplierPriceOfferId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
-            remote-show-suffix >
+          <el-select v-model="form.supplierPriceOfferId" :multiple="false" filterable remote reserve-keyword
+            placeholder="请输入SKU" remote-show-suffix>
             <el-option v-for="item in supplierOfferList" :key="parseInt(item.id)"
               :label="`${item.supplierCode}` + ' / ' + `${item.price} RMB`" :value="parseInt(item.id)">
               <span style="float: left">{{ item.supplierCode }}</span>
@@ -208,7 +212,7 @@
           <el-input v-model="form.forwarderPrice" placeholder="请输入货代报价" />
         </el-form-item>
         <el-form-item label="预估采购价" prop="forecastPurchasePrice">
-          <el-input v-model="form.forecastPurchasePrice" placeholder="这里可以临时指定采购价" clearable/>
+          <el-input v-model="form.forecastPurchasePrice" placeholder="这里可以临时指定采购价" clearable />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -245,6 +249,7 @@ import { listPlan, getPlan, delPlan, addPlan, updatePlan, updateForwarderPrice }
 import { listProduct } from "@/api/erp/product";
 import { listPrice, getPrice } from "@/api/erp/price";
 import { listSupplier, getSupplier } from "@/api/erp/supplier";
+import router from '@/router'
 
 const { proxy } = getCurrentInstance();
 const { record_status } = proxy.useDict('record_status');
@@ -503,5 +508,25 @@ function handleExport() {
   }, `plan_${new Date().getTime()}.xlsx`)
 }
 
+/** 跳转商品编辑页面 */
+function gotoProductEdit(skuId) {
+  console.log(`skuId:${skuId}`)
+  router.push({ path: "/product/product", query: {skuId: skuId} });
+}
+
 getList();
 </script>
+
+<style scope>
+/* 在你的组件样式中定义链接的默认和悬停状态 */
+.hover-link {
+  color: #0077cc; /* 浅蓝色 */
+  text-decoration: none; /* 去掉下划线 */
+  transition: color 0.3s; /* 添加过渡效果 */
+}
+
+.hover-link:hover {
+  color: #004499; /* 深蓝色 */
+  text-decoration: underline; /* 显示下划线 */
+}
+</style>
