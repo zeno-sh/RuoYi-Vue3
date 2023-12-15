@@ -60,15 +60,15 @@
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="productList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="productList" @selection-change="handleSelectionChange" height="600">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column type="index" width="50" label="序号" />
-      <el-table-column label="图片" align="center" prop="pictureUrl" width="100">
+      <el-table-column type="index" width="50" label="序号" fixed/>
+      <el-table-column label="图片" align="center" prop="pictureUrl" width="100" fixed>
         <template #default="scope">
           <image-preview :src="scope.row.pictureUrl" :width="50" :height="50" />
         </template>
       </el-table-column>
-      <el-table-column label="型号(SPU)" width="100" align="center" prop="modelNumber" />
+      <el-table-column label="型号(SPU)" width="100" align="center" prop="modelNumber" fixed=""/>
       <el-table-column label="SKU" width="180" align="center" prop="skuId" />
       <el-table-column label="产品名称" width="180" align="center" prop="skuName" />
       <el-table-column label="单位" align="center" prop="unit">
@@ -416,16 +416,16 @@
               <el-input v-model="scope.row.quantityPerBox" placeholder="单箱数量pcs" />
             </template>
           </el-table-column>
+          <el-table-column label="单箱重量g" prop="boxWeight" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.boxWeight" placeholder="单箱重量g" />
+            </template>
+          </el-table-column>
           <el-table-column label="包装规格cm" width="120px">
             <template #default="scope">
               <el-input v-model="scope.row.length" placeholder="长" />
               <el-input v-model="scope.row.width" placeholder="宽" />
               <el-input v-model="scope.row.height" placeholder="高" />
-            </template>
-          </el-table-column>
-          <el-table-column label="单箱重量g" prop="boxWeight" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.boxWeight" placeholder="单箱重量g" />
             </template>
           </el-table-column>
           <el-table-column label="单品净重g" prop="netWeight" width="150">

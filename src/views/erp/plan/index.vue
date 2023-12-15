@@ -45,7 +45,7 @@
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="planList" @selection-change="handleSelectionChange" border>
+    <el-table v-loading="loading" :data="planList" @selection-change="handleSelectionChange" border height="700">
       <el-table-column type="selection" align="center" />
       <el-table-column label="选品计划名称" align="center" prop="planName" fixed width="120" />
       <el-table-column label="图片" align="center" prop="productInfo.skuPicture" fixed>
