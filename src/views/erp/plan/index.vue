@@ -142,6 +142,16 @@
         <el-table-column label="ROI" align="center" prop="roiRate" width="100" />
       </el-table-column>
 
+      <el-table-column label="竞品趋势" align="center" width="250">
+        <template #default="scope">
+          <div v-for="trend in scope.row.productPlatformTrends" :key="trend.id">
+            <div>skuId:{{ trend.competitorSkuId }} 销量：{{ trend.competitorSaleNumber }}</div>
+            <div>价格：{{ trend.competitorSalePrice }} 份额：{{ parseInt(trend.competitorSalePrice * trend.competitorSaleNumber)
+            }}</div>
+          </div>
+        </template>
+      </el-table-column>
+
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template #default="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
