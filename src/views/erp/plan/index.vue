@@ -72,7 +72,11 @@
         <el-table-column label="PCS" align="center" prop="productInfo.specification.quantityPerBox" width="70" />
         <el-table-column label="箱重" align="center" prop="productInfo.specification.boxWeight">
           <template #default="scope">
-            <span>{{ scope.row.productInfo.specification.boxWeight / 1000 }} kg
+            <span v-if="scope.row.productInfo.specification.boxWeight >= 1000">{{
+              scope.row.productInfo.specification.boxWeight / 1000 }} kg
+            </span>
+            <span v-if="scope.row.productInfo.specification.boxWeight < 1000">{{
+              scope.row.productInfo.specification.boxWeight }} g
             </span>
           </template>
         </el-table-column>
@@ -86,13 +90,21 @@
         </el-table-column>
         <el-table-column label="单品毛重" align="center" prop="productInfo.specification.grossWeight">
           <template #default="scope">
-            <span>{{ scope.row.productInfo.specification.grossWeight }}g
+            <span v-if="scope.row.productInfo.specification.grossWeight < 1000">{{
+              scope.row.productInfo.specification.grossWeight }} g
+            </span>
+            <span v-if="scope.row.productInfo.specification.grossWeight >= 1000">{{
+              scope.row.productInfo.specification.grossWeight / 1000 }} kg
             </span>
           </template>
         </el-table-column>
         <el-table-column label="单品净重" align="center" prop="productInfo.specification.netWeight">
           <template #default="scope">
-            <span>{{ scope.row.productInfo.specification.netWeight }}g
+            <span v-if="scope.row.productInfo.specification.netWeight < 1000">{{
+              scope.row.productInfo.specification.netWeight }} g
+            </span>
+            <span v-if="scope.row.productInfo.specification.netWeight >= 1000">{{
+              scope.row.productInfo.specification.netWeight / 1000 }} kg
             </span>
           </template>
         </el-table-column>
@@ -531,7 +543,7 @@ function handleExport() {
 /** 跳转商品编辑页面 */
 function gotoProductEdit(skuId) {
   console.log(`skuId:${skuId}`)
-  router.push({ path: "/product/product", query: {skuId: skuId} });
+  router.push({ path: "/product/product", query: { skuId: skuId } });
 }
 
 getList();
@@ -540,13 +552,17 @@ getList();
 <style scope>
 /* 在你的组件样式中定义链接的默认和悬停状态 */
 .hover-link {
-  color: #0077cc; /* 浅蓝色 */
-  text-decoration: none; /* 去掉下划线 */
-  transition: color 0.3s; /* 添加过渡效果 */
+  color: #0077cc;
+  /* 浅蓝色 */
+  text-decoration: none;
+  /* 去掉下划线 */
+  transition: color 0.3s;
+  /* 添加过渡效果 */
 }
 
 .hover-link:hover {
-  color: #004499; /* 深蓝色 */
-  text-decoration: underline; /* 显示下划线 */
-}
-</style>
+  color: #004499;
+  /* 深蓝色 */
+  text-decoration: underline;
+  /* 显示下划线 */
+}</style>
