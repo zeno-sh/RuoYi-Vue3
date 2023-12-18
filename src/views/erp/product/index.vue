@@ -62,14 +62,14 @@
 
     <el-table v-loading="loading" :data="productList" @selection-change="handleSelectionChange" height="600">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column type="index" width="50" label="序号" fixed/>
+      <el-table-column type="index" width="50" label="序号" fixed />
       <el-table-column label="图片" align="center" prop="pictureUrl" width="100" fixed>
         <template #default="scope">
           <image-preview :src="scope.row.pictureUrl" :width="50" :height="50" />
         </template>
       </el-table-column>
-      <el-table-column label="型号(SPU)" width="100" align="center" prop="modelNumber" fixed=""/>
-      <el-table-column label="SKU" width="180" align="center" prop="skuId" >
+      <el-table-column label="型号(SPU)" width="100" align="center" prop="modelNumber" fixed="" />
+      <el-table-column label="SKU" width="180" align="center" prop="skuId">
         <template #default="scope">
           <a @click="handleUpdate(scope.row)" class="hover-link">{{ scope.row.skuId }}</a>
         </template>
@@ -532,7 +532,7 @@
               <el-input v-model="scope.row.link" placeholder="请输入采购链接" />
             </template>
           </el-table-column>
-          
+
           <el-table-column label="报价时间" prop="offerDate" width="240">
             <template #default="scope">
               <el-date-picker clearable v-model="scope.row.offerDate" type="date" value-format="YYYY-MM-DD"
@@ -578,7 +578,7 @@
 </template>
 
 <script setup name="Product">
-import { listProduct, getProduct, delProduct, addProduct, updateProduct,getProductBySkuId } from "@/api/erp/product";
+import { listProduct, getProduct, delProduct, addProduct, updateProduct, getProductBySkuId } from "@/api/erp/product";
 import { addPlan } from "@/api/erp/plan";
 import { listCommission } from "@/api/erp/commission";
 import { listFactory, queryFactoryByCodes } from "@/api/erp/factory";
@@ -1091,13 +1091,15 @@ function updateFirstChoice(selectedRow, data) {
 }
 
 onMounted(() => {
-  // getSupplierInfoByCode();
   console.log(query.skuId);
   routeEdit(query.skuId);
 });
 
 function routeEdit(skuId) {
   reset();
+  if (skuId == null || '' == skuId) {
+    return;
+  }
   getProductBySkuId(skuId).then(response => {
     form.value = response.data;
     dmProductCustomsList.value = response.data.dmProductCustomsList;
@@ -1127,13 +1129,17 @@ getList();
 <style scope>
 /* 在你的组件样式中定义链接的默认和悬停状态 */
 .hover-link {
-  color: #0077cc; /* 浅蓝色 */
-  text-decoration: none; /* 去掉下划线 */
-  transition: color 0.3s; /* 添加过渡效果 */
+  color: #0077cc;
+  /* 浅蓝色 */
+  text-decoration: none;
+  /* 去掉下划线 */
+  transition: color 0.3s;
+  /* 添加过渡效果 */
 }
 
 .hover-link:hover {
-  color: #004499; /* 深蓝色 */
-  text-decoration: underline; /* 显示下划线 */
-}
-</style>
+  color: #004499;
+  /* 深蓝色 */
+  text-decoration: underline;
+  /* 显示下划线 */
+}</style>

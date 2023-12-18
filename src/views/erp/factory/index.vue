@@ -7,6 +7,11 @@
       <el-form-item label="供应商代码" prop="supplierCode">
         <el-input v-model="queryParams.supplierCode" placeholder="请输入供应商代码" clearable @keyup.enter="handleQuery" />
       </el-form-item>
+      <el-form-item label="源头工厂" prop="sourceFactory">
+        <el-select v-model="queryParams.sourceFactory" placeholder="请选择源头工厂" clearable>
+          <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label" :value="dict.value" />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
         <el-button icon="Refresh" @click="resetQuery">重置</el-button>
@@ -34,10 +39,22 @@
 
     <el-table v-loading="loading" :data="factoryList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="供应商名称" align="center" prop="supplierName" />
       <el-table-column label="供应商代码" align="center" prop="supplierCode" />
-      <el-table-column label="网址" align="center" prop="website" />
-      <el-table-column label="备注" align="center" prop="remark" />
+      <el-table-column label="供应商名称" align="center" prop="supplierName" show-overflow-tooltip />
+      <el-table-column label="源头工厂" align="center" prop="sourceFactory">
+        <template #default="scope">
+          <dict-tag :options="sys_yes_no" :value="scope.row.sourceFactory" />
+        </template>
+      </el-table-column>
+      <el-table-column label="网址" align="center" prop="website" show-overflow-tooltip>
+        <template #default="scope">
+          <a :href="scope.row.website" target="_blank" style="text-decoration: none; color: rgb(100, 180, 237)">
+            {{ scope.row.website }}
+          </a>
+        </template>
+      </el-table-column>
+      <el-table-column label="备注" align="center" prop="remark" show-overflow-tooltip />
+
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
@@ -52,10 +69,15 @@
       @pagination="getList" />
 
     <!-- 添加或修改供应商信息对话框 -->
-    <el-dialog :title="title" v-model="open" width="600px" append-to-body>
-      <el-form ref="factoryRef" :model="form" :rules="rules" label-width="100px">
+    <el-dialog :title="title" v-model="open" width="500px" append-to-body>
+      <el-form ref="factoryRef" :model="form" :rules="rules" label-width="98px">
         <el-form-item label="供应商名称" prop="supplierName">
           <el-input v-model="form.supplierName" placeholder="请输入供应商名称" />
+        </el-form-item>
+        <el-form-item label="源头工厂" prop="sourceFactory">
+          <el-radio-group v-model="form.sourceFactory">
+            <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value">{{ dict.label }}</el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item label="供应商代码" prop="supplierCode">
           <el-input disabled v-model="form.supplierCode" placeholder="提交后系统自动生成" />
@@ -66,6 +88,7 @@
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
+
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -81,6 +104,7 @@
 import { listFactory, getFactory, delFactory, addFactory, updateFactory } from "@/api/erp/factory";
 
 const { proxy } = getCurrentInstance();
+const { sys_yes_no } = proxy.useDict('sys_yes_no');
 
 const factoryList = ref([]);
 const open = ref(false);
@@ -97,8 +121,11 @@ const data = reactive({
   queryParams: {
     pageNum: 1,
     pageSize: 10,
+    tenantId: null,
     supplierName: null,
     supplierCode: null,
+    website: null,
+    sourceFactory: null,
   },
   rules: {
     supplierName: [
@@ -134,6 +161,7 @@ function reset() {
     supplierCode: null,
     website: null,
     remark: null,
+    sourceFactory: null,
     createBy: null,
     createTime: null,
     updateTime: null
