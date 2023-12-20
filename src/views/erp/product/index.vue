@@ -499,40 +499,44 @@
               </el-select>
             </template>
           </el-table-column>
-          <el-table-column label="是否含税" prop="tax" width="150">
+          <el-table-column label="是否含税" prop="tax" width="110">
             <template #default="scope">
-              <el-select v-model="scope.row.tax" placeholder="请选择是否含税">
+              <el-select v-model="scope.row.tax" placeholder="请选择">
                 <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
                   :value="dict.value"></el-option>
               </el-select>
             </template>
           </el-table-column>
-          <el-table-column label="税率" prop="taxRate" width="150">
+          <el-table-column label="税率" prop="taxRate" width="100">
             <template #default="scope">
               <el-input v-model="scope.row.taxRate" placeholder="请输入税率" />
             </template>
           </el-table-column>
-          <el-table-column label="报价" prop="price" width="150">
+          <el-table-column label="报价" prop="price" width="110">
             <template #default="scope">
               <el-input v-model="scope.row.price" placeholder="请输入报价" />
             </template>
           </el-table-column>
-          <el-table-column label="起订数量" prop="orderNumber" width="150">
+          <el-table-column label="起订数量" prop="orderNumber" width="110">
             <template #default="scope">
               <el-input v-model="scope.row.orderNumber" placeholder="请输入起订数量" />
             </template>
           </el-table-column>
-          <el-table-column label="交期" prop="deliveryTime" width="150">
+          <el-table-column label="交期" prop="deliveryTime" width="90">
             <template #default="scope">
               <el-input v-model="scope.row.deliveryTime" placeholder="请输入交期" />
             </template>
           </el-table-column>
-          <el-table-column label="采购链接" prop="link" width="150">
+          <el-table-column label="采购链接" prop="link" width="200">
             <template #default="scope">
               <el-input v-model="scope.row.link" placeholder="请输入采购链接" />
             </template>
           </el-table-column>
-
+          <el-table-column label="备注" prop="remark" width="300">
+            <template #default="scope">
+              <el-input v-model="scope.row.remark" type="textarea" placeholder="请输入内容" />
+            </template>
+          </el-table-column>
           <el-table-column label="报价时间" prop="offerDate" width="240">
             <template #default="scope">
               <el-date-picker clearable v-model="scope.row.offerDate" type="date" value-format="YYYY-MM-DD"
@@ -1142,4 +1146,5 @@ getList();
   /* 深蓝色 */
   text-decoration: underline;
   /* 显示下划线 */
-}</style>
+}
+</style>
