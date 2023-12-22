@@ -717,6 +717,9 @@ function reset() {
   };
   dmProductCustomsList.value = [];
   dmProductPlatformTrendList.value = [];
+  dmSupplierPriceOfferList.value = [];
+  dmProductPurchaseList.value = [];
+  dmProductPriceList.value = [];
   proxy.resetForm("productRef");
 }
 
@@ -777,6 +780,7 @@ function handleSelectionChange(selection) {
 /** 新增按钮操作 */
 function handleAdd() {
   reset();
+
   open.value = true;
   title.value = "添加产品信息";
   noAdd.value = false;
@@ -1029,7 +1033,7 @@ function handleAddDmSupplierPriceOffer() {
   let obj = {};
   obj.supplierCode = "";
   obj.currency = "";
-  obj.tax = "";
+  obj.tax = "N";
   obj.taxRate = "";
   obj.price = "";
   obj.orderNumber = "";
@@ -1095,11 +1099,12 @@ function updateFirstChoice(selectedRow, data) {
 }
 
 onMounted(() => {
-  console.log(query.skuId);
+  console.log(1111);
   routeEdit(query.skuId);
 });
 
 function routeEdit(skuId) {
+  
   reset();
   if (skuId == null || '' == skuId) {
     return;
