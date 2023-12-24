@@ -544,6 +544,7 @@ function handleExport() {
 function gotoProductEdit(skuId) {
   console.log(`skuId:${skuId}`)
   router.push({ path: "/product/product", query: { skuId: skuId } });
+  // router.push({ name: "Product", params: { skuId: skuId } });
 }
 
 getList();

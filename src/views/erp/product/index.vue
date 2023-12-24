@@ -588,7 +588,7 @@ import { listCommission } from "@/api/erp/commission";
 import { listFactory, queryFactoryByCodes } from "@/api/erp/factory";
 import { useRoute } from 'vue-router';
 
-const { query } = useRoute();
+const { query,params } = useRoute();
 
 const { proxy } = getCurrentInstance();
 const { dm_product_sale_status, record_status, sys_yes_no, dm_product_flag, dm_platform, dm_currency_code, dm_unit_type } = proxy.useDict('dm_product_sale_status', 'record_status', 'sys_yes_no', 'dm_product_flag', 'dm_platform', 'dm_currency_code', 'dm_unit_type');
@@ -1099,7 +1099,7 @@ function updateFirstChoice(selectedRow, data) {
 }
 
 onMounted(() => {
-  console.log(1111);
+  // console.log(params.skuId);
   routeEdit(query.skuId);
 });
 
