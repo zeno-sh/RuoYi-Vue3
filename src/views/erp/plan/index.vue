@@ -279,7 +279,11 @@ import { listPlan, getPlan, delPlan, addPlan, updatePlan, updateForwarderPrice }
 import { listProduct } from "@/api/erp/product";
 import { listPrice, getPrice } from "@/api/erp/price";
 import { listSupplier, getSupplier } from "@/api/erp/supplier";
-import router from '@/router'
+import { useRouter } from 'vue-router';
+
+// 使用 useRouter 获取路由实例
+const router = useRouter();
+
 
 const { proxy } = getCurrentInstance();
 const { record_status } = proxy.useDict('record_status');
@@ -542,9 +546,8 @@ function handleExport() {
 
 /** 跳转商品编辑页面 */
 function gotoProductEdit(skuId) {
-  console.log(`skuId:${skuId}`)
-  router.push({ path: "/product/product", query: { skuId: skuId } });
-  // router.push({ name: "Product", params: { skuId: skuId } });
+  // router.push({ path: "/product/product", query: { skuId: skuId } });////
+  router.push({ name: "Productinfo", state: { skuId: skuId } });
 }
 
 getList();

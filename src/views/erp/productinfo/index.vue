@@ -581,7 +581,7 @@
   </div>
 </template>
 
-<script setup name="Product">
+<script setup name="Productinfo">
 import { listProduct, getProduct, delProduct, addProduct, updateProduct, getProductBySkuId } from "@/api/erp/product";
 import { addPlan } from "@/api/erp/plan";
 import { listCommission } from "@/api/erp/commission";
@@ -1105,8 +1105,9 @@ function updateFirstChoice(selectedRow, data) {
 }
 
 onMounted(() => {
+  console.log(1111);
   console.log(history.state);
-  // routeEdit(query.skuId);
+  routeEdit(history.state.skuId);
 });
 
 function routeEdit(skuId) {

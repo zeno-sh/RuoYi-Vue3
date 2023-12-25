@@ -1,11 +1,8 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="计划编号" prop="code">
-        <el-input v-model="queryParams.code" placeholder="请输入计划编号" clearable @keyup.enter="handleQuery" />
-      </el-form-item>
-      <el-form-item label="skuId" prop="skuId">
-        <el-input v-model="queryParams.skuId" placeholder="请输入skuId" clearable @keyup.enter="handleQuery" />
+      <el-form-item label="计划编码" prop="code">
+        <el-input v-model="queryParams.code" placeholder="请输入计划编码" clearable @keyup.enter="handleQuery" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -36,19 +33,7 @@
     <el-table v-loading="loading" :data="purchaseplanList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column type="index" width="50" label="序号" />
-      <el-table-column label="计划编号" align="center" prop="code" />
-      <el-table-column label="skuId" align="center" prop="skuId" />
-      <el-table-column label="采购数量" align="center" prop="purchaseQuantity" />
-      <el-table-column label="箱数" align="center" prop="numberOfCases" />
-      <el-table-column label="体积" align="center" prop="volume" />
-      <el-table-column label="重量" align="center" prop="weight" />
-      <el-table-column label="采购订单" align="center" prop="purchaseOrder" />
-      <el-table-column label="期望到货时间" align="center" prop="expectedArrivalDate" width="180">
-        <template #default="scope">
-          <span>{{ parseTime(scope.row.expectedArrivalDate, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="备注" align="center" prop="remark" />
+      <el-table-column label="计划编码" align="center" prop="code" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
@@ -63,37 +48,83 @@
       @pagination="getList" />
 
     <!-- 添加或修改采购计划对话框 -->
-    <el-dialog :title="title" v-model="open" width="500px" append-to-body>
+    <el-dialog :title="title" v-model="open" width="1200px" append-to-body>
       <el-form ref="purchaseplanRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="计划编号" prop="code">
-          <el-input v-model="form.code" disabled placeholder="保存后自动生成" />
+        <el-form-item label="计划编码" prop="code">
+          <el-input v-model="form.code" placeholder="保存后自动生成" />
         </el-form-item>
-        <el-form-item label="skuId" prop="skuId">
-          <el-input v-model="form.skuId" placeholder="请输入skuId" />
-        </el-form-item>
-        <el-form-item label="采购数量" prop="purchaseQuantity">
-          <el-input v-model="form.purchaseQuantity" placeholder="请输入采购数量" />
-        </el-form-item>
-        <el-form-item label="箱数" prop="numberOfCases">
-          <el-input v-model="form.numberOfCases" placeholder="请输入箱数" />
-        </el-form-item>
-        <el-form-item label="体积" prop="volume">
-          <el-input v-model="form.volume" placeholder="请输入体积" />
-        </el-form-item>
-        <el-form-item label="重量" prop="weight">
-          <el-input v-model="form.weight" placeholder="请输入重量" />
-        </el-form-item>
-        <el-form-item label="采购订单" prop="purchaseOrder">
-          <el-input v-model="form.purchaseOrder" placeholder="请输入采购订单" />
-        </el-form-item>
-        <el-form-item label="期望到货时间" prop="expectedArrivalDate">
-          <el-date-picker clearable v-model="form.expectedArrivalDate" type="date" value-format="YYYY-MM-DD"
-            placeholder="请选择期望到货时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
+        <el-divider content-position="center">采购计划详情信息</el-divider>
+        <el-row :gutter="10" class="mb8">
+          <el-col :span="1.5">
+            <el-button type="primary" icon="Plus" @click="handleAddDmPurchasePlanItem">添加</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button type="danger" icon="Delete" @click="handleDeleteDmPurchasePlanItem">删除</el-button>
+          </el-col>
+        </el-row>
+        <el-table :data="dmPurchasePlanItemList" :row-class-name="rowDmPurchasePlanItemIndex"
+          @selection-change="handleDmPurchasePlanItemSelectionChange" ref="dmPurchasePlanItem">
+          <el-table-column type="selection" width="50" align="center" />
+          <el-table-column label="序号" align="center" prop="index" width="50" />
+          <!-- <el-table-column label="skuId" prop="skuId" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.skuId" placeholder="请输入skuId" />
+            </template>
+          </el-table-column> -->
+          <el-table-column label="skuId" prop="skuId" width="150">
+            <template #default="scope">
+              <!-- <el-input v-model="scope.row.skuId" placeholder="请输入skuId" /> -->
+              <dm-product :skuId="scope.row.skuId" v-model="scope.row.skuId"></dm-product>
+            </template>
+            
+          </el-table-column>
+          
+          <!-- <el-table-column label="供应商" prop="supplierId" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.supplierId" placeholder="请输入供应商" />
+            </template>
+          </el-table-column> -->
+          <el-table-column label="采购数量" prop="purchaseQuantity" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.purchaseQuantity" placeholder="请输入采购数量" />
+            </template>
+          </el-table-column>
+          <el-table-column label="箱数" prop="numberOfCases" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.numberOfCases" placeholder="请输入箱数" />
+            </template>
+          </el-table-column>
+          <el-table-column label="体积" prop="volume" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.volume" placeholder="请输入体积" />
+            </template>
+          </el-table-column>
+          <el-table-column label="重量" prop="weight" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.weight" placeholder="请输入重量" />
+            </template>
+          </el-table-column>
+          <el-table-column label="采购订单" prop="purchaseOrder" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.purchaseOrder" placeholder="请输入采购订单" />
+            </template>
+          </el-table-column>
+          <el-table-column label="期望到货时间" prop="expectedArrivalDate" width="240">
+            <template #default="scope">
+              <el-date-picker clearable v-model="scope.row.expectedArrivalDate" type="date" value-format="YYYY-MM-DD"
+                placeholder="请选择期望到货时间">
+              </el-date-picker>
+            </template>
+          </el-table-column>
+          <el-table-column label="采购状态" prop="status" width="150">
+            <template #default="scope">
+              <el-select v-model="scope.row.status" placeholder="请选择采购状态">
+                <el-option v-for="dict in dm_purchase_plan_status" :key="dict.value" :label="dict.label"
+                  :value="dict.value"></el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+        </el-table>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -107,14 +138,18 @@
 
 <script setup name="Purchaseplan">
 import { listPurchaseplan, getPurchaseplan, delPurchaseplan, addPurchaseplan, updatePurchaseplan } from "@/api/erp/purchaseplan";
+import DmProduct from '@/components/DmProduct'
 
 const { proxy } = getCurrentInstance();
+const { dm_purchase_plan_status } = proxy.useDict('dm_purchase_plan_status');
 
 const purchaseplanList = ref([]);
+const dmPurchasePlanItemList = ref([]);
 const open = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
 const ids = ref([]);
+const checkedDmPurchasePlanItem = ref([]);
 const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
@@ -126,21 +161,8 @@ const data = reactive({
     pageNum: 1,
     pageSize: 10,
     code: null,
-    skuId: null,
-    purchaseQuantity: null,
-    numberOfCases: null,
-    volume: null,
-    weight: null,
-    purchaseOrder: null,
-    expectedArrivalDate: null,
   },
   rules: {
-    skuId: [
-      { required: true, message: "skuId不能为空", trigger: "blur" }
-    ],
-    purchaseQuantity: [
-      { required: true, message: "采购数量不能为空", trigger: "blur" }
-    ]
   }
 });
 
@@ -167,16 +189,10 @@ function reset() {
   form.value = {
     id: null,
     code: null,
-    skuId: null,
-    purchaseQuantity: null,
-    numberOfCases: null,
-    volume: null,
-    weight: null,
-    purchaseOrder: null,
-    expectedArrivalDate: null,
-    remark: null,
+    createBy: null,
     createTime: null
   };
+  dmPurchasePlanItemList.value = [];
   proxy.resetForm("purchaseplanRef");
 }
 
@@ -212,6 +228,7 @@ function handleUpdate(row) {
   const _id = row.id || ids.value
   getPurchaseplan(_id).then(response => {
     form.value = response.data;
+    dmPurchasePlanItemList.value = response.data.dmPurchasePlanItemList;
     open.value = true;
     title.value = "修改采购计划";
   });
@@ -221,6 +238,7 @@ function handleUpdate(row) {
 function submitForm() {
   proxy.$refs["purchaseplanRef"].validate(valid => {
     if (valid) {
+      form.value.dmPurchasePlanItemList = dmPurchasePlanItemList.value;
       if (form.value.id != null) {
         updatePurchaseplan(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
@@ -247,6 +265,45 @@ function handleDelete(row) {
     getList();
     proxy.$modal.msgSuccess("删除成功");
   }).catch(() => { });
+}
+
+/** 采购计划详情序号 */
+function rowDmPurchasePlanItemIndex({ row, rowIndex }) {
+  row.index = rowIndex + 1;
+}
+
+/** 采购计划详情添加按钮操作 */
+function handleAddDmPurchasePlanItem() {
+  let obj = {};
+  obj.supplierId = "";
+  obj.skuId = "";
+  obj.purchaseQuantity = "";
+  obj.numberOfCases = "";
+  obj.volume = "";
+  obj.weight = "";
+  obj.purchaseOrder = "";
+  obj.expectedArrivalDate = "";
+  obj.remark = "";
+  obj.status = "";
+  dmPurchasePlanItemList.value.push(obj);
+}
+
+/** 采购计划详情删除按钮操作 */
+function handleDeleteDmPurchasePlanItem() {
+  if (checkedDmPurchasePlanItem.value.length == 0) {
+    proxy.$modal.msgError("请先选择要删除的采购计划详情数据");
+  } else {
+    const dmPurchasePlanItems = dmPurchasePlanItemList.value;
+    const checkedDmPurchasePlanItems = checkedDmPurchasePlanItem.value;
+    dmPurchasePlanItemList.value = dmPurchasePlanItems.filter(function (item) {
+      return checkedDmPurchasePlanItems.indexOf(item.index) == -1
+    });
+  }
+}
+
+/** 复选框选中数据 */
+function handleDmPurchasePlanItemSelectionChange(selection) {
+  checkedDmPurchasePlanItem.value = selection.map(item => item.index)
 }
 
 /** 导出按钮操作 */
