@@ -140,7 +140,7 @@
       @pagination="getList" />
 
     <!-- 添加或修改产品信息对话框 -->
-    <el-dialog :title="title" v-model="open" width="1200px" append-to-body>
+    <el-dialog :title="title" v-model="open" width="95%" append-to-body :close-on-click-modal="false" :close-on-press-escape="true">
       <el-form ref="productRef" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="图片" prop="pictureUrl">
           <image-upload v-model="form.pictureUrl" />

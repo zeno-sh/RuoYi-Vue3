@@ -58,7 +58,7 @@
           <a @click="gotoProductEdit(scope.row.planSkuId)" class="hover-link">{{ scope.row.planSkuId }}</a>
         </template>
       </el-table-column>
-      <el-table-column label="产品名称" align="center" prop="productInfo.skuName" width="120" />
+      <el-table-column label="产品名称" align="center" prop="productInfo.skuName" width="150" />
       <el-table-column label="商品规格" align="center">
         <el-table-column label="箱规" align="center" width="150"
           prop="productInfo.specification.boxLength,specification.boxLength.boxWidth">
@@ -110,6 +110,7 @@
         </el-table-column>
         <el-table-column label="体积m³" align="center" prop="productInfo.volume" />
         <el-table-column label="体积升" align="center" prop="productInfo.volumeRise" />
+        <el-table-column label="密度" align="center" prop="productInfo.density" />
       </el-table-column>
 
 
