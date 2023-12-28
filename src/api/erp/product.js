@@ -10,6 +10,17 @@ export function listProduct(query) {
 }
 
 // 查询产品信息详细
+export function getProductByKeyword(keyword) {
+  return request({
+    url: '/erp/product/search',
+    method: 'get',
+    params: {
+      keyword
+    }
+  })
+}
+
+// 查询产品信息详细
 export function getProduct(id) {
   return request({
     url: '/erp/product/' + id,
