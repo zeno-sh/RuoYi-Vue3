@@ -195,15 +195,20 @@
               <el-input v-model="scope.row.pcs" placeholder="" clearable @change="calculateBox(scope.row)" />
             </template>
           </el-table-column>
-          <el-table-column label="箱数" prop="numberOfBox" width="150">
+          <el-table-column label="箱数" prop="numberOfBox" width="180">
             <template #default="scope">
               <el-row type="flex" justify="start" align="middle">
-                <el-col :span="16">
+                <el-col :span="14">
                   <el-input v-model="scope.row.numberOfBox" placeholder="" clearable />
                 </el-col>
                 <el-col :span="10">
-                  <el-icon style="color: rgb(236, 122, 39); margin-left: 5px;" v-if="calculateWarning"><Warning /></el-icon>
-                  <span v-if="calculateWarning">{{ calculateBoxNum }}</span>
+                  <el-tooltip class="box-item" effect="dark" content="实际计算结果不为整数，建议进行调整" placement="bottom"
+                    v-if="scope.row.calculateWarning">
+                    <el-icon style="color: rgb(236, 122, 39); margin-left: 5px;">
+                      <Warning />
+                    </el-icon>
+                  </el-tooltip>
+                  <span v-if="scope.row.calculateWarning">{{ scope.row.calculateBoxNum }}</span>
                 </el-col>
               </el-row>
             </template>
@@ -211,12 +216,12 @@
 
           <el-table-column label="体积" prop="volume" width="150">
             <template #default="scope">
-              <el-input v-model="scope.row.volume" placeholder="请输入体积" />
+              <el-input v-model="scope.row.volume" placeholder="自动计算" disabled/>
             </template>
           </el-table-column>
           <el-table-column label="重量" prop="weight" width="150">
             <template #default="scope">
-              <el-input v-model="scope.row.weight" placeholder="请输入重量" />
+              <el-input v-model="scope.row.weight" placeholder="自动计算" disabled/>
             </template>
           </el-table-column>
           <el-table-column label="上架状态" prop="shelfStatus" width="150">
@@ -259,8 +264,8 @@ const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
 const title = ref("");
-const calculateWarning = ref(false);
-const calculateBoxNum = ref(null);
+
+const purchaseData = ref(null); // 共享状态
 
 const data = reactive({
   form: {},
@@ -438,21 +443,21 @@ function handleExport() {
 
 function getPcsData(row) {
   purchaseQueryParams.value.skuId = row.skuId;
-  const purchase = ref(null);
   listPurchase(purchaseQueryParams.value).then(response => {
-    purchase.value = response.rows[0];
-    row.pcs = purchase.value.quantityPerBox;
+    purchaseData.value = response.rows[0];
+    row.pcs = purchaseData.value.quantityPerBox;
   });
 }
 
 function calculateBox(row) {
-  calculateWarning.value = false;
+  row.calculateWarning = false;
   if (row.quantity !== null && row.pcs !== null) {
     const result = row.quantity / row.pcs;
     row.numberOfBox = result.toFixed(0); // 使用 toFixed(0) 将结果四舍五入为整数赋值给 numberOfBox
-    calculateBoxNum.value = result.toFixed(1); // 将结果保留一位小数赋值给 calculateBoxNum
-    calculateWarning.value = !(Number.isInteger(Number(calculateBoxNum.value)) && calculateBoxNum.value > 0);
-    console.log(`calculateWarning=${calculateWarning.value}`);
+    row.calculateBoxNum = result.toFixed(1); // 将结果保留一位小数赋值给 calculateBoxNum
+    row.calculateWarning = !(Number.isInteger(Number(row.calculateBoxNum)) && row.calculateBoxNum > 0);
+    row.volume = ((purchaseData.value.boxWidth * purchaseData.value.boxLength * purchaseData.value.boxHeight) / 1000000).toFixed(3);
+    row.weight = (purchaseData.value.boxWeight / 1000 * row.calculateBoxNum).toFixed(2);
   }
 }
 
