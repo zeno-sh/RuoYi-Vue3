@@ -42,37 +42,38 @@
     <el-table v-loading="loading" :data="transportplanList">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column type="index" width="50" label="序号" />
-      <el-table-column label="发货计划" align="center" prop="code" />
+      <el-table-column label="发货计划编码" align="center" prop="code" width="200"/>
       <el-table-column label="运输状态" align="center" prop="transportStatus">
         <template #default="scope">
           <dict-tag :options="dm_transport_status" :value="scope.row.transportStatus" />
         </template>
       </el-table-column>
-      <el-table-column label="海外仓入库单号" align="center" prop="overseaLocationCheckinId" />
+      <el-table-column label="海外仓入库单号" align="center" prop="overseaLocationCheckinId" width="250" />
       <el-table-column label="货代公司" align="center" prop="forwarder" />
-      <el-table-column label="报价" align="center" prop="offerPrice" />
+      
       <el-table-column label="币种" align="center" prop="currency">
         <template #default="scope">
           <dict-tag :options="dm_currency_code" :value="scope.row.currency" />
         </template>
       </el-table-column>
+      <el-table-column label="报价" align="center" prop="offerPrice" />
       <el-table-column label="结算状态" align="center" prop="settleStatus">
         <template #default="scope">
           <dict-tag :options="sys_yes_no" :value="scope.row.settleStatus" />
         </template>
       </el-table-column>
-      <el-table-column label="账单" align="center" prop="billPrice" />
-      <el-table-column label="发运日期" align="center" prop="despatchDate" width="180">
+      <!-- <el-table-column label="账单" align="center" prop="billPrice" /> -->
+      <el-table-column label="发运日期" align="center" prop="despatchDate" width="120">
         <template #default="scope">
           <span>{{ parseTime(scope.row.despatchDate, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="预计抵达日期" align="center" prop="arrivalDate" width="180">
+      <el-table-column label="预计抵达日期" align="center" prop="arrivalDate" width="120">
         <template #default="scope">
           <span>{{ parseTime(scope.row.arrivalDate, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="200">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['erp:transportplan:edit']">修改</el-button>
@@ -175,7 +176,7 @@
             <el-button type="danger" icon="Delete" @click="handleDeleteDmTransportPlanItem">删除</el-button>
           </el-col>
         </el-row>
-        <el-table :data="dmTransportPlanItemList" :row-class-name="rowDmTransportPlanItemIndex"
+        <el-table :data="dmTransportPlanItemList" :row-class-name="rowDmTransportPlanItemIndex" show-summary
           @selection-change="handleDmTransportPlanItemSelectionChange" ref="dmTransportPlanItem">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column label="序号" align="center" prop="index" width="50" />
@@ -216,12 +217,12 @@
 
           <el-table-column label="体积" prop="volume" width="150">
             <template #default="scope">
-              <el-input v-model="scope.row.volume" placeholder="自动计算" disabled/>
+              <el-input v-model="scope.row.volume" placeholder="自动计算" />
             </template>
           </el-table-column>
           <el-table-column label="重量" prop="weight" width="150">
             <template #default="scope">
-              <el-input v-model="scope.row.weight" placeholder="自动计算" disabled/>
+              <el-input v-model="scope.row.weight" placeholder="自动计算" />
             </template>
           </el-table-column>
           <el-table-column label="上架状态" prop="shelfStatus" width="150">
@@ -456,7 +457,7 @@ function calculateBox(row) {
     row.numberOfBox = result.toFixed(0); // 使用 toFixed(0) 将结果四舍五入为整数赋值给 numberOfBox
     row.calculateBoxNum = result.toFixed(1); // 将结果保留一位小数赋值给 calculateBoxNum
     row.calculateWarning = !(Number.isInteger(Number(row.calculateBoxNum)) && row.calculateBoxNum > 0);
-    row.volume = ((purchaseData.value.boxWidth * purchaseData.value.boxLength * purchaseData.value.boxHeight) / 1000000).toFixed(3);
+    row.volume = ((purchaseData.value.boxWidth * purchaseData.value.boxLength * purchaseData.value.boxHeight) / 1000000 * row.calculateBoxNum).toFixed(3);
     row.weight = (purchaseData.value.boxWeight / 1000 * row.calculateBoxNum).toFixed(2);
   }
 }

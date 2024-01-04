@@ -1105,8 +1105,6 @@ function updateFirstChoice(selectedRow, data) {
 }
 
 onMounted(() => {
-  console.log(1111);
-  console.log(history.state);
   routeEdit(history.state.skuId);
 });
 

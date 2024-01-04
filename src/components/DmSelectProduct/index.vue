@@ -13,6 +13,7 @@
 
 <script setup>
 import { getProductByKeyword } from "@/api/erp/product";
+import { defineProps } from "vue";
 
 const skuId = ref(null);
 const productList = ref([]);
@@ -54,4 +55,7 @@ const handleSkuChange = () => {
   emit('sku-selected', skuId.value);
 };
 
+onMounted(() => {
+    getProduct(props.skuId);
+});
 </script>
