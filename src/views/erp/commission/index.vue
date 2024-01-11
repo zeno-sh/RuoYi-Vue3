@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="98px">
       <el-form-item label="平台类目名称" prop="platformName">
         <el-input v-model="queryParams.platformName" placeholder="请输入平台类目名称" clearable @keyup.enter="handleQuery" />
       </el-form-item>

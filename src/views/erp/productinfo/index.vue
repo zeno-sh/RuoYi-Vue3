@@ -189,12 +189,12 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="类目" prop="categoryId">
-              <el-input v-model="form.categoryId" placeholder="请输入类目" />
+              <el-input v-model="form.categoryId" placeholder="请输入类目" disabled />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="品牌" prop="brandId">
-              <el-input v-model="form.brandId" placeholder="请输入品牌" />
+              <el-input v-model="form.brandId" placeholder="请输入品牌" disabled />
             </el-form-item>
           </el-col>
         </el-row>
@@ -217,12 +217,11 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="类目佣金" prop="categoryCommission">
-              <!-- <el-input v-model="form.categoryCommission" placeholder="请输入类目佣金" /> -->
-              <el-select v-model="form.categoryCommission" :multiple="false" filterable remote reserve-keyword
-                placeholder="请选择佣金" remote-show-suffix :remote-method="getCategorCommission" clearable>
+            <el-form-item label="类目佣金" prop="categoryCommissionId">
+              <el-select v-model="form.categoryCommissionId" :multiple="false" filterable remote reserve-keyword
+                placeholder="请选择佣金" remote-show-suffix clearable>
                 <el-option v-for="item in categoryCommissionList" :key="item.id"
-                  :label="`${item.platformName}` + ' / ' + `${item.rate}` + '%'" :value="item.rate">
+                  :label="`${item.platformName}` + ' / ' + `${item.rate}` + '%'" :value="item.id">
                   <span style="float: left">{{ item.platformName }}</span>
                   <span
                     style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{
@@ -244,13 +243,13 @@
         <el-row type="flex">
           <el-col :span="12">
             <el-form-item label="规格说明" prop="specification">
-              <el-input v-model="form.specification" type="textarea" :autosize="{minRows:2}"
+              <el-input v-model="form.specification" type="textarea" :autosize="{ minRows: 2 }"
                 placeholder="请输入规格说明，采购需求。例如：价格区间、中性包装、箱规尺寸、欧规电源、俄语说明书等等" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="产品描述" prop="description">
-              <el-input v-model="form.description" type="textarea" placeholder="请输入内容" :autosize="{minRows:2}"/>
+              <el-input v-model="form.description" type="textarea" placeholder="请输入内容" :autosize="{ minRows: 2 }" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -425,38 +424,46 @@
               <el-input v-model="scope.row.cartonSizeName" placeholder="请输入箱规名称" />
             </template>
           </el-table-column>
-          <el-table-column label="外箱规格cm" width="150">
+          <el-table-column label="外箱规格" width="280">
             <template #default="scope">
-              <el-input v-model="scope.row.boxLength" placeholder="长" />
-              <el-input v-model="scope.row.boxWidth" placeholder="宽" />
-              <el-input v-model="scope.row.boxHeight" placeholder="高" />
+              <div class="input-group">
+                <el-input class="input-inner" v-model="scope.row.boxLength" placeholder="长" />
+                <el-input class="input-inner" v-model="scope.row.boxWidth" placeholder="宽" />
+                <el-input class="input-inner" v-model="scope.row.boxHeight" placeholder="高" />
+                <el-input class="input-cm" placeholder="cm" disabled />
+              </div>
             </template>
           </el-table-column>
-          <el-table-column label="单箱数量pcs" prop="quantityPerBox" width="150">
+
+          <el-table-column label="单箱数量pcs" prop="quantityPerBox" width="120">
             <template #default="scope">
-              <el-input v-model="scope.row.quantityPerBox" placeholder="单箱数量pcs" />
+              <el-input-number class="input-number" controls-position="right" :min="1" v-model="scope.row.quantityPerBox"
+                placeholder="单箱数量pcs" />
             </template>
           </el-table-column>
-          <el-table-column label="单箱重量g" prop="boxWeight" width="150">
+          <el-table-column label="单箱重量g" prop="boxWeight" width="120">
             <template #default="scope">
-              <el-input v-model="scope.row.boxWeight" placeholder="单箱重量g" />
+              <el-input class="input-number" v-model="scope.row.boxWeight" placeholder="单箱重量g" />
             </template>
           </el-table-column>
-          <el-table-column label="包装规格cm" width="120px">
+          <el-table-column label="包装规格" width="280">
             <template #default="scope">
-              <el-input v-model="scope.row.length" placeholder="长" />
-              <el-input v-model="scope.row.width" placeholder="宽" />
-              <el-input v-model="scope.row.height" placeholder="高" />
+              <div class="input-group">
+                <el-input class="input-inner" v-model="scope.row.length" placeholder="长" />
+                <el-input class="input-inner" v-model="scope.row.width" placeholder="宽" />
+                <el-input class="input-inner" v-model="scope.row.height" placeholder="高" />
+                <el-input class="input-cm" placeholder="cm" disabled />
+              </div>
             </template>
           </el-table-column>
-          <el-table-column label="单品净重g" prop="netWeight" width="150">
+          <el-table-column label="单品净重g" prop="netWeight" width="120">
             <template #default="scope">
-              <el-input v-model="scope.row.netWeight" placeholder="单品净重g" />
+              <el-input class="input-number" v-model="scope.row.netWeight" placeholder="单品净重g" />
             </template>
           </el-table-column>
-          <el-table-column label="单品毛重g" prop="grossWeight" width="150">
+          <el-table-column label="单品毛重g" prop="grossWeight" width="120">
             <template #default="scope">
-              <el-input v-model="scope.row.grossWeight" placeholder="单品毛重g" />
+              <el-input class="input-number" v-model="scope.row.grossWeight" placeholder="单品毛重g" />
             </template>
           </el-table-column>
           <el-table-column label="产品材质" prop="material" width="150">
@@ -534,14 +541,16 @@
               <el-input v-model="scope.row.price" placeholder="请输入报价" />
             </template>
           </el-table-column>
-          <el-table-column label="起订数量" prop="orderNumber" width="110">
+          <el-table-column label="起订数量" prop="orderNumber" width="120">
             <template #default="scope">
-              <el-input v-model="scope.row.orderNumber" placeholder="请输入起订数量" />
+              <el-input-number class="input-number" controls-position="right" :min="1" v-model="scope.row.orderNumber"
+                placeholder="请输入起订数量" />
             </template>
           </el-table-column>
-          <el-table-column label="交期" prop="deliveryTime" width="90">
+          <el-table-column label="交期" prop="deliveryTime" width="120">
             <template #default="scope">
-              <el-input v-model="scope.row.deliveryTime" placeholder="请输入交期" />
+              <el-input-number class="input-number" controls-position="right" :min="1" v-model="scope.row.deliveryTime"
+                placeholder="请输入交期" />
             </template>
           </el-table-column>
           <el-table-column label="采购链接" prop="link" width="200">
@@ -664,6 +673,7 @@ const data = reactive({
     platform: null,
     competitorLink: null,
     createTime: null,
+    categoryCommissionId: null,
   },
   supplierQueryParams: {
     supplierCode: ''
@@ -688,7 +698,6 @@ const { queryParams, form, rules, formPlan, supplierQueryParams } = toRefs(data)
 
 /** 查询类目佣金列表 */
 function getCategorCommission() {
-  loading.value = true;
   listCommission(queryParams.value).then(response => {
     categoryCommissionList.value = response.rows;
   });
@@ -836,6 +845,7 @@ function handleUpdate(row) {
       getSupplierInfoByCodes();
     }
   });
+  getCategorCommission();
 }
 
 /** 提交按钮 */
@@ -1021,7 +1031,7 @@ function handleAddDmProductPurchase() {
   obj.boxLength = "";
   obj.boxWidth = "";
   obj.boxHeight = "";
-  obj.quantityPerBox = "";
+  obj.quantityPerBox = 1;
   obj.boxWeight = "";
   obj.grossWeight = "";
   obj.firstChoice = "N";
@@ -1061,9 +1071,9 @@ function handleAddDmSupplierPriceOffer() {
   obj.tax = "N";
   obj.taxRate = "";
   obj.price = "";
-  obj.orderNumber = "";
+  obj.orderNumber = 1;
   obj.link = "";
-  obj.deliveryTime = "";
+  obj.deliveryTime = 1;
   obj.firstChoice = "N";
   obj.remark = "";
   obj.offerDate = "";
@@ -1117,7 +1127,12 @@ function getSupplierInfoByCodes() {
 
 function updateFirstChoice(selectedRow, data) {
   data.forEach(row => {
-    if (row.id !== selectedRow.id) {
+    // 比较对象本身而不是ID，以处理undefined的情况
+    if (selectedRow.id === undefined || row.id === undefined) {
+      if (row !== selectedRow) {
+        row.firstChoice = 'N';
+      }
+    } else if (row.id !== selectedRow.id) {
       row.firstChoice = 'N';
     }
   });
@@ -1175,5 +1190,24 @@ getList();
   /* 深蓝色 */
   text-decoration: underline;
   /* 显示下划线 */
+}
+
+.input-number {
+  width: 88px;
+}
+
+.input-group .input-inner {
+  margin-right: -1px;
+  width: 24%;
+  /* 这会使三个输入框等宽 */
+}
+
+.input-group .input-inner:last-child {
+  margin-right: 0;
+}
+
+.input-group .input-cm {
+  width: 50px;
+  border-left: none;
 }
 </style>
