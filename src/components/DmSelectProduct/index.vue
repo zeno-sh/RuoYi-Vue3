@@ -1,11 +1,11 @@
 <template>
     <el-select :modelValue="skuId" :multiple="false" filterable remote reserve-keyword placeholder="输入关键词"
         remote-show-suffix :remote-method="getProduct" clearable @clear="clearList" @change="handleSkuChange">
-        <el-option v-for="item in productList" :key="item.skuId" :label="`${item.skuId}` + ' / ' + `${item.skuName}`"
+        <el-option v-for="item in productList" :key="item.skuId" :label="`${item.skuName}` + ' / ' + `${item.skuId}`"
             :value="item.skuId">
-            <span style="float: left">{{ item.skuId }}</span>
+            <span style="float: left">{{ item.skuName }}</span>
             <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{
-                item.skuName
+                item.skuId
             }}</span>
         </el-option>
     </el-select>
@@ -52,7 +52,7 @@ function clearList() {
 }
 
 const handleSkuChange = () => {
-  emit('sku-selected', skuId.value);
+    emit('sku-selected', skuId.value);
 };
 
 onMounted(() => {

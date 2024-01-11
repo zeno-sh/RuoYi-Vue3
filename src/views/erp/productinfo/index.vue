@@ -7,6 +7,11 @@
       <el-form-item label="产品名称" prop="skuName">
         <el-input v-model="queryParams.skuName" placeholder="请输入产品名称" clearable @keyup.enter="handleQuery" />
       </el-form-item>
+      <el-form-item label="目标平台" prop="platform">
+        <el-select v-model="queryParams.platform" placeholder="请选择目标平台" clearable>
+          <el-option v-for="dict in dm_platform" :key="dict.value" :label="dict.label" :value="dict.value" />
+        </el-select>
+      </el-form-item>
       <el-form-item label="售卖状态" prop="saleStatus">
         <el-select v-model="queryParams.saleStatus" placeholder="请选择售卖状态" clearable>
           <el-option v-for="dict in dm_product_sale_status" :key="dict.value" :label="dict.label" :value="dict.value" />
@@ -14,9 +19,6 @@
       </el-form-item>
       <el-form-item label="类目" prop="categoryId">
         <el-input v-model="queryParams.categoryId" placeholder="请输入类目" clearable @keyup.enter="handleQuery" />
-      </el-form-item>
-      <el-form-item label="品牌" prop="brandId">
-        <el-input v-model="queryParams.brandId" placeholder="请输入品牌" clearable @keyup.enter="handleQuery" />
       </el-form-item>
       <el-form-item label="标签" prop="flagId">
         <el-select v-model="queryParams.flagId" placeholder="请选择标签" clearable>
@@ -60,7 +62,7 @@
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="productList" @selection-change="handleSelectionChange" height="600">
+    <el-table v-loading="loading" :data="productList" @selection-change="handleSelectionChange" height="600" border>
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column type="index" width="50" label="序号" fixed />
       <el-table-column label="图片" align="center" prop="pictureUrl" width="100" fixed>
@@ -68,23 +70,29 @@
           <image-preview :src="scope.row.pictureUrl" :width="50" :height="50" />
         </template>
       </el-table-column>
-      <el-table-column label="型号(SPU)" width="100" align="center" prop="modelNumber" fixed="" />
-      <el-table-column label="SKU" width="180" align="center" prop="skuId">
+      <el-table-column label="SKU" width="180" align="center" prop="skuId" fixed>
         <template #default="scope">
           <a @click="handleUpdate(scope.row)" class="hover-link">{{ scope.row.skuId }}</a>
         </template>
       </el-table-column>
+      <el-table-column label="型号(SPU)" width="100" align="center" prop="modelNumber" />
+
       <el-table-column label="产品名称" width="180" align="center" prop="skuName" />
+      <el-table-column label="目标平台" align="center" prop="platform">
+        <template #default="scope">
+          <dict-tag :options="dm_platform" :value="scope.row.platform" />
+        </template>
+      </el-table-column>
       <el-table-column label="单位" align="center" prop="unit">
         <template #default="scope">
           <dict-tag :options="dm_unit_type" :value="scope.row.unit" />
         </template>
       </el-table-column>
-      <el-table-column label="预估成本价" align="center" prop="costPrice" width="90">
+      <!-- <el-table-column label="预估成本价" align="center" prop="costPrice" width="90">
         <template #default="scope">
           ￥{{ scope.row.costPrice }}
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="售卖状态" align="center" prop="saleStatus">
         <template #default="scope">
           <dict-tag :options="dm_product_sale_status" :value="scope.row.saleStatus" />
@@ -140,7 +148,8 @@
       @pagination="getList" />
 
     <!-- 添加或修改产品信息对话框 -->
-    <el-dialog :title="title" v-model="open" width="95%" append-to-body :close-on-click-modal="false" :close-on-press-escape="true">
+    <el-dialog :title="title" v-model="open" width="95%" append-to-body :close-on-click-modal="false"
+      :close-on-press-escape="true">
       <el-form ref="productRef" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="图片" prop="pictureUrl">
           <image-upload v-model="form.pictureUrl" />
@@ -188,9 +197,9 @@
               <el-input v-model="form.brandId" placeholder="请输入品牌" />
             </el-form-item>
           </el-col>
-
         </el-row>
-        <el-row type="fles">
+
+        <el-row type="flex">
           <el-col :span="8">
             <el-form-item label="标签" prop="flagId">
               <el-select v-model="form.flagId" placeholder="请选择标签">
@@ -199,11 +208,19 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-row :span="8">
+          <el-col :span="8">
+            <el-form-item label="目标平台" prop="platform">
+              <el-select v-model="form.platform" placeholder="请选择目标平台">
+                <el-option v-for="dict in dm_platform" :key="dict.value" :label="dict.label"
+                  :value="parseInt(dict.value)"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
             <el-form-item label="类目佣金" prop="categoryCommission">
               <!-- <el-input v-model="form.categoryCommission" placeholder="请输入类目佣金" /> -->
               <el-select v-model="form.categoryCommission" :multiple="false" filterable remote reserve-keyword
-                placeholder="请输入SKU" remote-show-suffix :remote-method="getCategorCommission" clearable>
+                placeholder="请选择佣金" remote-show-suffix :remote-method="getCategorCommission" clearable>
                 <el-option v-for="item in categoryCommissionList" :key="item.id"
                   :label="`${item.platformName}` + ' / ' + `${item.rate}` + '%'" :value="item.rate">
                   <span style="float: left">{{ item.platformName }}</span>
@@ -214,7 +231,7 @@
                 </el-option>
               </el-select>
             </el-form-item>
-          </el-row>
+          </el-col>
         </el-row>
 
         <el-form-item label="售卖状态" prop="saleStatus">
@@ -227,13 +244,13 @@
         <el-row type="flex">
           <el-col :span="12">
             <el-form-item label="规格说明" prop="specification">
-              <el-input v-model="form.specification" type="textarea"
+              <el-input v-model="form.specification" type="textarea" :autosize="{minRows:2}"
                 placeholder="请输入规格说明，采购需求。例如：价格区间、中性包装、箱规尺寸、欧规电源、俄语说明书等等" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="产品描述" prop="description">
-              <el-input v-model="form.description" type="textarea" placeholder="请输入内容" />
+              <el-input v-model="form.description" type="textarea" placeholder="请输入内容" :autosize="{minRows:2}"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -594,7 +611,7 @@ const route = useRoute();
 const skuId = ref('');
 
 
-const { query,params } = useRoute();
+const { query, params } = useRoute();
 
 const { proxy } = getCurrentInstance();
 const { dm_product_sale_status, record_status, sys_yes_no, dm_product_flag, dm_platform, dm_currency_code, dm_unit_type } = proxy.useDict('dm_product_sale_status', 'record_status', 'sys_yes_no', 'dm_product_flag', 'dm_platform', 'dm_currency_code', 'dm_unit_type');
@@ -643,7 +660,8 @@ const data = reactive({
     saleStatus: null,
     categoryId: null,
     brandId: null,
-    status: null,
+    status: "1",
+    platform: null,
     competitorLink: null,
     createTime: null,
   },
@@ -716,6 +734,7 @@ function reset() {
     description: null,
     categoryCommission: null,
     status: null,
+    platform: null,
     competitorLink: null,
     createBy: null,
     createTime: null,
@@ -1109,7 +1128,7 @@ onMounted(() => {
 });
 
 function routeEdit(skuId) {
-  
+
   reset();
   if (skuId == null || '' == skuId) {
     return;

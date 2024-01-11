@@ -443,6 +443,9 @@ function handleExport() {
 }
 
 function getPcsData(row) {
+  if (row.skuId == null || row.skuId == '') {
+    return;
+  }
   purchaseQueryParams.value.skuId = row.skuId;
   listPurchase(purchaseQueryParams.value).then(response => {
     purchaseData.value = response.rows[0];

@@ -48,10 +48,13 @@
       @pagination="getList" />
 
     <!-- 添加或修改采购计划对话框 -->
-    <el-dialog :title="title" v-model="open" width="1200px" append-to-body>
+    <el-dialog :title="title" v-model="open" width="1200px" append-to-body :close-on-click-modal="false">
       <el-form ref="purchaseplanRef" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="计划编码" prop="code">
-          <el-input v-model="form.code" placeholder="保存后自动生成" />
+          <el-input v-model="form.code" placeholder="保存后自动生成" disabled />
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
         <el-divider content-position="center">采购计划详情信息</el-divider>
         <el-row :gutter="10" class="mb8">
@@ -66,44 +69,55 @@
           @selection-change="handleDmPurchasePlanItemSelectionChange" ref="dmPurchasePlanItem">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column label="序号" align="center" prop="index" width="50" />
-          <!-- <el-table-column label="skuId" prop="skuId" width="150">
+          <el-table-column label="图片" align="center" prop="pictureUrl" width="100">
             <template #default="scope">
-              <el-input v-model="scope.row.skuId" placeholder="请输入skuId" />
-            </template>
-          </el-table-column> -->
-          <el-table-column label="skuId" prop="skuId" width="150">
-            <template #default="scope">
-              <!-- <el-input v-model="scope.row.skuId" placeholder="请输入skuId" /> -->
-              <dm-product :skuId="scope.row.skuId" v-model="scope.row.skuId"></dm-product>
-            </template>
-            
-          </el-table-column>
-          
-          <!-- <el-table-column label="供应商" prop="supplierId" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.supplierId" placeholder="请输入供应商" />
-            </template>
-          </el-table-column> -->
-          <el-table-column label="采购数量" prop="purchaseQuantity" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.purchaseQuantity" placeholder="请输入采购数量" />
+              <image-preview :src="scope.row.pictureUrl" :width="50" :height="50" />
             </template>
           </el-table-column>
-          <el-table-column label="箱数" prop="numberOfCases" width="150">
+          <el-table-column label="skuId" prop="skuId" width="250">
             <template #default="scope">
-              <el-input v-model="scope.row.numberOfCases" placeholder="请输入箱数" />
+              <dm-select-product :skuId="scope.row.skuId" v-model="scope.row.skuId"
+                @sku-selected="getPcsData(scope.row)"></dm-select-product>
             </template>
           </el-table-column>
-          <el-table-column label="体积" prop="volume" width="150">
+          <el-table-column label="采购数量" prop="quantity" width="150">
             <template #default="scope">
-              <el-input v-model="scope.row.volume" placeholder="请输入体积" />
+              <el-input v-model="scope.row.quantity" placeholder="请输入采购数量" clearable @change="calculateBox(scope.row)" />
+            </template>
+          </el-table-column>
+          <el-table-column label="pcs" prop="pcs" width="120">
+            <template #default="scope">
+              <el-input v-model="scope.row.pcs" placeholder="" clearable @change="calculateBox(scope.row)" />
+            </template>
+          </el-table-column>
+          <el-table-column label="箱数" prop="numberOfBox" width="180">
+            <template #default="scope">
+              <el-row type="flex" justify="start" align="middle">
+                <el-col :span="14">
+                  <el-input v-model="scope.row.numberOfBox" placeholder="" clearable />
+                </el-col>
+                <el-col :span="10">
+                  <el-tooltip class="box-item" effect="dark" content="实际计算结果不为整数，建议进行调整" placement="bottom"
+                    v-if="scope.row.calculateWarning">
+                    <el-icon style="color: rgb(236, 122, 39); margin-left: 5px;">
+                      <Warning />
+                    </el-icon>
+                  </el-tooltip>
+                  <span v-if="scope.row.calculateWarning">{{ scope.row.calculateBoxNum }}</span>
+                </el-col>
+              </el-row>
+            </template>
+          </el-table-column>
+          <!-- <el-table-column label="体积" prop="volume" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.volume" placeholder="自动计算" />
             </template>
           </el-table-column>
           <el-table-column label="重量" prop="weight" width="150">
             <template #default="scope">
-              <el-input v-model="scope.row.weight" placeholder="请输入重量" />
+              <el-input v-model="scope.row.weight" placeholder="自动计算" />
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column label="采购订单" prop="purchaseOrder" width="150">
             <template #default="scope">
               <el-input v-model="scope.row.purchaseOrder" placeholder="请输入采购订单" />
@@ -120,7 +134,7 @@
             <template #default="scope">
               <el-select v-model="scope.row.status" placeholder="请选择采购状态">
                 <el-option v-for="dict in dm_purchase_plan_status" :key="dict.value" :label="dict.label"
-                  :value="dict.value"></el-option>
+                  :value="parseInt(dict.value)"></el-option>
               </el-select>
             </template>
           </el-table-column>
@@ -138,7 +152,9 @@
 
 <script setup name="Purchaseplan">
 import { listPurchaseplan, getPurchaseplan, delPurchaseplan, addPurchaseplan, updatePurchaseplan } from "@/api/erp/purchaseplan";
-import DmProduct from '@/components/DmProduct'
+import DmSelectProduct from '@/components/DmSelectProduct'
+import { listPurchase } from "@/api/erp/purchase";
+import { getProductBySkuId } from "@/api/erp/product";
 
 const { proxy } = getCurrentInstance();
 const { dm_purchase_plan_status } = proxy.useDict('dm_purchase_plan_status');
@@ -154,6 +170,8 @@ const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
 const title = ref("");
+
+const purchaseData = ref(null);
 
 const data = reactive({
   form: {},
@@ -231,6 +249,12 @@ function handleUpdate(row) {
     dmPurchasePlanItemList.value = response.data.dmPurchasePlanItemList;
     open.value = true;
     title.value = "修改采购计划";
+
+    if (dmPurchasePlanItemList.value.length > 0) {
+      dmPurchasePlanItemList.value.forEach(item => {
+        getProduct(item);
+      });
+    }
   });
 }
 
@@ -277,8 +301,8 @@ function handleAddDmPurchasePlanItem() {
   let obj = {};
   obj.supplierId = "";
   obj.skuId = "";
-  obj.purchaseQuantity = "";
-  obj.numberOfCases = "";
+  obj.quantity = "";
+  obj.numberOfBox = "";
   obj.volume = "";
   obj.weight = "";
   obj.purchaseOrder = "";
@@ -311,6 +335,39 @@ function handleExport() {
   proxy.download('erp/purchaseplan/export', {
     ...queryParams.value
   }, `purchaseplan_${new Date().getTime()}.xlsx`)
+}
+
+function getProduct(row) {
+  if (row.skuId == null || row.skuId == '') {
+    return;
+  }
+  getProductBySkuId(row.skuId).then(response => {
+    row.pictureUrl = response.data.pictureUrl;
+  });
+}
+
+function getPcsData(row) {
+  if (row.skuId == null || row.skuId == '') {
+    return;
+  }
+  queryParams.value.skuId = row.skuId;
+  listPurchase(queryParams.value).then(response => {
+    purchaseData.value = response.rows[0];
+    row.pcs = purchaseData.value.quantityPerBox;
+  });
+  getProduct(row);
+}
+
+function calculateBox(row) {
+  row.calculateWarning = false;
+  if (row.quantity !== null && row.pcs !== null) {
+    const result = row.quantity / row.pcs;
+    row.numberOfBox = result.toFixed(0); // 使用 toFixed(0) 将结果四舍五入为整数赋值给 numberOfBox
+    row.calculateBoxNum = result.toFixed(1); // 将结果保留一位小数赋值给 calculateBoxNum
+    row.calculateWarning = !(Number.isInteger(Number(row.calculateBoxNum)) && row.calculateBoxNum > 0);
+    row.volume = ((purchaseData.value.boxWidth * purchaseData.value.boxLength * purchaseData.value.boxHeight) / 1000000 * row.calculateBoxNum).toFixed(3);
+    row.weight = (purchaseData.value.boxWeight / 1000 * row.calculateBoxNum).toFixed(2);
+  }
 }
 
 getList();
