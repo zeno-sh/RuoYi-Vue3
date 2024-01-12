@@ -78,7 +78,7 @@
       <el-table-column label="型号(SPU)" width="100" align="center" prop="modelNumber" />
 
       <el-table-column label="产品名称" width="180" align="center" prop="skuName" />
-      <el-table-column label="目标平台" align="center" prop="platform">
+      <el-table-column label="目标平台" align="center" prop="platform" width="120">
         <template #default="scope">
           <dict-tag :options="dm_platform" :value="scope.row.platform" />
         </template>
