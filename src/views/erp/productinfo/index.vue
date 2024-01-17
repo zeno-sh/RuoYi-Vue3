@@ -219,7 +219,7 @@
           <el-col :span="8">
             <el-form-item label="类目佣金" prop="categoryCommissionId">
               <el-select v-model="form.categoryCommissionId" :multiple="false" filterable remote reserve-keyword
-                placeholder="请选择佣金" remote-show-suffix clearable>
+              placeholder="请选择佣金" remote-show-suffix :remote-method="getCategorCommission" clearable>
                 <el-option v-for="item in categoryCommissionList" :key="item.id"
                   :label="`${item.platformName}` + ' / ' + `${item.rate}` + '%'" :value="item.id">
                   <span style="float: left">{{ item.platformName }}</span>
