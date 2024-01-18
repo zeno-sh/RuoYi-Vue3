@@ -39,25 +39,25 @@
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="transportplanList">
+    <el-table v-loading="loading" :data="transportplanList" border>
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column type="index" width="50" label="序号" />
-      <el-table-column label="发货计划编码" align="center" prop="code" width="200"/>
-      <el-table-column label="运输状态" align="center" prop="transportStatus">
+      <el-table-column label="发货计划编码" align="center" prop="code" width="200" />
+      <el-table-column label="运输状态" align="center" prop="transportStatus" width="110">
         <template #default="scope">
           <dict-tag :options="dm_transport_status" :value="scope.row.transportStatus" />
         </template>
       </el-table-column>
       <el-table-column label="海外仓入库单号" align="center" prop="overseaLocationCheckinId" width="250" />
-      <el-table-column label="货代公司" align="center" prop="forwarder" />
-      
-      <el-table-column label="币种" align="center" prop="currency">
+      <el-table-column label="货代公司" align="center" prop="forwarder" width="120"/>
+
+      <el-table-column label="币种" align="center" prop="currency" width="100"> 
         <template #default="scope">
           <dict-tag :options="dm_currency_code" :value="scope.row.currency" />
         </template>
       </el-table-column>
-      <el-table-column label="报价" align="center" prop="offerPrice" />
-      <el-table-column label="结算状态" align="center" prop="settleStatus">
+      <el-table-column label="报价" align="center" prop="offerPrice" width="100"/>
+      <el-table-column label="结算状态" align="center" prop="settleStatus" width="100">
         <template #default="scope">
           <dict-tag :options="sys_yes_no" :value="scope.row.settleStatus" />
         </template>
@@ -180,27 +180,36 @@
           @selection-change="handleDmTransportPlanItemSelectionChange" ref="dmTransportPlanItem">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column label="序号" align="center" prop="index" width="50" />
+          <el-table-column label="图片" align="center" prop="pictureUrl" width="100">
+            <template #default="scope">
+              <image-preview :src="scope.row.pictureUrl" :width="50" :height="50" />
+            </template>
+          </el-table-column>
           <el-table-column label="产品ID" prop="skuId" width="250">
             <template #default="scope">
               <dm-select-product :skuId="scope.row.skuId" v-model="scope.row.skuId"
                 @sku-selected="getPcsData(scope.row)"></dm-select-product>
             </template>
           </el-table-column>
-          <el-table-column label="发运数量" prop="quantity" width="150">
+          <el-table-column label="发运数量" prop="quantity" width="120">
             <template #default="scope">
-              <el-input v-model="scope.row.quantity" placeholder="请输入发运数量" clearable @change="calculateBox(scope.row)" />
+              <el-input-number class="input-number" controls-position="right" :min="1" v-model="scope.row.quantity"
+                placeholder="请输入发运数量" @change="calculateBox(scope.row)" />
+
             </template>
           </el-table-column>
           <el-table-column label="pcs" prop="pcs" width="120">
             <template #default="scope">
-              <el-input v-model="scope.row.pcs" placeholder="" clearable @change="calculateBox(scope.row)" />
+              <el-input-number class="input-number" controls-position="right" v-model="scope.row.pcs" placeholder=""
+                clearable @change="calculateBox(scope.row)" />
             </template>
           </el-table-column>
           <el-table-column label="箱数" prop="numberOfBox" width="180">
             <template #default="scope">
               <el-row type="flex" justify="start" align="middle">
                 <el-col :span="14">
-                  <el-input v-model="scope.row.numberOfBox" placeholder="" clearable />
+                  <el-input-number class="input-number" controls-position="right" v-model="scope.row.numberOfBox"
+                    placeholder="" clearable />
                 </el-col>
                 <el-col :span="10">
                   <el-tooltip class="box-item" effect="dark" content="实际计算结果不为整数，建议进行调整" placement="bottom"
@@ -250,6 +259,7 @@ import { listTransportplan, getTransportplan, delTransportplan, addTransportplan
 import { listPurchase } from "@/api/erp/purchase";
 import DmCurrency from '@/components/DmCurrency'
 import DmSelectProduct from '@/components/DmSelectProduct'
+import { getProductBySkuId } from "@/api/erp/product";
 
 const { proxy } = getCurrentInstance();
 const { dm_transport_status, sys_yes_no, dm_currency_code } = proxy.useDict('dm_transport_status', 'sys_yes_no', 'dm_currency_code');
@@ -364,6 +374,12 @@ function handleUpdate(row) {
     dmTransportPlanItemList.value = response.data.dmTransportPlanItemList;
     open.value = true;
     title.value = "修改头程计划";
+
+    if (dmTransportPlanItemList.value.length > 0) {
+      dmTransportPlanItemList.value.forEach(item => {
+        getProduct(item);
+      });
+    }
   });
 }
 
@@ -448,9 +464,16 @@ function getPcsData(row) {
   }
   purchaseQueryParams.value.skuId = row.skuId;
   listPurchase(purchaseQueryParams.value).then(response => {
-    purchaseData.value = response.rows[0];
+    // 查找 firstChoice='Y' 的元素
+    const firstChoiceItem = response.rows.find(row => row.firstChoice === 'Y');
+
+    // 如果找到，则使用该元素；否则，默认使用第一个元素
+    purchaseData.value = firstChoiceItem || response.rows[0];
+
+    // 设置 row.pcs 的值
     row.pcs = purchaseData.value.quantityPerBox;
   });
+  getProduct(row);
 }
 
 function calculateBox(row) {
@@ -465,6 +488,20 @@ function calculateBox(row) {
   }
 }
 
+function getProduct(row) {
+  if (row.skuId == null || row.skuId == '') {
+    return;
+  }
+  getProductBySkuId(row.skuId).then(response => {
+    row.pictureUrl = response.data.pictureUrl;
+  });
+}
 
 getList();
 </script>
+
+<style scoped>
+.input-number {
+  width: 88px;
+}
+</style>

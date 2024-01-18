@@ -154,15 +154,15 @@
         <el-container style="height: 90%">
           <!-- 左侧导航 -->
           <el-aside width="200px">
-            <el-menu @select="handleSelect">
+            <el-menu :default-active="activeSection" @select="handleSelect">
               <!-- 产品图片作为菜单项 -->
-              <div class="menu-item" @click="handleSelect('image-upload')">
+              <div index="image-upload" class="menu-item" @click="handleSelect('image-upload')">
                 <image-preview :src="form.pictureUrl" :width="120" :height="120" :preview-src-list="[]" />
                 <div> {{ form.skuName }} </div>
                 <div> {{ form.skuId }} </div>
                 <div> &nbsp; </div>
-
               </div>
+              <el-menu-item index="image-upload">图片信息</el-menu-item>
               <el-menu-item index="basic-info">基本信息</el-menu-item>
               <el-menu-item index="sales-trend">销量趋势</el-menu-item>
               <el-menu-item index="price-strategy">价格策略</el-menu-item>
@@ -620,6 +620,10 @@
             </div>
 
             <div v-show="activeSection === 'image-upload'">
+              <!-- 标题区域 -->
+              <div class="form-title">
+                <span class="title-bar"></span>产品图片
+              </div>
               <el-form-item label="图片" prop="pictureUrl">
                 <image-upload v-model="form.pictureUrl" :limit="1" />
               </el-form-item>
@@ -667,7 +671,8 @@ import { addPlan } from "@/api/erp/plan";
 import { listCommission } from "@/api/erp/commission";
 import { listFactory, queryFactoryByCodes } from "@/api/erp/factory";
 import { ref, onMounted } from 'vue';
-import { onBeforeRouteUpdate, useRoute } from 'vue-router';
+import { useRoute } from 'vue-router';
+import { ElMessage } from 'element-plus';
 
 const route = useRoute();
 
@@ -908,7 +913,8 @@ function handleUpdate(row) {
 
 /** 提交按钮 */
 function submitForm() {
-  proxy.$refs["productRef"].validate(valid => {
+  proxy.$refs["productRef"].validate((valid, fields) => {
+    console.log(valid)
     if (valid) {
       form.value.dmProductCustomsList = dmProductCustomsList.value;
       form.value.dmProductPlatformTrendList = dmProductPlatformTrendList.value;
@@ -927,6 +933,18 @@ function submitForm() {
           open.value = false;
           getList();
         });
+      }
+    } else {
+      let messages = [];
+      for (const key in fields) {
+        if (fields[key].length > 0) {
+          fields[key].forEach(fieldError => {
+            messages.push(fieldError.message);
+          });
+        }
+      }
+      if (messages.length > 0) {
+        ElMessage.error(messages.join('\n'));
       }
     }
   });
