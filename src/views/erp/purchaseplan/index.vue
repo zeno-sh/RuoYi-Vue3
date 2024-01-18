@@ -66,7 +66,7 @@
           </el-col>
         </el-row>
         <el-table :data="dmPurchasePlanItemList" :row-class-name="rowDmPurchasePlanItemIndex"
-          @selection-change="handleDmPurchasePlanItemSelectionChange" ref="dmPurchasePlanItem">
+          @selection-change="handleDmPurchasePlanItemSelectionChange" ref="dmPurchasePlanItem" show-summary>
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column label="序号" align="center" prop="index" width="50" />
           <el-table-column label="图片" align="center" prop="pictureUrl" width="100">

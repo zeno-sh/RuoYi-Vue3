@@ -151,427 +151,481 @@
     <el-dialog :title="title" v-model="open" width="95%" append-to-body :close-on-click-modal="false"
       :close-on-press-escape="true">
       <el-form ref="productRef" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="图片" prop="pictureUrl">
-          <image-upload v-model="form.pictureUrl" />
-        </el-form-item>
-        <el-form-item label="产品名称" prop="skuName">
-          <el-input v-model="form.skuName" placeholder="请输入产品名称" />
-        </el-form-item>
-        <el-row type="flex">
-          <el-col :span="8">
-            <el-form-item label="SKU" prop="skuId">
-              <el-input v-model="form.skuId" placeholder="请输入SKU" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="型号(SPU)" prop="modelNumber">
-              <el-input v-model="form.modelNumber" placeholder="请输入型号(SPU)" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <!-- <el-form-item label="单位" prop="unit">
-              <el-input v-model="form.unit" placeholder="请输入单位" />
-            </el-form-item> -->
-            <el-form-item label="单位" prop="unit">
-              <el-select v-model="form.unit" placeholder="请选择单位">
-                <el-option v-for="dict in dm_unit_type" :key="dict.value" :label="dict.label"
-                  :value="dict.value"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
+        <el-container style="height: 90%">
+          <!-- 左侧导航 -->
+          <el-aside width="200px">
+            <el-menu @select="handleSelect">
+              <!-- 产品图片作为菜单项 -->
+              <div class="menu-item" @click="handleSelect('image-upload')">
+                <image-preview :src="form.pictureUrl" :width="120" :height="120" :preview-src-list="[]" />
+                <div> {{ form.skuName }} </div>
+                <div> {{ form.skuId }} </div>
+                <div> &nbsp; </div>
 
-        <el-row type="flex">
-          <el-col :span="8">
-            <el-form-item label="预估成本价" prop="costPrice">
-              <el-input v-model="form.costPrice" placeholder="请输入预估成本价" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="类目" prop="categoryId">
-              <el-input v-model="form.categoryId" placeholder="请输入类目" disabled />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="品牌" prop="brandId">
-              <el-input v-model="form.brandId" placeholder="请输入品牌" disabled />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row type="flex">
-          <el-col :span="8">
-            <el-form-item label="标签" prop="flagId">
-              <el-select v-model="form.flagId" placeholder="请选择标签">
-                <el-option v-for="dict in dm_product_flag" :key="dict.value" :label="dict.label"
-                  :value="parseInt(dict.value)"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="目标平台" prop="platform">
-              <el-select v-model="form.platform" placeholder="请选择目标平台">
-                <el-option v-for="dict in dm_platform" :key="dict.value" :label="dict.label"
-                  :value="parseInt(dict.value)"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="类目佣金" prop="categoryCommissionId">
-              <el-select v-model="form.categoryCommissionId" :multiple="false" filterable remote reserve-keyword
-              placeholder="请选择佣金" remote-show-suffix :remote-method="getCategorCommission" clearable>
-                <el-option v-for="item in categoryCommissionList" :key="item.id"
-                  :label="`${item.platformName}` + ' / ' + `${item.rate}` + '%'" :value="item.id">
-                  <span style="float: left">{{ item.platformName }}</span>
-                  <span
-                    style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{
-                      item.rate
-                    }}{{ '%' }}</span>
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-form-item label="售卖状态" prop="saleStatus">
-          <el-radio-group v-model="form.saleStatus">
-            <el-radio v-for="dict in dm_product_sale_status" :key="dict.value" :label="parseInt(dict.value)">{{ dict.label
-            }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-
-        <el-row type="flex">
-          <el-col :span="12">
-            <el-form-item label="规格说明" prop="specification">
-              <el-input v-model="form.specification" type="textarea" :autosize="{ minRows: 2 }"
-                placeholder="请输入规格说明，采购需求。例如：价格区间、中性包装、箱规尺寸、欧规电源、俄语说明书等等" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="产品描述" prop="description">
-              <el-input v-model="form.description" type="textarea" placeholder="请输入内容" :autosize="{ minRows: 2 }" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-
-        <el-divider content-position="center">产品销量趋势信息</el-divider>
-        <el-row :gutter="10" class="mb8">
-          <el-col :span="1.5">
-            <el-button type="primary" icon="Plus" @click="handleAddDmProductPlatformTrend">添加</el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <el-button type="danger" icon="Delete" @click="handleDeleteDmProductPlatformTrend">删除</el-button>
-          </el-col>
-        </el-row>
-
-        <el-table :data="dmProductPlatformTrendList" :row-class-name="rowDmProductPlatformTrendIndex"
-          @selection-change="handleDmProductPlatformTrendSelectionChange" ref="dmProductPlatformTrend">
-          <el-table-column type="selection" width="50" align="center" />
-          <el-table-column label="序号" align="center" prop="index" width="50" />
-          <el-table-column label="平台" prop="platformId" width="150">
-            <template #default="scope">
-              <el-select v-model="scope.row.platformId" placeholder="请选择平台">
-                <el-option v-for="dict in dm_platform" :key="dict.value" :label="dict.label"
-                  :value="parseInt(dict.value)"></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="竞品链接" prop="competitorLink" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.competitorLink" placeholder="请输入竞品竞品链接" />
-            </template>
-          </el-table-column>
-          <el-table-column label="竞品产品Id" prop="competitorSkuId" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.competitorSkuId" placeholder="请输入竞品产品Id" />
-            </template>
-          </el-table-column>
-          <el-table-column label="竞品销量" prop="competitorSaleNumber" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.competitorSaleNumber" placeholder="请输入竞品销量" />
-            </template>
-          </el-table-column>
-
-          <el-table-column label="竞品价格" prop="competitorSalePrice" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.competitorSalePrice" placeholder="请输入竞品价格" />
-            </template>
-          </el-table-column>
-        </el-table>
-
-        <el-divider content-position="center">产品价格策略信息</el-divider>
-        <el-row :gutter="10" class="mb8">
-          <el-col :span="1.5">
-            <el-button type="primary" icon="Plus" @click="handleAddDmProductPrice">添加</el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <el-button type="danger" icon="Delete" @click="handleDeleteDmProductPrice">删除</el-button>
-          </el-col>
-        </el-row>
-        <el-table :data="dmProductPriceList" :row-class-name="rowDmProductPriceIndex"
-          @selection-change="handleDmProductPriceSelectionChange" ref="dmProductPrice">
-          <el-table-column type="selection" width="50" align="center" />
-          <el-table-column label="序号" align="center" prop="index" width="50" />
-          <el-table-column label="首选" prop="firstChoice" width="150">
-            <template #default="scope">
-              <el-radio-group v-model="scope.row.firstChoice">
-                <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
-                  @change="() => updateFirstChoice(scope.row, dmProductPriceList)">{{ dict.label }}</el-radio>
-              </el-radio-group>
-            </template>
-          </el-table-column>
-          <el-table-column label="价格策略名称" prop="priceStrategyName" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.priceStrategyName" placeholder="请输入价格策略名称" />
-            </template>
-          </el-table-column>
-          <el-table-column label="产品售价" prop="sellingPrice" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.sellingPrice" placeholder="请输入产品售价" />
-            </template>
-          </el-table-column>
-          <el-table-column label="产品原价" prop="originalPrice" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.originalPrice" placeholder="请输入产品原价" />
-            </template>
-          </el-table-column>
-        </el-table>
-
-        <el-divider content-position="center">海关信息</el-divider>
-        <el-row :gutter="10" class="mb8">
-          <el-col :span="1.5">
-            <el-button type="primary" :disabled="noAdd" icon="Plus" @click="handleAddDmProductCustoms">添加</el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <el-button type="danger" icon="Delete" @click="handleDeleteDmProductCustoms">删除</el-button>
-          </el-col>
-        </el-row>
-        <el-table :data="dmProductCustomsList" :row-class-name="rowDmProductCustomsIndex"
-          @selection-change="handleDmProductCustomsSelectionChange" ref="dmProductCustoms">
-          <el-table-column type="selection" width="50" align="center" />
-          <el-table-column label="序号" align="center" prop="index" width="50" />
-          <el-table-column label="报关名称英文" prop="customsEn" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.customsEn" placeholder="请输入报关名称英文" />
-            </template>
-          </el-table-column>
-          <el-table-column label="报关名称中文" prop="customsZh" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.customsZh" placeholder="请输入报关名称中文" />
-            </template>
-          </el-table-column>
-          <el-table-column label="材质" prop="material" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.material" placeholder="请输入材质" />
-            </template>
-          </el-table-column>
-          <el-table-column label="含电池" prop="hasBattery" width="150">
-            <template #default="scope">
-              <el-select v-model="scope.row.hasBattery" placeholder="请选择含电池">
-                <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
-                  :value="dict.value"></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="含液体" prop="hasLiquid" width="150">
-            <template #default="scope">
-              <el-select v-model="scope.row.hasLiquid" placeholder="请选择含液体">
-                <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
-                  :value="dict.value"></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="纺织品" prop="hasTextile" width="150">
-            <template #default="scope">
-              <el-select v-model="scope.row.hasTextile" placeholder="请选择纺织品">
-                <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
-                  :value="dict.value"></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="报关价格" prop="price" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.price" placeholder="请输入报关价格" />
-            </template>
-          </el-table-column>
-        </el-table>
-
-
-        <el-divider content-position="center">采购信息信息</el-divider>
-        <el-row :gutter="10" class="mb8">
-          <el-col :span="1.5">
-            <el-button type="primary" icon="Plus" @click="handleAddDmProductPurchase">添加</el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <el-button type="danger" icon="Delete" @click="handleDeleteDmProductPurchase">删除</el-button>
-          </el-col>
-        </el-row>
-        <el-table :data="dmProductPurchaseList" :row-class-name="rowDmProductPurchaseIndex"
-          @selection-change="handleDmProductPurchaseSelectionChange" ref="dmProductPurchase">
-          <el-table-column type="selection" width="50" align="center" />
-          <el-table-column label="序号" align="center" prop="index" width="50" />
-          <el-table-column label="首选" prop="firstChoice" width="150">
-            <template #default="scope">
-              <el-radio-group v-model="scope.row.firstChoice">
-                <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
-                  @change="() => updateFirstChoice(scope.row, dmProductPurchaseList)">{{ dict.label }}</el-radio>
-              </el-radio-group>
-            </template>
-          </el-table-column>
-          <el-table-column label="箱规名称" prop="cartonSizeName" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.cartonSizeName" placeholder="请输入箱规名称" />
-            </template>
-          </el-table-column>
-          <el-table-column label="外箱规格" width="280">
-            <template #default="scope">
-              <div class="input-group">
-                <el-input class="input-inner" v-model="scope.row.boxLength" placeholder="长" />
-                <el-input class="input-inner" v-model="scope.row.boxWidth" placeholder="宽" />
-                <el-input class="input-inner" v-model="scope.row.boxHeight" placeholder="高" />
-                <el-input class="input-cm" placeholder="cm" disabled />
               </div>
-            </template>
-          </el-table-column>
+              <el-menu-item index="basic-info">基本信息</el-menu-item>
+              <el-menu-item index="sales-trend">销量趋势</el-menu-item>
+              <el-menu-item index="price-strategy">价格策略</el-menu-item>
+              <el-menu-item index="purchasing-information">采购信息</el-menu-item>
+              <el-menu-item index="supplier-quotation">供应商报价</el-menu-item>
+              <el-menu-item index="customs-information">海关信息</el-menu-item>
+            </el-menu>
+          </el-aside>
 
-          <el-table-column label="单箱数量pcs" prop="quantityPerBox" width="120">
-            <template #default="scope">
-              <el-input-number class="input-number" controls-position="right" :min="1" v-model="scope.row.quantityPerBox"
-                placeholder="单箱数量pcs" />
-            </template>
-          </el-table-column>
-          <el-table-column label="单箱重量g" prop="boxWeight" width="120">
-            <template #default="scope">
-              <el-input class="input-number" v-model="scope.row.boxWeight" placeholder="单箱重量g" />
-            </template>
-          </el-table-column>
-          <el-table-column label="包装规格" width="280">
-            <template #default="scope">
-              <div class="input-group">
-                <el-input class="input-inner" v-model="scope.row.length" placeholder="长" />
-                <el-input class="input-inner" v-model="scope.row.width" placeholder="宽" />
-                <el-input class="input-inner" v-model="scope.row.height" placeholder="高" />
-                <el-input class="input-cm" placeholder="cm" disabled />
+          <!-- 右侧表单区域 -->
+          <el-main>
+
+            <div v-show="activeSection === 'basic-info'">
+              <!-- 标题区域 -->
+              <div class="form-title">
+                <span class="title-bar"></span>基本信息
               </div>
-            </template>
-          </el-table-column>
-          <el-table-column label="单品净重g" prop="netWeight" width="120">
-            <template #default="scope">
-              <el-input class="input-number" v-model="scope.row.netWeight" placeholder="单品净重g" />
-            </template>
-          </el-table-column>
-          <el-table-column label="单品毛重g" prop="grossWeight" width="120">
-            <template #default="scope">
-              <el-input class="input-number" v-model="scope.row.grossWeight" placeholder="单品毛重g" />
-            </template>
-          </el-table-column>
-          <el-table-column label="产品材质" prop="material" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.material" placeholder="请输入产品材质" />
-            </template>
-          </el-table-column>
-        </el-table>
+              <el-form-item label="产品名称" prop="skuName">
+                <el-input v-model="form.skuName" placeholder="请输入产品名称" />
+              </el-form-item>
+              <el-row type="flex">
+                <el-col :span="8">
+                  <el-form-item label="SKU" prop="skuId">
+                    <el-input v-model="form.skuId" placeholder="请输入SKU" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="型号(SPU)" prop="modelNumber">
+                    <el-input v-model="form.modelNumber" placeholder="请输入型号(SPU)" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="单位" prop="unit">
+                    <el-select v-model="form.unit" placeholder="请选择单位">
+                      <el-option v-for="dict in dm_unit_type" :key="dict.value" :label="dict.label"
+                        :value="dict.value"></el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+              </el-row>
 
+              <el-row type="flex">
+                <el-col :span="8">
+                  <el-form-item label="预估成本价" prop="costPrice">
+                    <el-input v-model="form.costPrice" placeholder="请输入预估成本价" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="类目" prop="categoryId">
+                    <el-input v-model="form.categoryId" placeholder="请输入类目" disabled />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="品牌" prop="brandId">
+                    <el-input v-model="form.brandId" placeholder="请输入品牌" disabled />
+                  </el-form-item>
+                </el-col>
+              </el-row>
 
-        <el-divider content-position="center">供应商报价信息</el-divider>
-        <el-row :gutter="10" class="mb8">
-          <el-col :span="1.5">
-            <el-button type="primary" icon="Plus" @click="handleAddDmSupplierPriceOffer">添加</el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <el-button type="danger" icon="Delete" @click="handleDeleteDmSupplierPriceOffer">删除</el-button>
-          </el-col>
-        </el-row>
-        <el-table :data="dmSupplierPriceOfferList" :row-class-name="rowDmSupplierPriceOfferIndex"
-          @selection-change="handleDmSupplierPriceOfferSelectionChange" ref="dmSupplierPriceOffer">
-          <el-table-column type="selection" width="50" align="center" />
-          <el-table-column label="序号" align="center" prop="index" width="50" />
-          <el-table-column label="首选" prop="firstChoice" width="150">
-            <template #default="scope">
-              <el-radio-group v-model="scope.row.firstChoice">
-                <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
-                  @change="() => updateFirstChoice(scope.row, dmSupplierPriceOfferList)">{{ dict.label }}</el-radio>
-              </el-radio-group>
-            </template>
-          </el-table-column>
-          <el-table-column label="供应商" prop="supplierCode" width="150">
-            <template #default="scope">
-              <!-- <el-input v-model="scope.row.supplierCode" placeholder="请选择供应商" /> -->
-              <el-select v-model="scope.row.supplierCode" :multiple="false" filterable remote placeholder="请选择供应商"
-                remote-show-suffix :remote-method="getSupplierInfo" clearable>
-                <el-option v-for="item in factoryList" :key="item.supplierCode"
-                  :label="`${item.supplierName}` + ' / ' + `${item.supplierCode}`" :value="item.supplierCode">
-                  <span style="float: left">{{ item.supplierName }}</span>
-                  <span
-                    style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{
-                      item.supplierCode }}</span>
-                </el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="币种" prop="currency" width="150">
-            <template #default="scope">
-              <!-- <el-input v-model="scope.row.currency" placeholder="请输入币种" /> -->
-              <el-select v-model="scope.row.currency" placeholder="请选择币种">
-                <el-option v-for="dict in dm_currency_code" :key="dict.value"
-                  :label="`${dict.label}` + ' / ' + `${dict.remark}`" :value="parseInt(dict.value)">
-                  <span style="float: left">{{ dict.label }}</span>
-                  <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; ">{{ dict.remark
-                  }}</span>
-                </el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="是否含税" prop="tax" width="110">
-            <template #default="scope">
-              <el-select v-model="scope.row.tax" placeholder="请选择">
-                <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
-                  :value="dict.value"></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="税率" prop="taxRate" width="100">
-            <template #default="scope">
-              <el-input v-model="scope.row.taxRate" placeholder="请输入税率" />
-            </template>
-          </el-table-column>
-          <el-table-column label="报价" prop="price" width="110">
-            <template #default="scope">
-              <el-input v-model="scope.row.price" placeholder="请输入报价" />
-            </template>
-          </el-table-column>
-          <el-table-column label="起订数量" prop="orderNumber" width="120">
-            <template #default="scope">
-              <el-input-number class="input-number" controls-position="right" :min="1" v-model="scope.row.orderNumber"
-                placeholder="请输入起订数量" />
-            </template>
-          </el-table-column>
-          <el-table-column label="交期" prop="deliveryTime" width="120">
-            <template #default="scope">
-              <el-input-number class="input-number" controls-position="right" :min="1" v-model="scope.row.deliveryTime"
-                placeholder="请输入交期" />
-            </template>
-          </el-table-column>
-          <el-table-column label="采购链接" prop="link" width="200">
-            <template #default="scope">
-              <el-input v-model="scope.row.link" placeholder="请输入采购链接" />
-            </template>
-          </el-table-column>
-          <el-table-column label="备注" prop="remark" width="300">
-            <template #default="scope">
-              <el-input v-model="scope.row.remark" type="textarea" placeholder="请输入内容" />
-            </template>
-          </el-table-column>
-          <el-table-column label="报价时间" prop="offerDate" width="240">
-            <template #default="scope">
-              <el-date-picker clearable v-model="scope.row.offerDate" type="date" value-format="YYYY-MM-DD"
-                placeholder="请选择报价时间">
-              </el-date-picker>
-            </template>
-          </el-table-column>
-        </el-table>
+              <el-row type="flex">
+                <el-col :span="8">
+                  <el-form-item label="标签" prop="flagId">
+                    <el-select v-model="form.flagId" placeholder="请选择标签">
+                      <el-option v-for="dict in dm_product_flag" :key="dict.value" :label="dict.label"
+                        :value="parseInt(dict.value)"></el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="目标平台" prop="platform">
+                    <el-select v-model="form.platform" placeholder="请选择目标平台">
+                      <el-option v-for="dict in dm_platform" :key="dict.value" :label="dict.label"
+                        :value="parseInt(dict.value)"></el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="类目佣金" prop="categoryCommissionId">
+                    <el-select v-model="form.categoryCommissionId" :multiple="false" filterable remote reserve-keyword
+                      placeholder="请选择佣金" remote-show-suffix :remote-method="getCategorCommission" clearable>
+                      <el-option v-for="item in categoryCommissionList" :key="item.id"
+                        :label="`${item.platformName}` + ' / ' + `${item.rate}` + '%'" :value="item.id">
+                        <span style="float: left">{{ item.platformName }}</span>
+                        <span
+                          style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{
+                            item.rate
+                          }}{{ '%' }}</span>
+                      </el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+              </el-row>
 
+              <el-form-item label="售卖状态" prop="saleStatus">
+                <el-radio-group v-model="form.saleStatus">
+                  <el-radio v-for="dict in dm_product_sale_status" :key="dict.value" :label="parseInt(dict.value)">{{
+                    dict.label
+                  }}</el-radio>
+                </el-radio-group>
+              </el-form-item>
+
+              <el-row type="flex">
+                <el-col :span="12">
+                  <el-form-item label="规格说明" prop="specification">
+                    <el-input v-model="form.specification" type="textarea" :autosize="{ minRows: 8 }"
+                      placeholder="请输入规格说明，采购需求。例如：价格区间、中性包装、箱规尺寸、欧规电源、俄语说明书等等" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="产品描述" prop="description">
+                    <el-input v-model="form.description" type="textarea" placeholder="请输入内容" :autosize="{ minRows: 8 }" />
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </div>
+
+            <div v-show="activeSection === 'sales-trend'">
+              <!-- 标题区域 -->
+              <div class="form-title">
+                <span class="title-bar"></span>竞对产品销量趋势
+              </div>
+              <el-row :gutter="10" class="mb8">
+                <el-col :span="1.5">
+                  <el-button type="primary" icon="Plus" @click="handleAddDmProductPlatformTrend">添加</el-button>
+                </el-col>
+                <el-col :span="1.5">
+                  <el-button type="danger" icon="Delete" @click="handleDeleteDmProductPlatformTrend">删除</el-button>
+                </el-col>
+              </el-row>
+
+              <el-table :data="dmProductPlatformTrendList" :row-class-name="rowDmProductPlatformTrendIndex"
+                @selection-change="handleDmProductPlatformTrendSelectionChange" ref="dmProductPlatformTrend">
+                <el-table-column type="selection" width="50" align="center" />
+                <el-table-column label="序号" align="center" prop="index" width="50" />
+                <el-table-column label="平台" prop="platformId" width="150">
+                  <template #default="scope">
+                    <el-select v-model="scope.row.platformId" placeholder="请选择平台">
+                      <el-option v-for="dict in dm_platform" :key="dict.value" :label="dict.label"
+                        :value="parseInt(dict.value)"></el-option>
+                    </el-select>
+                  </template>
+                </el-table-column>
+                <el-table-column label="竞品链接" prop="competitorLink" width="150">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.competitorLink" placeholder="请输入竞品竞品链接" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="竞品产品Id" prop="competitorSkuId" width="150">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.competitorSkuId" placeholder="请输入竞品产品Id" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="竞品销量" prop="competitorSaleNumber" width="150">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.competitorSaleNumber" placeholder="请输入竞品销量" />
+                  </template>
+                </el-table-column>
+
+                <el-table-column label="竞品价格" prop="competitorSalePrice" width="150">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.competitorSalePrice" placeholder="请输入竞品价格" />
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+            <div v-show="activeSection === 'price-strategy'">
+              <!-- 标题区域 -->
+              <div class="form-title">
+                <span class="title-bar"></span>产品价格策略
+              </div>
+              <el-row :gutter="10" class="mb8">
+                <el-col :span="1.5">
+                  <el-button type="primary" icon="Plus" @click="handleAddDmProductPrice">添加</el-button>
+                </el-col>
+                <el-col :span="1.5">
+                  <el-button type="danger" icon="Delete" @click="handleDeleteDmProductPrice">删除</el-button>
+                </el-col>
+              </el-row>
+              <el-table :data="dmProductPriceList" :row-class-name="rowDmProductPriceIndex"
+                @selection-change="handleDmProductPriceSelectionChange" ref="dmProductPrice">
+                <el-table-column type="selection" width="50" align="center" />
+                <el-table-column label="序号" align="center" prop="index" width="50" />
+                <el-table-column label="首选" prop="firstChoice" width="150">
+                  <template #default="scope">
+                    <el-radio-group v-model="scope.row.firstChoice">
+                      <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
+                        @change="() => updateFirstChoice(scope.row, dmProductPriceList)">{{ dict.label }}</el-radio>
+                    </el-radio-group>
+                  </template>
+                </el-table-column>
+                <el-table-column label="价格策略名称" prop="priceStrategyName" width="150">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.priceStrategyName" placeholder="请输入价格策略名称" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="产品售价" prop="sellingPrice" width="150">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.sellingPrice" placeholder="请输入产品售价" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="产品原价" prop="originalPrice" width="150">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.originalPrice" placeholder="请输入产品原价" />
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+            <div v-show="activeSection === 'purchasing-information'">
+              <!-- 标题区域 -->
+              <div class="form-title">
+                <span class="title-bar"></span>产品采购信息
+              </div>
+              <el-row :gutter="10" class="mb8">
+                <el-col :span="1.5">
+                  <el-button type="primary" icon="Plus" @click="handleAddDmProductPurchase">添加</el-button>
+                </el-col>
+                <el-col :span="1.5">
+                  <el-button type="danger" icon="Delete" @click="handleDeleteDmProductPurchase">删除</el-button>
+                </el-col>
+              </el-row>
+              <el-table :data="dmProductPurchaseList" :row-class-name="rowDmProductPurchaseIndex"
+                @selection-change="handleDmProductPurchaseSelectionChange" ref="dmProductPurchase">
+                <el-table-column type="selection" width="50" align="center" />
+                <el-table-column label="序号" align="center" prop="index" width="50" />
+                <el-table-column label="首选" prop="firstChoice" width="150">
+                  <template #default="scope">
+                    <el-radio-group v-model="scope.row.firstChoice">
+                      <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
+                        @change="() => updateFirstChoice(scope.row, dmProductPurchaseList)">{{ dict.label }}</el-radio>
+                    </el-radio-group>
+                  </template>
+                </el-table-column>
+                <el-table-column label="箱规名称" prop="cartonSizeName" width="150">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.cartonSizeName" placeholder="请输入箱规名称" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="外箱规格" width="280">
+                  <template #default="scope">
+                    <div class="input-group">
+                      <el-input class="input-inner" v-model="scope.row.boxLength" placeholder="长" />
+                      <el-input class="input-inner" v-model="scope.row.boxWidth" placeholder="宽" />
+                      <el-input class="input-inner" v-model="scope.row.boxHeight" placeholder="高" />
+                      <el-input class="input-cm" placeholder="cm" disabled />
+                    </div>
+                  </template>
+                </el-table-column>
+
+                <el-table-column label="单箱数量pcs" prop="quantityPerBox" width="120">
+                  <template #default="scope">
+                    <el-input-number class="input-number" controls-position="right" :min="1"
+                      v-model="scope.row.quantityPerBox" placeholder="单箱数量pcs" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="单箱重量g" prop="boxWeight" width="120">
+                  <template #default="scope">
+                    <el-input class="input-number" v-model="scope.row.boxWeight" placeholder="单箱重量g" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="包装规格" width="280">
+                  <template #default="scope">
+                    <div class="input-group">
+                      <el-input class="input-inner" v-model="scope.row.length" placeholder="长" />
+                      <el-input class="input-inner" v-model="scope.row.width" placeholder="宽" />
+                      <el-input class="input-inner" v-model="scope.row.height" placeholder="高" />
+                      <el-input class="input-cm" placeholder="cm" disabled />
+                    </div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="单品净重g" prop="netWeight" width="120">
+                  <template #default="scope">
+                    <el-input class="input-number" v-model="scope.row.netWeight" placeholder="单品净重g" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="单品毛重g" prop="grossWeight" width="120">
+                  <template #default="scope">
+                    <el-input class="input-number" v-model="scope.row.grossWeight" placeholder="单品毛重g" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="产品材质" prop="material" width="150">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.material" placeholder="请输入产品材质" />
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+            <!-- 供应商报价 -->
+            <div v-show="activeSection === 'supplier-quotation'">
+              <!-- 标题区域 -->
+              <div class="form-title">
+                <span class="title-bar"></span>供应商报价
+              </div>
+              <el-row :gutter="10" class="mb8">
+                <el-col :span="1.5">
+                  <el-button type="primary" icon="Plus" @click="handleAddDmSupplierPriceOffer">添加</el-button>
+                </el-col>
+                <el-col :span="1.5">
+                  <el-button type="danger" icon="Delete" @click="handleDeleteDmSupplierPriceOffer">删除</el-button>
+                </el-col>
+              </el-row>
+              <el-table :data="dmSupplierPriceOfferList" :row-class-name="rowDmSupplierPriceOfferIndex"
+                @selection-change="handleDmSupplierPriceOfferSelectionChange" ref="dmSupplierPriceOffer">
+                <el-table-column type="selection" width="50" align="center" />
+                <el-table-column label="序号" align="center" prop="index" width="50" />
+                <el-table-column label="首选" prop="firstChoice" width="150">
+                  <template #default="scope">
+                    <el-radio-group v-model="scope.row.firstChoice">
+                      <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
+                        @change="() => updateFirstChoice(scope.row, dmSupplierPriceOfferList)">{{ dict.label }}</el-radio>
+                    </el-radio-group>
+                  </template>
+                </el-table-column>
+                <el-table-column label="供应商" prop="supplierCode" width="150">
+                  <template #default="scope">
+                    <!-- <el-input v-model="scope.row.supplierCode" placeholder="请选择供应商" /> -->
+                    <el-select v-model="scope.row.supplierCode" :multiple="false" filterable remote placeholder="请选择供应商"
+                      remote-show-suffix :remote-method="getSupplierInfo" clearable>
+                      <el-option v-for="item in factoryList" :key="item.supplierCode"
+                        :label="`${item.supplierName}` + ' / ' + `${item.supplierCode}`" :value="item.supplierCode">
+                        <span style="float: left">{{ item.supplierName }}</span>
+                        <span
+                          style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{
+                            item.supplierCode }}</span>
+                      </el-option>
+                    </el-select>
+                  </template>
+                </el-table-column>
+                <el-table-column label="币种" prop="currency" width="150">
+                  <template #default="scope">
+                    <!-- <el-input v-model="scope.row.currency" placeholder="请输入币种" /> -->
+                    <el-select v-model="scope.row.currency" placeholder="请选择币种">
+                      <el-option v-for="dict in dm_currency_code" :key="dict.value"
+                        :label="`${dict.label}` + ' / ' + `${dict.remark}`" :value="parseInt(dict.value)">
+                        <span style="float: left">{{ dict.label }}</span>
+                        <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; ">{{
+                          dict.remark
+                        }}</span>
+                      </el-option>
+                    </el-select>
+                  </template>
+                </el-table-column>
+                <el-table-column label="是否含税" prop="tax" width="110">
+                  <template #default="scope">
+                    <el-select v-model="scope.row.tax" placeholder="请选择">
+                      <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
+                        :value="dict.value"></el-option>
+                    </el-select>
+                  </template>
+                </el-table-column>
+                <el-table-column label="税率" prop="taxRate" width="100">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.taxRate" placeholder="请输入税率" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="报价" prop="price" width="110">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.price" placeholder="请输入报价" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="起订数量" prop="orderNumber" width="120">
+                  <template #default="scope">
+                    <el-input-number class="input-number" controls-position="right" :min="1"
+                      v-model="scope.row.orderNumber" placeholder="请输入起订数量" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="交期" prop="deliveryTime" width="120">
+                  <template #default="scope">
+                    <el-input-number class="input-number" controls-position="right" :min="1"
+                      v-model="scope.row.deliveryTime" placeholder="请输入交期" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="采购链接" prop="link" width="200">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.link" placeholder="请输入采购链接" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="备注" prop="remark" width="300">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.remark" type="textarea" placeholder="请输入内容" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="报价时间" prop="offerDate" width="240">
+                  <template #default="scope">
+                    <el-date-picker clearable v-model="scope.row.offerDate" type="date" value-format="YYYY-MM-DD"
+                      placeholder="请选择报价时间">
+                    </el-date-picker>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+            <!-- 海关信息 -->
+            <div v-show="activeSection === 'customs-information'">
+              <!-- 标题区域 -->
+              <div class="form-title">
+                <span class="title-bar"></span>海关信息
+              </div>
+              <el-row :gutter="10" class="mb8">
+                <el-col :span="1.5">
+                  <el-button type="primary" :disabled="noAdd" icon="Plus"
+                    @click="handleAddDmProductCustoms">添加</el-button>
+                </el-col>
+                <el-col :span="1.5">
+                  <el-button type="danger" icon="Delete" @click="handleDeleteDmProductCustoms">删除</el-button>
+                </el-col>
+              </el-row>
+              <el-table :data="dmProductCustomsList" :row-class-name="rowDmProductCustomsIndex"
+                @selection-change="handleDmProductCustomsSelectionChange" ref="dmProductCustoms">
+                <el-table-column type="selection" width="50" align="center" />
+                <el-table-column label="序号" align="center" prop="index" width="50" />
+                <el-table-column label="报关名称英文" prop="customsEn" width="150">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.customsEn" placeholder="请输入报关名称英文" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="报关名称中文" prop="customsZh" width="150">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.customsZh" placeholder="请输入报关名称中文" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="材质" prop="material" width="150">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.material" placeholder="请输入材质" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="含电池" prop="hasBattery" width="150">
+                  <template #default="scope">
+                    <el-select v-model="scope.row.hasBattery" placeholder="请选择含电池">
+                      <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
+                        :value="dict.value"></el-option>
+                    </el-select>
+                  </template>
+                </el-table-column>
+                <el-table-column label="含液体" prop="hasLiquid" width="150">
+                  <template #default="scope">
+                    <el-select v-model="scope.row.hasLiquid" placeholder="请选择含液体">
+                      <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
+                        :value="dict.value"></el-option>
+                    </el-select>
+                  </template>
+                </el-table-column>
+                <el-table-column label="纺织品" prop="hasTextile" width="150">
+                  <template #default="scope">
+                    <el-select v-model="scope.row.hasTextile" placeholder="请选择纺织品">
+                      <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
+                        :value="dict.value"></el-option>
+                    </el-select>
+                  </template>
+                </el-table-column>
+                <el-table-column label="报关价格" prop="price" width="150">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.price" placeholder="请输入报关价格" />
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+
+            <div v-show="activeSection === 'image-upload'">
+              <el-form-item label="图片" prop="pictureUrl">
+                <image-upload v-model="form.pictureUrl" :limit="1" />
+              </el-form-item>
+            </div>
+          </el-main>
+        </el-container>
       </el-form>
 
       <template #footer>
@@ -613,14 +667,9 @@ import { addPlan } from "@/api/erp/plan";
 import { listCommission } from "@/api/erp/commission";
 import { listFactory, queryFactoryByCodes } from "@/api/erp/factory";
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 
 const route = useRoute();
-// 使用 ref 创建响应式变量来存储参数
-const skuId = ref('');
-
-
-const { query, params } = useRoute();
 
 const { proxy } = getCurrentInstance();
 const { dm_product_sale_status, record_status, sys_yes_no, dm_product_flag, dm_platform, dm_currency_code, dm_unit_type } = proxy.useDict('dm_product_sale_status', 'record_status', 'sys_yes_no', 'dm_product_flag', 'dm_platform', 'dm_currency_code', 'dm_unit_type');
@@ -695,6 +744,15 @@ const data = reactive({
 });
 
 const { queryParams, form, rules, formPlan, supplierQueryParams } = toRefs(data);
+
+
+// 当前激活的表单部分
+const activeSection = ref('basic-info');
+
+// 处理选择菜单项
+function handleSelect(index) {
+  activeSection.value = index;
+}
 
 /** 查询类目佣金列表 */
 function getCategorCommission() {
@@ -1138,9 +1196,10 @@ function updateFirstChoice(selectedRow, data) {
   });
 }
 
-onMounted(() => {
+onActivated(() => {
   routeEdit(history.state.skuId);
 });
+
 
 function routeEdit(skuId) {
 
@@ -1209,5 +1268,60 @@ getList();
 .input-group .input-cm {
   width: 50px;
   border-left: none;
+}
+
+.left-aside {
+  border-right: 1px solid #ebeef5;
+}
+
+.menu-item {
+  text-align: center;
+  padding: 5px;
+  border-bottom: 1px solid #ebeef5;
+  cursor: pointer;
+}
+
+.menu-item div {
+  font-size: small;
+  line-height: normal;
+  /* 或者使用更小的值，如 1.2 */
+  margin-bottom: 0;
+  /* 或者使用一个负值来减少间距，如 -5px */
+}
+
+.product-image {
+  max-width: 100%;
+  height: auto;
+}
+
+.menu-navigation {
+  border-right: none;
+}
+
+.right-form {
+  border-left: 1px solid #ebeef5;
+}
+
+.form-section {
+  border: 1px solid #ebeef5;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.form-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+}
+
+.title-bar {
+  width: 4px;
+  height: 20px;
+  background-color: #004499;
+  /* 深蓝色 */
+  margin-right: 8px;
+  /* 标题和竖杠之间的间隔 */
 }
 </style>
