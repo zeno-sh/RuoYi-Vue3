@@ -153,7 +153,7 @@
       <el-form ref="productRef" :model="form" :rules="rules" label-width="100px">
         <el-container style="height: 90%">
           <!-- 左侧导航 -->
-          <el-aside width="200px">
+          <el-aside width="220px">
             <el-menu :default-active="activeSection" @select="handleSelect">
               <!-- 产品图片作为菜单项 -->
               <div index="image-upload" class="menu-item" @click="handleSelect('image-upload')">
@@ -1341,5 +1341,15 @@ getList();
   /* 深蓝色 */
   margin-right: 8px;
   /* 标题和竖杠之间的间隔 */
+}
+
+.el-aside {
+  background: #ffffff;
+  padding: 8px 20px 20px 20px;
+  margin-bottom: 0px;
+}
+
+.el-menu-item {
+  height: 42px;
 }
 </style>
