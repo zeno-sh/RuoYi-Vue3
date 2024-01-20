@@ -41,6 +41,29 @@
 
     <el-table v-loading="loading" :data="transportplanList" border>
       <el-table-column type="selection" width="55" align="center" />
+      <el-table-column type="expand">
+        <template #default="props">
+          <div class="sub-table-container">
+            <h3>发货明细</h3>
+            <el-table :data="props.row.dmTransportPlanItemList" border>
+              <el-table-column label="sku" prop="skuId" width="150">
+                <template #default="scope">
+                  <a @click="gotoProductEdit(scope.row.skuId)" class="hover-link">{{ scope.row.skuId }}</a>
+                </template>
+              </el-table-column>
+              <el-table-column label="发运数量" prop="quantity" width="100" />
+              <el-table-column label="箱数" prop="numberOfBox" width="100" />
+              <el-table-column label="体积" prop="volume" width="100" />
+              <el-table-column label="重量" prop="weight" width="100" />
+              <el-table-column label="上架状态" prop="shelfStatus" width="100">
+                <template #default="scope">
+                  <dict-tag :options="sys_yes_no" :value="scope.row.shelfStatus" />
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column type="index" width="50" label="序号" />
       <el-table-column label="发货计划编码" align="center" prop="code" width="200" />
       <el-table-column label="运输状态" align="center" prop="transportStatus" width="110">
@@ -49,14 +72,14 @@
         </template>
       </el-table-column>
       <el-table-column label="海外仓入库单号" align="center" prop="overseaLocationCheckinId" width="250" />
-      <el-table-column label="货代公司" align="center" prop="forwarder" width="120"/>
+      <el-table-column label="货代公司" align="center" prop="forwarder" width="120" />
 
-      <el-table-column label="币种" align="center" prop="currency" width="100"> 
+      <el-table-column label="币种" align="center" prop="currency" width="100">
         <template #default="scope">
           <dict-tag :options="dm_currency_code" :value="scope.row.currency" />
         </template>
       </el-table-column>
-      <el-table-column label="报价" align="center" prop="offerPrice" width="100"/>
+      <el-table-column label="报价" align="center" prop="offerPrice" width="100" />
       <el-table-column label="结算状态" align="center" prop="settleStatus" width="100">
         <template #default="scope">
           <dict-tag :options="sys_yes_no" :value="scope.row.settleStatus" />
@@ -260,6 +283,10 @@ import { listPurchase } from "@/api/erp/purchase";
 import DmCurrency from '@/components/DmCurrency'
 import DmSelectProduct from '@/components/DmSelectProduct'
 import { getProductBySkuId } from "@/api/erp/product";
+import { useRouter } from 'vue-router';
+
+// 使用 useRouter 获取路由实例
+const router = useRouter();
 
 const { proxy } = getCurrentInstance();
 const { dm_transport_status, sys_yes_no, dm_currency_code } = proxy.useDict('dm_transport_status', 'sys_yes_no', 'dm_currency_code');
@@ -497,11 +524,38 @@ function getProduct(row) {
   });
 }
 
+/** 跳转商品编辑页面 */
+function gotoProductEdit(skuId) {
+  router.push({ name: "Productinfo", state: { skuId: skuId } });
+}
+
 getList();
 </script>
 
 <style scoped>
 .input-number {
   width: 88px;
+}
+
+.sub-table-container {
+  padding: 0 40px;
+  /* 在这里调整左右内边距 */
+}
+
+/* 在你的组件样式中定义链接的默认和悬停状态 */
+.hover-link {
+  color: #0077cc;
+  /* 浅蓝色 */
+  text-decoration: none;
+  /* 去掉下划线 */
+  transition: color 0.3s;
+  /* 添加过渡效果 */
+}
+
+.hover-link:hover {
+  color: #004499;
+  /* 深蓝色 */
+  text-decoration: underline;
+  /* 显示下划线 */
 }
 </style>
