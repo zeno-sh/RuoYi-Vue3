@@ -47,6 +47,7 @@
 
 <script setup>
 import { getToken } from "@/utils/auth";
+import { isExternal } from "@/utils/validate";
 
 const props = defineProps({
   modelValue: [String, Object, Array],
@@ -93,7 +94,8 @@ watch(() => props.modelValue, val => {
     // 然后将数组转为对象数组
     fileList.value = list.map(item => {
       if (typeof item === "string") {
-        if (item.indexOf(baseUrl) === -1) {
+        //如果使用云存储，这里需要判断一下返回的路径是否是带公网地址
+        if (item.indexOf(baseUrl) === -1 && !isExternal(item)) {
           item = { name: baseUrl + item, url: baseUrl + item };
         } else {
           item = { name: item, url: item };
