@@ -45,7 +45,7 @@
         <template #default="props">
           <div class="sub-table-container">
             <h3>发货明细</h3>
-            <el-table :data="props.row.dmTransportPlanItemList" border>
+            <el-table :data="props.row.dmTransportPlanItemList" border show-summary>
               <el-table-column label="sku" prop="skuId" width="150">
                 <template #default="scope">
                   <a @click="gotoProductEdit(scope.row.skuId)" class="hover-link">{{ scope.row.skuId }}</a>
