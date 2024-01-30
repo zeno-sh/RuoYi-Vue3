@@ -1,54 +1,54 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="98px">
-      <el-form-item label="选品计划名称" prop="planName">
-        <el-input v-model="queryParams.planName" placeholder="请输入选品计划名称" clearable @keyup.enter="handleQuery" />
+      <el-form-item label="閫夊搧璁″垝鍚嶇О" prop="planName">
+        <el-input v-model="queryParams.planName" placeholder="璇疯緭鍏ラ€夊搧璁″垝鍚嶇О" clearable @keyup.enter="handleQuery" />
       </el-form-item>
       <el-form-item label="SKU" prop="planSkuId">
-        <el-input v-model="queryParams.planSkuId" placeholder="请输入SKU" clearable @keyup.enter="handleQuery" />
+        <el-input v-model="queryParams.planSkuId" placeholder="璇疯緭鍏KU" clearable @keyup.enter="handleQuery" />
       </el-form-item>
-      <el-form-item label="创建时间" style="width: 308px">
+      <el-form-item label="鍒涘缓鏃堕棿" style="width: 308px">
         <el-date-picker v-model="daterangeCreateTime" value-format="YYYY-MM-DD" type="daterange" range-separator="-"
-          start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
+          start-placeholder="寮€濮嬫棩鏈�" end-placeholder="缁撴潫鏃ユ湡"></el-date-picker>
       </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
+      <el-form-item label="鐘舵€�" prop="status">
+        <el-select v-model="queryParams.status" placeholder="璇烽€夋嫨鐘舵€�" clearable>
           <el-option v-for="dict in record_status" :key="dict.value" :label="dict.label" :value="dict.value" />
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="Search" @click="handleQuery">鎼滅储</el-button>
+        <el-button icon="Refresh" @click="resetQuery">閲嶇疆</el-button>
       </el-form-item>
     </el-form>
 
     <el-row :gutter="10" class="mb8">
       <!-- <el-col :span="1.5">
-        <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['erp:plan:add']">新增</el-button>
+        <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['erp:plan:add']">鏂板</el-button>
       </el-col> -->
       <el-col :span="1.5">
         <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate"
-          v-hasPermi="['erp:plan:edit']">修改</el-button>
+          v-hasPermi="['erp:plan:edit']">淇敼</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete"
-          v-hasPermi="['erp:plan:remove']">删除</el-button>
+          v-hasPermi="['erp:plan:remove']">鍒犻櫎</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="warning" plain icon="Download" @click="handleExport"
-          v-hasPermi="['erp:plan:export']">导出</el-button>
+          v-hasPermi="['erp:plan:export']">瀵煎嚭</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="success" plain icon="Edit" @click="handleForwarderPrice"
-          v-hasPermi="['erp:plan:edit']">一键修改货代头程报价</el-button>
+          v-hasPermi="['erp:plan:edit']">涓€閿慨鏀硅揣浠ｅご绋嬫姤浠�</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="planList" @selection-change="handleSelectionChange" border height="700">
       <el-table-column type="selection" align="center" />
-      <el-table-column label="选品计划名称" align="center" prop="planName" fixed width="120" />
-      <el-table-column label="图片" align="center" prop="productInfo.skuPicture" fixed>
+      <el-table-column label="閫夊搧璁″垝鍚嶇О" align="center" prop="planName" fixed width="120" />
+      <el-table-column label="鍥剧墖" align="center" prop="productInfo.skuPicture" fixed>
         <template #default="scope">
           <image-preview :src="scope.row.productInfo.skuPicture" :width="50" :height="50" />
         </template>
@@ -58,9 +58,27 @@
           <a @click="gotoProductEdit(scope.row.planSkuId)" class="hover-link">{{ scope.row.planSkuId }}</a>
         </template>
       </el-table-column>
-      <el-table-column label="产品名称" align="center" prop="productInfo.skuName" width="150" />
-      <el-table-column label="商品规格" align="center">
-        <el-table-column label="箱规" align="center" width="150"
+      <el-table-column label="浜у搧鍚嶇О" align="center" prop="productInfo.skuName" width="150" />
+      
+      <el-table-column label="鍒╂鼎棰勪及" align="center">
+        <el-table-column label="鍓嶇鍘熶环" align="center" prop="productPrice.originalPrice" width="100">
+          <template #default="scope">
+            <span>{{ scope.row.productPrice.originalPrice }} 鍗㈠竷</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="鍓嶇瀹氫环" align="center" prop="productPrice.sellingPrice" width="100">
+          <template #default="scope">
+            <span>{{ scope.row.productPrice.sellingPrice }} 鍗㈠竷</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="缁撶畻浠�" align="center" prop="settlementPrice" width="100" />
+        <el-table-column label="棰勪及鍒╂鼎" align="center" prop="profitPrice" width="100" />
+        <el-table-column label="姣涘埄鐜�" align="center" prop="grossProfitRate" width="100" />
+        <el-table-column label="ROI" align="center" prop="roiRate" width="100" />
+      </el-table-column>
+      
+      <el-table-column label="鍟嗗搧瑙勬牸" align="center">
+        <el-table-column label="绠辫" align="center" width="150"
           prop="productInfo.specification.boxLength,specification.boxLength.boxWidth">
           <template #default="scope">
             <span>{{ scope.row.productInfo.specification.boxLength }}*
@@ -70,7 +88,7 @@
           </template>
         </el-table-column>
         <el-table-column label="PCS" align="center" prop="productInfo.specification.quantityPerBox" width="70" />
-        <el-table-column label="箱重" align="center" prop="productInfo.specification.boxWeight">
+        <el-table-column label="绠遍噸" align="center" prop="productInfo.specification.boxWeight">
           <template #default="scope">
             <span v-if="scope.row.productInfo.specification.boxWeight >= 1000">{{
               scope.row.productInfo.specification.boxWeight / 1000 }} kg
@@ -80,7 +98,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="包装规格" align="center" width="150" prop="productInfo.specification.length">
+        <el-table-column label="鍖呰瑙勬牸" align="center" width="150" prop="productInfo.specification.length">
           <template #default="scope">
             <span>{{ scope.row.productInfo.specification.length }}*
               {{ scope.row.productInfo.specification.width }}*
@@ -88,7 +106,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="单品毛重" align="center" prop="productInfo.specification.grossWeight">
+        <el-table-column label="鍗曞搧姣涢噸" align="center" prop="productInfo.specification.grossWeight">
           <template #default="scope">
             <span v-if="scope.row.productInfo.specification.grossWeight < 1000">{{
               scope.row.productInfo.specification.grossWeight }} g
@@ -98,7 +116,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="单品净重" align="center" prop="productInfo.specification.netWeight">
+        <el-table-column label="鍗曞搧鍑€閲�" align="center" prop="productInfo.specification.netWeight">
           <template #default="scope">
             <span v-if="scope.row.productInfo.specification.netWeight < 1000">{{
               scope.row.productInfo.specification.netWeight }} g
@@ -108,84 +126,66 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="体积m³" align="center" prop="productInfo.volume" />
-        <el-table-column label="体积升" align="center" prop="productInfo.volumeRise" />
-        <el-table-column label="密度" align="center" prop="productInfo.density" />
+        <el-table-column label="浣撶Нm鲁" align="center" prop="productInfo.volume" />
+        <el-table-column label="浣撶Н鍗�" align="center" prop="productInfo.volumeRise" />
+        <el-table-column label="瀵嗗害" align="center" prop="productInfo.density" />
       </el-table-column>
 
 
-      <el-table-column label="成本明细（人民币）" align="center">
-        <el-table-column label="国内成本" align="center">
-          <el-table-column label="采购价" align="center" prop="productCost.purchasePrice" />
-          <el-table-column label="货代头程" align="center" prop="productCost.firstLegPrice" />
+      <el-table-column label="鎴愭湰鏄庣粏锛堜汉姘戝竵锛�" align="center">
+        <el-table-column label="鍥藉唴鎴愭湰" align="center">
+          <el-table-column label="閲囪喘浠�" align="center" prop="productCost.purchasePrice" />
+          <el-table-column label="璐т唬澶寸▼" align="center" prop="productCost.firstLegPrice" />
         </el-table-column>
-        <el-table-column label="海外仓成本" align="center">
-          <el-table-column label="卸货费" align="center" prop="productCost.fbsUnloadPrice" />
-          <el-table-column label="上架费" align="center" prop="productCost.fbsShelfPrice" />
-          <el-table-column label="订单操作费" align="center" prop="productCost.fbsOrderPrice" width="100" />
-          <el-table-column label="送货费" align="center" prop="productCost.fbsDeliveryPrice" />
+        <el-table-column label="娴峰浠撴垚鏈�" align="center">
+          <el-table-column label="鍗歌揣璐�" align="center" prop="productCost.fbsUnloadPrice" />
+          <el-table-column label="涓婃灦璐�" align="center" prop="productCost.fbsShelfPrice" />
+          <el-table-column label="璁㈠崟鎿嶄綔璐�" align="center" prop="productCost.fbsOrderPrice" width="100" />
+          <el-table-column label="閫佽揣璐�" align="center" prop="productCost.fbsDeliveryPrice" />
         </el-table-column>
-        <el-table-column label="平台成本" align="center">
-          <el-table-column label="类目佣金" align="center" prop="productCostConfig.categoryRate" />
-          <el-table-column label="ozon转运费" align="center" prop="productCost.ozonDeliveryPrice" width="100" />
-          <el-table-column label="最后一公里" align="center" prop="productCost.lastMilePrice" width="100" />
-          <el-table-column label="广告费率" align="center" prop="productCostConfig.adRate" width="100" />
-          <el-table-column label="广告费" align="center" prop="productCost.adPrice" width="100" />
-          <el-table-column label="货损率" align="center" prop="productCostConfig.lossRate" width="100" />
-          <el-table-column label="货损" align="center" prop="productCost.lossPrice" width="100" />
+        <el-table-column label="骞冲彴鎴愭湰" align="center">
+          <el-table-column label="绫荤洰浣ｉ噾" align="center" prop="productCostConfig.categoryRate" />
+          <el-table-column label="ozon杞繍璐�" align="center" prop="productCost.ozonDeliveryPrice" width="100" />
+          <el-table-column label="鏈€鍚庝竴鍏噷" align="center" prop="productCost.lastMilePrice" width="100" />
+          <el-table-column label="骞垮憡璐圭巼" align="center" prop="productCostConfig.adRate" width="100" />
+          <el-table-column label="骞垮憡璐�" align="center" prop="productCost.adPrice" width="100" />
+          <el-table-column label="璐ф崯鐜�" align="center" prop="productCostConfig.lossRate" width="100" />
+          <el-table-column label="璐ф崯" align="center" prop="productCost.lossPrice" width="100" />
 
         </el-table-column>
       </el-table-column>
 
-
-      <el-table-column label="利润预估" align="center">
-        <el-table-column label="前端原价" align="center" prop="productPrice.originalPrice" width="100">
-          <template #default="scope">
-            <span>{{ scope.row.productPrice.originalPrice }} 卢布</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="前端定价" align="center" prop="productPrice.sellingPrice" width="100">
-          <template #default="scope">
-            <span>{{ scope.row.productPrice.sellingPrice }} 卢布</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="结算价" align="center" prop="settlementPrice" width="100" />
-        <el-table-column label="预估利润" align="center" prop="profitPrice" width="100" />
-        <el-table-column label="毛利率" align="center" prop="grossProfitRate" width="100" />
-        <el-table-column label="ROI" align="center" prop="roiRate" width="100" />
-      </el-table-column>
-
-      <el-table-column label="竞品趋势" align="center" width="250">
+      <el-table-column label="绔炲搧瓒嬪娍" align="center" width="250">
         <template #default="scope">
           <div v-for="trend in scope.row.productPlatformTrends" :key="trend.id">
-            <div>skuId:{{ trend.competitorSkuId }} 销量：{{ trend.competitorSaleNumber }}</div>
-            <div>价格：{{ trend.competitorSalePrice }} 份额：{{ parseInt(trend.competitorSalePrice * trend.competitorSaleNumber)
+            <div>skuId:{{ trend.competitorSkuId }} 閿€閲忥細{{ trend.competitorSaleNumber }}</div>
+            <div>浠锋牸锛歿{ trend.competitorSalePrice }} 浠介锛歿{ parseInt(trend.competitorSalePrice * trend.competitorSaleNumber)
             }}</div>
           </div>
         </template>
       </el-table-column>
 
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+      <el-table-column label="鍒涘缓鏃堕棿" align="center" prop="createTime" width="180">
         <template #default="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="修改时间" align="center" prop="updateTime" width="180">
+      <el-table-column label="淇敼鏃堕棿" align="center" prop="updateTime" width="180">
         <template #default="scope">
           <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center" prop="status">
+      <el-table-column label="鐘舵€�" align="center" prop="status">
         <template #default="scope">
           <dict-tag :options="record_status" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="180">
+      <el-table-column label="鎿嶄綔" align="center" class-name="small-padding fixed-width" width="180">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
-            v-hasPermi="['erp:plan:edit']">修改</el-button>
+            v-hasPermi="['erp:plan:edit']">淇敼</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"
-            v-hasPermi="['erp:plan:remove']">删除</el-button>
+            v-hasPermi="['erp:plan:remove']">鍒犻櫎</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -193,14 +193,14 @@
     <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize"
       @pagination="getList" />
 
-    <!-- 添加或修改选品计划对话框 -->
+    <!-- 娣诲姞鎴栦慨鏀归€夊搧璁″垝瀵硅瘽妗� -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
       <el-form ref="planRef" :model="form" :rules="rules" label-width="120px">
-        <el-form-item label="选品计划名称" prop="planName">
-          <el-input v-model="form.planName" placeholder="请输入选品计划名称" />
+        <el-form-item label="閫夊搧璁″垝鍚嶇О" prop="planName">
+          <el-input v-model="form.planName" placeholder="璇疯緭鍏ラ€夊搧璁″垝鍚嶇О" />
         </el-form-item>
         <el-form-item label="SKU" prop="planSkuId">
-          <el-select v-model="form.planSkuId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
+          <el-select v-model="form.planSkuId" :multiple="false" filterable remote reserve-keyword placeholder="璇疯緭鍏KU"
             remote-show-suffix :remote-method="getProduct" disabled>
             <el-option v-for="item in productList" :key="item.skuId" :label="`${item.skuName}` + ' / ' + `${item.skuId}`"
               :value="item.skuId">
@@ -210,8 +210,8 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="价格计划" prop="priceId">
-          <el-select v-model="form.priceId" :multiple="false" filterable remote reserve-keyword placeholder="请输入SKU"
+        <el-form-item label="浠锋牸璁″垝" prop="priceId">
+          <el-select v-model="form.priceId" :multiple="false" filterable remote reserve-keyword placeholder="璇疯緭鍏KU"
             remote-show-suffix :remote-method="getPriceList">
             <el-option v-for="item in priceList" :key="parseInt(item.id)"
               :label="`${item.priceStrategyName}` + ' / ' + `${item.sellingPrice} RUB`" :value="parseInt(item.id)">
@@ -221,10 +221,10 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="供应商报价" prop="supplierPriceOfferId">
-          <!-- <el-input v-model="form.supplierPriceOfferId" placeholder="请输入供应商报价" /> -->
+        <el-form-item label="渚涘簲鍟嗘姤浠�" prop="supplierPriceOfferId">
+          <!-- <el-input v-model="form.supplierPriceOfferId" placeholder="璇疯緭鍏ヤ緵搴斿晢鎶ヤ环" /> -->
           <el-select v-model="form.supplierPriceOfferId" :multiple="false" filterable remote reserve-keyword
-            placeholder="请输入SKU" remote-show-suffix>
+            placeholder="璇疯緭鍏KU" remote-show-suffix>
             <el-option v-for="item in supplierOfferList" :key="parseInt(item.id)"
               :label="`${item.supplierCode}` + ' / ' + `${item.price} RMB`" :value="parseInt(item.id)">
               <span style="float: left">{{ item.supplierCode }}</span>
@@ -233,42 +233,42 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="货代报价" prop="forwarderPrice">
-          <el-input v-model="form.forwarderPrice" placeholder="请输入货代报价" />
+        <el-form-item label="璐т唬鎶ヤ环" prop="forwarderPrice">
+          <el-input v-model="form.forwarderPrice" placeholder="璇疯緭鍏ヨ揣浠ｆ姤浠�" />
         </el-form-item>
-        <el-form-item label="预估采购价" prop="forecastPurchasePrice">
-          <el-input v-model="form.forecastPurchasePrice" placeholder="这里可以临时指定采购价" clearable />
+        <el-form-item label="棰勪及閲囪喘浠�" prop="forecastPurchasePrice">
+          <el-input v-model="form.forecastPurchasePrice" placeholder="杩欓噷鍙互涓存椂鎸囧畾閲囪喘浠�" clearable />
         </el-form-item>
-        <el-form-item label="广告费率" prop="adRate">
-          <el-input v-model="form.adRate" placeholder="请输入广告费率" />
+        <el-form-item label="骞垮憡璐圭巼" prop="adRate">
+          <el-input v-model="form.adRate" placeholder="璇疯緭鍏ュ箍鍛婅垂鐜�" />
         </el-form-item>
-        <el-form-item label="货损率" prop="lossRate">
-          <el-input v-model="form.lossRate" placeholder="请输入货损率" />
+        <el-form-item label="璐ф崯鐜�" prop="lossRate">
+          <el-input v-model="form.lossRate" placeholder="璇疯緭鍏ヨ揣鎹熺巼" />
         </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="submitForm">确 定</el-button>
-          <el-button @click="cancel">取 消</el-button>
+          <el-button type="primary" @click="submitForm">纭� 瀹�</el-button>
+          <el-button @click="cancel">鍙� 娑�</el-button>
         </div>
       </template>
     </el-dialog>
 
 
-    <!-- 批量修改货代头程价格 -->
+    <!-- 鎵归噺淇敼璐т唬澶寸▼浠锋牸 -->
     <el-dialog :title="titleForwarderPrice" v-model="openForwarderPrice" width="600px" append-to-body>
       <el-form ref="forwarderPriceRef" :model="formForwarderPrice" :rules="rules" label-width="120px">
         <el-form-item label="SKU" prop="skuIdListStr">
-          <el-input disabled v-model="formForwarderPrice.skuIdListStr" type="textarea" placeholder="请选择SKU" />
+          <el-input disabled v-model="formForwarderPrice.skuIdListStr" type="textarea" placeholder="璇烽€夋嫨SKU" />
         </el-form-item>
-        <el-form-item label="货代头程报价" prop="forwarderPrice">
-          <el-input v-model="formForwarderPrice.forwarderPrice" placeholder="请输入本次货代头程报价（人民币）" />
+        <el-form-item label="璐т唬澶寸▼鎶ヤ环" prop="forwarderPrice">
+          <el-input v-model="formForwarderPrice.forwarderPrice" placeholder="璇疯緭鍏ユ湰娆¤揣浠ｅご绋嬫姤浠凤紙浜烘皯甯侊級" />
         </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="submitFormForwarderPrice">确 定</el-button>
-          <el-button @click="cancelForwarderPrice">取 消</el-button>
+          <el-button type="primary" @click="submitFormForwarderPrice">纭� 瀹�</el-button>
+          <el-button @click="cancelForwarderPrice">鍙� 娑�</el-button>
         </div>
       </template>
     </el-dialog>
@@ -282,7 +282,7 @@ import { listPrice, getPrice } from "@/api/erp/price";
 import { listSupplier, getSupplier } from "@/api/erp/supplier";
 import { useRouter } from 'vue-router';
 
-// 使用 useRouter 获取路由实例
+// 浣跨敤 useRouter 鑾峰彇璺敱瀹炰緥
 const router = useRouter();
 
 
@@ -326,10 +326,10 @@ const data = reactive({
   },
   rules: {
     // planName: [
-    //   { required: true, message: "选品计划名称不能为空", trigger: "blur" }
+    //   { required: true, message: "閫夊搧璁″垝鍚嶇О涓嶈兘涓虹┖", trigger: "blur" }
     // ],
     planSkuId: [
-      { required: true, message: "SKU不能为空", trigger: "blur" }
+      { required: true, message: "SKU涓嶈兘涓虹┖", trigger: "blur" }
     ]
   }
 });
@@ -365,7 +365,7 @@ function getPriceList(planSkuId) {
   }
 }
 
-/** 查询供应商报价列表 */
+/** 鏌ヨ渚涘簲鍟嗘姤浠峰垪琛� */
 function getSupplierOfferList(planSkuId) {
   priceQueryParams.value.skuId = planSkuId;
   listSupplier(priceQueryParams.value).then(response => {
@@ -374,7 +374,7 @@ function getSupplierOfferList(planSkuId) {
 }
 
 
-/** 查询选品计划列表 */
+/** 鏌ヨ閫夊搧璁″垝鍒楄〃 */
 function getList() {
   loading.value = true;
   queryParams.value.params = {};
@@ -389,13 +389,13 @@ function getList() {
   });
 }
 
-// 取消按钮
+// 鍙栨秷鎸夐挳
 function cancel() {
   open.value = false;
   reset();
 }
 
-// 表单重置
+// 琛ㄥ崟閲嶇疆
 function reset() {
   form.value = {
     id: null,
@@ -416,63 +416,63 @@ function reset() {
   proxy.resetForm("planRef");
 }
 
-/** 搜索按钮操作 */
+/** 鎼滅储鎸夐挳鎿嶄綔 */
 function handleQuery() {
   queryParams.value.pageNum = 1;
   getList();
 }
 
-/** 重置按钮操作 */
+/** 閲嶇疆鎸夐挳鎿嶄綔 */
 function resetQuery() {
   daterangeCreateTime.value = [];
   proxy.resetForm("queryRef");
   handleQuery();
 }
 
-// 多选框选中数据
+// 澶氶€夋閫変腑鏁版嵁
 function handleSelectionChange(selection) {
   ids.value = selection.map(item => item.id);
   single.value = selection.length != 1;
   multiple.value = !selection.length;
 
-  //新增选中的记录
+  //鏂板閫変腑鐨勮褰�
   selectedPlanList.value = selection.map(item => item);
   selectedSkuIdList.value = selection.map(item => item.planSkuId);
 }
 
-/** 新增按钮操作 */
+/** 鏂板鎸夐挳鎿嶄綔 */
 function handleAdd() {
   reset();
   open.value = true;
-  title.value = "添加选品计划";
+  title.value = "娣诲姞閫夊搧璁″垝";
 }
 
-/** 修改按钮操作 */
+/** 淇敼鎸夐挳鎿嶄綔 */
 function handleUpdate(row) {
   reset();
   const _id = row.id || ids.value
   getPlan(_id).then(response => {
     form.value = response.data;
     open.value = true;
-    title.value = "修改选品计划";
+    title.value = "淇敼閫夊搧璁″垝";
   });
   getPriceList(row.planSkuId);
   getSupplierOfferList(row.planSkuId);
 }
 
-/** 提交按钮 */
+/** 鎻愪氦鎸夐挳 */
 function submitForm() {
   proxy.$refs["planRef"].validate(valid => {
     if (valid) {
       if (form.value.id != null) {
         updatePlan(form.value).then(response => {
-          proxy.$modal.msgSuccess("修改成功");
+          proxy.$modal.msgSuccess("淇敼鎴愬姛");
           open.value = false;
           getList();
         });
       } else {
         addPlan(form.value).then(response => {
-          proxy.$modal.msgSuccess("新增成功");
+          proxy.$modal.msgSuccess("鏂板鎴愬姛");
           open.value = false;
           getList();
         });
@@ -481,20 +481,20 @@ function submitForm() {
   });
 }
 
-/** 删除按钮操作 */
+/** 鍒犻櫎鎸夐挳鎿嶄綔 */
 function handleDelete(row) {
   const _ids = row.id || ids.value;
-  proxy.$modal.confirm('是否确认删除选品计划编号为"' + _ids + '"的数据项？').then(function () {
+  proxy.$modal.confirm('鏄惁纭鍒犻櫎閫夊搧璁″垝缂栧彿涓�"' + _ids + '"鐨勬暟鎹」锛�').then(function () {
     return delPlan(_ids);
   }).then(() => {
     getList();
-    proxy.$modal.msgSuccess("删除成功");
+    proxy.$modal.msgSuccess("鍒犻櫎鎴愬姛");
   }).catch(() => { });
 }
 
-////////一键修改头程报价
+////////涓€閿慨鏀瑰ご绋嬫姤浠�
 
-// 表单重置
+// 琛ㄥ崟閲嶇疆
 function resetForwarderPrice() {
   formForwarderPrice.value = {
     dmProductSelectionPlanList: [],
@@ -506,46 +506,46 @@ function resetForwarderPrice() {
 function handleForwarderPrice() {
   resetForwarderPrice();
   openForwarderPrice.value = true;
-  titleForwarderPrice.value = "批量修改货代头程报价";
+  titleForwarderPrice.value = "鎵归噺淇敼璐т唬澶寸▼鎶ヤ环";
   formForwarderPrice.value.dmProductSelectionPlanList = selectedPlanList.value;
   formForwarderPrice.value.skuIdListStr = selectedPlanList.value.map(item => item.planSkuId).join(",");
 }
 
-// 取消按钮
+// 鍙栨秷鎸夐挳
 function cancelForwarderPrice() {
   openForwarderPrice.value = false;
   resetForwarderPrice();
 }
 
-/** 提交按钮 */
+/** 鎻愪氦鎸夐挳 */
 function submitFormForwarderPrice() {
   proxy.$refs["forwarderPriceRef"].validate(valid => {
 
     if (formForwarderPrice.value.length == 0) {
-      proxy.$modal.msgError("批量修改货代头程报价时 SKU不能为空");
+      proxy.$modal.msgError("鎵归噺淇敼璐т唬澶寸▼鎶ヤ环鏃� SKU涓嶈兘涓虹┖");
     } else {
       if (valid) {
         formForwarderPrice.value.dmProductSelectionPlanList = selectedPlanList.value;
         updateForwarderPrice(formForwarderPrice.value).then(response => {
-          proxy.$modal.msgSuccess("批量修改货代头程报价成功");
+          proxy.$modal.msgSuccess("鎵归噺淇敼璐т唬澶寸▼鎶ヤ环鎴愬姛");
           openForwarderPrice.value = false;
         });
       } else {
-        proxy.$modal.msgError("批量修改货代头程报价失败");
+        proxy.$modal.msgError("鎵归噺淇敼璐т唬澶寸▼鎶ヤ环澶辫触");
       }
     }
   });
 }
 
 
-/** 导出按钮操作 */
+/** 瀵煎嚭鎸夐挳鎿嶄綔 */
 function handleExport() {
   proxy.download('erp/plan/export', {
     ...queryParams.value
   }, `plan_${new Date().getTime()}.xlsx`)
 }
 
-/** 跳转商品编辑页面 */
+/** 璺宠浆鍟嗗搧缂栬緫椤甸潰 */
 function gotoProductEdit(skuId) {
   // router.push({ path: "/product/product", query: { skuId: skuId } });////
   router.push({ name: "Productinfo", state: { skuId: skuId } });
@@ -555,20 +555,20 @@ getList();
 </script>
 
 <style scope>
-/* 在你的组件样式中定义链接的默认和悬停状态 */
+/* 鍦ㄤ綘鐨勭粍浠舵牱寮忎腑瀹氫箟閾炬帴鐨勯粯璁ゅ拰鎮仠鐘舵€� */
 .hover-link {
   color: #0077cc;
-  /* 浅蓝色 */
+  /* 娴呰摑鑹� */
   text-decoration: none;
-  /* 去掉下划线 */
+  /* 鍘绘帀涓嬪垝绾� */
   transition: color 0.3s;
-  /* 添加过渡效果 */
+  /* 娣诲姞杩囨浮鏁堟灉 */
 }
 
 .hover-link:hover {
   color: #004499;
-  /* 深蓝色 */
+  /* 娣辫摑鑹� */
   text-decoration: underline;
-  /* 显示下划线 */
+  /* 鏄剧ず涓嬪垝绾� */
 }
 </style>

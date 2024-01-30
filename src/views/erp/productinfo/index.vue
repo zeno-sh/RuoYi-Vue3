@@ -761,7 +761,11 @@ function handleSelect(index) {
 
 /** 查询类目佣金列表 */
 function getCategorCommission() {
-  listCommission(queryParams.value).then(response => {
+  const param = {
+    pageNum: 1,
+    pageSize: 100
+  }
+  listCommission(param).then(response => {
     categoryCommissionList.value = response.rows;
   });
 }
