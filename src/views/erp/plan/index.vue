@@ -41,7 +41,7 @@
       </el-col>
       <el-col :span="1.5">
         <el-button type="success" plain icon="Edit" @click="handleForwarderPrice"
-          v-hasPermi="['erp:plan:edit']">一键修改货代头程报�?</el-button>
+          v-hasPermi="['erp:plan:edit']">一键修改货代头程报价</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -494,7 +494,7 @@ function handleDelete(row) {
   }).catch(() => { });
 }
 
-////////一键修改头程报�?
+////////一键修改头程报价
 
 // 表单重置
 function resetForwarderPrice() {
