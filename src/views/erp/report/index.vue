@@ -6,7 +6,7 @@
       </el-form-item>
       <el-form-item label="账单日期" style="width: 308px">
         <el-date-picker v-model="daterangeCreateTime" value-format="YYYY-MM-DD" type="daterange" range-separator="-"
-          start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
+          start-placeholder="开始日期" end-placeholder="结束日期" :shortcuts="shortcuts"></el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -34,12 +34,17 @@
         </el-table-column>
         <el-table-column label="毛利率" align="center" prop="grossMargin" width="120">
           <template #default="scope">
-            {{ scope.row.grossMargin * 100 + '%' }}
+            {{ (scope.row.grossMargin * 100).toFixed(2) + '%' }}
           </template>
         </el-table-column>
-        <el-table-column label="ROI" align="center" prop="roi">
+        <el-table-column label="ROI" align="center" prop="roi" width="120">
           <template #default="scope">
-            {{ scope.row.roi * 100 + '%' }}
+            {{ (scope.row.roi * 100).toFixed(2) + '%' }}
+          </template>
+        </el-table-column>
+        <el-table-column label="ACoas" align="center" prop="acoas" width="120">
+          <template #default="scope">
+            {{ (scope.row.acoas * 100).toFixed(2) + '%' }}
           </template>
         </el-table-column>
         <el-table-column label="经营收入" align="center" prop="incomeOperating" width="120">
@@ -54,7 +59,7 @@
         <el-table-column label="退货量" align="center" prop="volumeReturns" />
         <el-table-column label="退货率" align="center" prop="returnRate">
           <template #default="scope">
-            {{ scope.row.returnRate * 100 + '%' }}
+            {{ (scope.row.returnRate * 100).toFixed(2) + '%' }}
           </template>
         </el-table-column>
         <el-table-column label="广告销量" align="center" prop="volumeAd" />
@@ -70,7 +75,12 @@
         </el-table-column>
       </el-table-column>
       <el-table-column label="平台支出" align="center">
-        <el-table-column label="平台服务费" align="center" prop="costPlatfromService" width="120">
+        <el-table-column label="广告花费" align="center" prop="costAd" width="120">
+          <template #default="scope">
+            <FormattedCurrency :value="scope.row.costAd" />
+          </template>
+        </el-table-column>
+        <el-table-column label="平台服务费" align="center" prop="costPlatformService" width="120">
           <template #default="scope">
             <FormattedCurrency :value="scope.row.costPlatfromService" />
           </template>
@@ -126,14 +136,14 @@
             <FormattedCurrency :value="scope.row.costRent" />
           </template>
         </el-table-column>
-        <el-table-column label="营业税" align="center" prop="businessTax" width="120">
+        <el-table-column label="营业税" align="center" prop="costBusinessTax" width="120">
           <template #default="scope">
-            {{ (scope.row.businessTax * 100).toFixed(2) + '%' }}
+            <FormattedCurrency :value="scope.row.costBusinessTax" />
           </template>
         </el-table-column>
-        <el-table-column label="银行税率" align="center" prop="bankTax" width="120">
+        <el-table-column label="银行税" align="center" prop="costBankTax" width="120">
           <template #default="scope">
-            {{ (scope.row.bankTax * 100).toFixed(2) + '%' }}
+            <FormattedCurrency :value="scope.row.costBankTax" />
           </template>
         </el-table-column>
       </el-table-column>
@@ -182,6 +192,79 @@ const data = reactive({
 });
 
 const { queryParams, form, rules } = toRefs(data);
+
+const shortcuts = [
+  {
+    text: '7天内',
+    value: () => {
+      const end = new Date();
+      const start = new Date();
+      start.setDate(start.getDate() - 7);
+      return [start, end];
+    },
+  },
+  {
+    text: '15天内',
+    value: () => {
+      const end = new Date();
+      const start = new Date();
+      start.setDate(start.getDate() - 15);
+      return [start, end];
+    },
+  },
+  {
+    text: '30天内',
+    value: () => {
+      const end = new Date();
+      const start = new Date();
+      start.setDate(start.getDate() - 30);
+      return [start, end];
+    },
+  },
+  {
+    text: '上周',
+    value: () => {
+      const end = new Date();
+      const start = new Date();
+      const day = end.getDay() || 7;
+      start.setDate(start.getDate() - day + 1 - 7);
+      end.setDate(end.getDate() - day);
+      return [start, end];
+    },
+  },
+  {
+    text: '上月',
+    value: () => {
+      const end = new Date();
+      const start = new Date();
+      start.setDate(1);
+      start.setMonth(start.getMonth() - 1);
+      end.setDate(1);
+      end.setDate(end.getDate() - 1);
+      return [start, end];
+    },
+  },
+  {
+    text: '本周',
+    value: () => {
+      const end = new Date();
+      const start = new Date();
+      const day = start.getDay() || 7;
+      start.setDate(start.getDate() - day + 1);
+      return [start, end];
+    },
+  },
+  {
+    text: '本月',
+    value: () => {
+      const end = new Date();
+      const start = new Date();
+      start.setDate(1);
+      return [start, end];
+    },
+  },
+];
+
 
 /** 查询交易记录列表 */
 function getList() {
