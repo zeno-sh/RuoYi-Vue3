@@ -1,8 +1,9 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="门店" prop="operationId">
-        <el-input v-model="queryParams.clientId" placeholder="请输入门店" clearable @keyup.enter="handleQuery" />
+      <el-form-item label="门店" prop="clientId">
+        <!-- <el-input v-model="queryParams.clientId" placeholder="请输入门店" clearable @keyup.enter="handleQuery" /> -->
+        <dm-shop-select v-model="queryParams.clientId" clearable></dm-shop-select>
       </el-form-item>
       <el-form-item label="账单日期" style="width: 308px">
         <el-date-picker v-model="daterangeCreateTime" value-format="YYYY-MM-DD" type="daterange" range-separator="-"
@@ -165,6 +166,7 @@
 <script setup name="Report">
 import FormattedCurrency from '@/components/FormattedCurrency'
 import { listReport } from "@/api/erp/report";
+import DmShopSelect from '@/components/DmShopSelect';
 
 const { proxy } = getCurrentInstance();
 

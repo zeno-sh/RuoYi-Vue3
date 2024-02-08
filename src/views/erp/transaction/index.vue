@@ -1,8 +1,15 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="操作ID" prop="operationId">
-        <el-input v-model="queryParams.operationId" placeholder="请输入操作ID" clearable @keyup.enter="handleQuery" />
+      <el-form-item label="门店" prop="clientId">
+        <!-- <el-input v-model="queryParams.operationId" placeholder="请输入操作ID" clearable @keyup.enter="handleQuery" /> -->
+        <dm-shop-select v-model="queryParams.clientId" clearable @keyup.enter="handleQuery"></dm-shop-select>
+      </el-form-item>
+      <el-form-item label="收费类型" prop="type">
+        <el-select v-model="queryParams.type" placeholder="请选择收费类型" clearable>
+          <el-option v-for="dict in dm_finance_transaction_type" :key="dict.value" :label="dict.label"
+            :value="dict.value" />
+        </el-select>
       </el-form-item>
       <el-form-item label="操作类型" prop="operationType">
         <el-select v-model="queryParams.operationType" placeholder="请选择操作类型" clearable>
@@ -10,6 +17,7 @@
             :value="dict.value" />
         </el-select>
       </el-form-item>
+      
       <el-form-item label="发货单号" prop="postingNumber">
         <el-input v-model="queryParams.postingNumber" placeholder="请输入发货单号 " clearable @keyup.enter="handleQuery" />
       </el-form-item>
@@ -22,12 +30,7 @@
         <el-date-picker v-model="daterangeCreateTime" value-format="YYYY-MM-DD" type="daterange" range-separator="-"
           start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
       </el-form-item>
-      <el-form-item label="收费类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择收费类型" clearable>
-          <el-option v-for="dict in dm_finance_transaction_type" :key="dict.value" :label="dict.label"
-            :value="dict.value" />
-        </el-select>
-      </el-form-item>
+      
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
         <el-button icon="Refresh" @click="resetQuery">重置</el-button>
@@ -56,7 +59,7 @@
     <el-table v-loading="loading" :data="transactionList" @selection-change="handleSelectionChange" height="600" border>
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column type="index" width="50" label="序号" fixed />
-      <el-table-column label="门店id" align="center" prop="clientId" fixed />
+      <el-table-column label="门店" align="center" prop="clientId" fixed />
       <el-table-column label="操作ID" align="center" prop="operationId" width="120" />
       <el-table-column label="发货单号" align="center" prop="postingNumber" width="160" />
       <el-table-column label="收费类型" align="center" prop="type" width="128">
@@ -180,6 +183,7 @@
 <script setup name="Transaction">
 import FormattedCurrency from '@/components/FormattedCurrency'
 import { listTransaction, getTransaction, delTransaction, addTransaction, updateTransaction } from "@/api/erp/transaction";
+import DmShopSelect from '@/components/DmShopSelect';
 
 const { proxy } = getCurrentInstance();
 const { dm_finance_operation_type, dm_finance_transaction_type } = proxy.useDict('dm_finance_operation_type', 'dm_finance_transaction_type');
@@ -200,7 +204,7 @@ const data = reactive({
   queryParams: {
     pageNum: 1,
     pageSize: 20,
-    operationId: null,
+    clientId: null,
     postingNumber: null,
     operationType: null,
     operationDate: null,

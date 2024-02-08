@@ -2,60 +2,22 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="门店" prop="clientId">
-        <el-input
-          v-model="queryParams.clientId"
-          placeholder="请输入门店"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="订单号" prop="orderId">
-        <el-input
-          v-model="queryParams.orderId"
-          placeholder="请输入订单号"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+        <!-- <el-input v-model="queryParams.clientId" placeholder="请输入门店" clearable @keyup.enter="handleQuery" /> -->
+        <dm-shop-select v-model="queryParams.clientId" clearable @keyup.enter="handleQuery"></dm-shop-select>
       </el-form-item>
       <el-form-item label="发货编号" prop="postingNumber">
-        <el-input
-          v-model="queryParams.postingNumber"
-          placeholder="请输入发货编号"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+        <el-input v-model="queryParams.postingNumber" placeholder="请输入发货编号" clearable @keyup.enter="handleQuery" />
       </el-form-item>
       <el-form-item label="平台Sku" prop="platformSkuId">
-        <el-input
-          v-model="queryParams.platformSkuId"
-          placeholder="请输入平台Sku"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+        <el-input v-model="queryParams.platformSkuId" placeholder="请输入平台Sku" clearable @keyup.enter="handleQuery" />
       </el-form-item>
       <el-form-item label="货号" prop="offerId">
-        <el-input
-          v-model="queryParams.offerId"
-          placeholder="请输入货号"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+        <el-input v-model="queryParams.offerId" placeholder="请输入货号" clearable @keyup.enter="handleQuery" />
       </el-form-item>
       <el-form-item label="退货日期" prop="returnDate">
-        <el-date-picker clearable
-          v-model="queryParams.returnDate"
-          type="date"
-          value-format="YYYY-MM-DD"
+        <el-date-picker clearable v-model="queryParams.returnDate" type="date" value-format="YYYY-MM-DD"
           placeholder="请选择退货日期">
         </el-date-picker>
-      </el-form-item>
-      <el-form-item label="退货数量" prop="quantity">
-        <el-input
-          v-model="queryParams.quantity"
-          placeholder="请输入退货数量"
-          clearable
-          @keyup.enter="handleQuery"
-        />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -64,78 +26,53 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="Plus"
-          @click="handleAdd"
-          v-hasPermi="['erp:return:add']"
-        >新增</el-button>
+      <!-- <el-col :span="1.5">
+        <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['erp:return:add']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="Edit"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['erp:return:edit']"
-        >修改</el-button>
+        <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate"
+          v-hasPermi="['erp:return:edit']">修改</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="Delete"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['erp:return:remove']"
-        >删除</el-button>
-      </el-col>
+        <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete"
+          v-hasPermi="['erp:return:remove']">删除</el-button>
+      </el-col> -->
       <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="Download"
-          @click="handleExport"
-          v-hasPermi="['erp:return:export']"
-        >导出</el-button>
+        <el-button type="warning" plain icon="Download" @click="handleExport"
+          v-hasPermi="['erp:return:export']">导出</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="returnList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="" align="center" prop="id" />
+    <el-table v-loading="loading" :data="returnList" @selection-change="handleSelectionChange" border>
+      <el-table-column type="selection" align="center" />
+      <el-table-column type="index" label="序号" />
       <el-table-column label="门店" align="center" prop="clientId" />
-      <el-table-column label="订单号" align="center" prop="orderId" />
-      <el-table-column label="发货编号" align="center" prop="postingNumber" />
-      <el-table-column label="平台Sku" align="center" prop="platformSkuId" />
-      <el-table-column label="货号" align="center" prop="offerId" />
-      <el-table-column label="退货日期" align="center" prop="returnDate" width="180">
+      <el-table-column label="退货日期" align="center" prop="returnDate">
         <template #default="scope">
           <span>{{ parseTime(scope.row.returnDate, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
+      <!-- <el-table-column label="订单号" align="center" prop="orderId" /> -->
+      <el-table-column label="发货编号" align="center" prop="postingNumber" />
+      <el-table-column label="货号" align="center" prop="offerId" />
+      <el-table-column label="平台Sku" align="center" prop="platformSkuId" />
+
       <el-table-column label="退货数量" align="center" prop="quantity" />
       <el-table-column label="退货原因" align="center" prop="returnReason" />
       <el-table-column label="退货状态" align="center" prop="status" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <!-- <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
-          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['erp:return:edit']">修改</el-button>
-          <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['erp:return:remove']">删除</el-button>
+          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
+            v-hasPermi="['erp:return:edit']">修改</el-button>
+          <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"
+            v-hasPermi="['erp:return:remove']">删除</el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
-    
-    <pagination
-      v-show="total>0"
-      :total="total"
-      v-model:page="queryParams.pageNum"
-      v-model:limit="queryParams.pageSize"
-      @pagination="getList"
-    />
+
+    <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize"
+      @pagination="getList" />
 
     <!-- 添加或修改退货记录对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
@@ -156,11 +93,7 @@
           <el-input v-model="form.offerId" placeholder="请输入货号" />
         </el-form-item>
         <el-form-item label="退货日期" prop="returnDate">
-          <el-date-picker clearable
-            v-model="form.returnDate"
-            type="date"
-            value-format="YYYY-MM-DD"
-            placeholder="请选择退货日期">
+          <el-date-picker clearable v-model="form.returnDate" type="date" value-format="YYYY-MM-DD" placeholder="请选择退货日期">
           </el-date-picker>
         </el-form-item>
         <el-form-item label="退货数量" prop="quantity">
@@ -182,6 +115,7 @@
 
 <script setup name="Return">
 import { listReturn, getReturn, delReturn, addReturn, updateReturn } from "@/api/erp/return";
+import DmShopSelect from '@/components/DmShopSelect';
 
 const { proxy } = getCurrentInstance();
 
@@ -327,12 +261,12 @@ function submitForm() {
 /** 删除按钮操作 */
 function handleDelete(row) {
   const _ids = row.id || ids.value;
-  proxy.$modal.confirm('是否确认删除退货记录编号为"' + _ids + '"的数据项？').then(function() {
+  proxy.$modal.confirm('是否确认删除退货记录编号为"' + _ids + '"的数据项？').then(function () {
     return delReturn(_ids);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");
-  }).catch(() => {});
+  }).catch(() => { });
 }
 
 /** 导出按钮操作 */
