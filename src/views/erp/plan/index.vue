@@ -10,7 +10,7 @@
       </el-form-item>
       <el-form-item label="创建时间" style="width: 308px">
         <el-date-picker v-model="daterangeCreateTime" value-format="YYYY-MM-DD" type="daterange" range-separator="-"
-          start-placeholder="开始日�?" end-placeholder="结束日期"></el-date-picker>
+          start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
@@ -222,7 +222,7 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="供应商报�?" prop="supplierPriceOfferId">
+        <el-form-item label="供应商报价" prop="supplierPriceOfferId">
           <!-- <el-input v-model="form.supplierPriceOfferId" placeholder="请输入供应商报价" /> -->
           <el-select v-model="form.supplierPriceOfferId" :multiple="false" filterable remote reserve-keyword
             placeholder="请输入SKU" remote-show-suffix>

@@ -210,8 +210,7 @@
           </el-table-column>
           <el-table-column label="产品ID" prop="skuId" width="250">
             <template #default="scope">
-              <dm-select-product :skuId="scope.row.skuId" v-model="scope.row.skuId"
-                @sku-selected="getPcsData(scope.row)"></dm-select-product>
+              <dm-select-product v-model="scope.row.skuId" @sku-selected="getPcsData(scope.row)"></dm-select-product>
             </template>
           </el-table-column>
           <el-table-column label="发运数量" prop="quantity" width="120">
