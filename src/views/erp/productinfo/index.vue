@@ -718,6 +718,8 @@ const data = reactive({
   queryParams: {
     pageNum: 1,
     pageSize: 10,
+    orderByColumn: 'create_time',
+    isAsc: 'desc',
     skuId: null,
     skuName: null,
     saleStatus: null,
