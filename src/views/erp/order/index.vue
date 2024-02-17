@@ -51,7 +51,7 @@
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="orderList" @selection-change="handleSelectionChange" border fit>
+    <el-table v-loading="loading" :data="orderList" @selection-change="handleSelectionChange" border style="width: 100%">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column type="index" label="序号" />
       <el-table-column label="门店" align="center" prop="clientId" />
@@ -68,17 +68,17 @@
           <dict-tag :options="dm_order_substatus" :value="scope.row.substatus" />
         </template>
       </el-table-column>
-      <el-table-column label="接单时间" align="center" prop="inProcessAt" width="180">
+      <el-table-column label="接单时间" align="center" prop="inProcessAt">
         <template #default="scope">
           <span>{{ parseTime(scope.row.inProcessAt, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="发运时间" align="center" prop="shipmentDate" width="180">
+      <el-table-column label="发运时间" align="center" prop="shipmentDate">
         <template #default="scope">
           <span>{{ parseTime(scope.row.shipmentDate, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="交货时间" align="center" prop="deliveringDate" width="180">
+      <el-table-column label="交货时间" align="center" prop="deliveringDate">
         <template #default="scope">
           <span>{{ parseTime(scope.row.deliveringDate, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
@@ -92,7 +92,7 @@
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['erp:order:edit']">修改</el-button>
-            <el-button link type="primary" icon="Edit" @click="createChat(scope.row)"
+          <el-button link type="primary" icon="Edit" @click="createChat(scope.row)"
             v-hasPermi="['erp:chat:add']">创建聊天</el-button>
           <!-- <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"
             v-hasPermi="['erp:order:remove']">删除</el-button> -->
@@ -192,6 +192,8 @@ const data = reactive({
   queryParams: {
     pageNum: 1,
     pageSize: 10,
+    orderByColumn: 'in_process_at',
+    isAsc: 'desc',
     clientId: '1633585',
     orderId: null,
     postingNumber: null,

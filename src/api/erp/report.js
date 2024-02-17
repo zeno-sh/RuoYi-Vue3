@@ -9,9 +9,18 @@ export function listReport(query) {
   });
 }
 
-export function volumn(query) {
+export function indexVolume(query) {
   return request({
-    url: "/erp/report/volume/product",
+    url: "/erp/report/index/volume",
+    method: "get",
+    params: query,
+  });
+}
+
+
+export function indexAd(query) {
+  return request({
+    url: "/erp/report/index/ad",
     method: "get",
     params: query,
   });

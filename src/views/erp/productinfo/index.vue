@@ -62,7 +62,7 @@
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="productList" @selection-change="handleSelectionChange" height="600" border>
+    <el-table v-loading="loading" :data="productList" @selection-change="handleSelectionChange" border>
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column type="index" width="50" label="序号" fixed />
       <el-table-column label="图片" align="center" prop="pictureUrl" width="100" fixed>
