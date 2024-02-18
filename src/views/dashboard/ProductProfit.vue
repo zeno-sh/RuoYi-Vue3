@@ -4,29 +4,29 @@
       <el-table-column type="index" label="" align="center" width="50" />
       <el-table-column prop="offerId" label="商品" align="left" width="250">
         <template #default="scope">
-        <div style="display: flex; align-items: right;">
-          <img :src="scope.row.imageUrl" style="width: 32px; height: 32px; margin-right: 10px;">
-          <span>{{ scope.row.offerId }}</span>
-        </div>
-      </template>
+          <div style="display: flex; align-items: right;">
+            <img :src="scope.row.imageUrl" style="width: 32px; height: 32px; margin-right: 10px;">
+            <span>{{ scope.row.offerId }}</span>
+          </div>
+        </template>
       </el-table-column>
-      <el-table-column prop="volumeSales" label="产品销量" align="right" width="80"></el-table-column>
-      <el-table-column prop="volumeAd" label="广告销量" align="right" width="80"></el-table-column>
-      <el-table-column prop="amountSales" label="销售额" align="right" width="120">
+      <el-table-column prop="volumeSales" label="产品销量" align="right" width="110" sortable></el-table-column>
+      <el-table-column prop="volumeAd" label="广告销量" align="right" width="110" sortable></el-table-column>
+      <el-table-column prop="amountSales" label="销售额" align="right" width="120" sortable>
         <template #default="scope">
           <el-tooltip effect="dark" :content="convertAmount(scope.row.amountSales)" placement="right">
             <span>{{ formatCurrency(scope.row.amountSales.toFixed(2)) }}</span>
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="costAd" label="广告花费" align="right" width="120">
+      <el-table-column prop="costAd" label="广告花费" align="right" width="120" sortable>
         <template #default="scope">
           <el-tooltip effect="dark" :content="convertAmount(scope.row.costAd)" placement="right">
             <span>{{ formatCurrency(scope.row.costAd.toFixed(2)) }}</span>
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="amountAd" label="广告销售额" align="right" width="120">
+      <el-table-column prop="amountAd" label="广告销售额" align="right" width="120" sortable>
         <template #default="scope">
           <el-tooltip effect="dark" :content="convertAmount(scope.row.amountAd)" placement="right">
             <span>{{ formatCurrency(scope.row.amountAd.toFixed(2)) }}</span>
@@ -44,24 +44,24 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="amountProfit" label="利润" align="right" width="120">
+      <el-table-column prop="amountProfit" label="利润" align="right" width="120" sortable>
         <template #default="scope">
           <el-tooltip effect="dark" :content="convertAmount(scope.row.amountProfit)" placement="right">
             <span>{{ formatCurrency(scope.row.amountProfit) }}</span>
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="profitRate" label="毛利率" align="right" width="90">
+      <el-table-column prop="profitRate" label="毛利率" align="right" width="90" sortable>
         <template #default="scope">
           {{ convertRate(scope.row.profitRate) }}
         </template>
       </el-table-column>
-      <el-table-column prop="roi" label="ROI" align="right" width="90">
+      <el-table-column prop="roi" label="ROI" align="right" width="90" sortable>
         <template #default="scope">
           {{ convertRate(scope.row.roi) }}
         </template>
       </el-table-column>
-      <el-table-column prop="acos" label="ACOS" align="right" width="90">
+      <el-table-column prop="acos" label="ACOS" align="right" width="90" sortable>
         <template #default="scope">
           {{ convertRate(scope.row.acos) }}
         </template>
@@ -125,6 +125,19 @@ function convertRate(rate) {
 // 公开方法供父组件调用
 defineExpose({ updateParams });
 </script>
+
+<style scoped>
+.caret-wrapper {
+  flex-direction: column;
+  align-items: center;
+  height: 14px;
+  width: 24px;
+  vertical-align: middle;
+  cursor: pointer;
+  overflow: initial;
+  position: relative;
+}
+</style>
 
 
 <!-- 父组件调用示例 -->

@@ -16,11 +16,11 @@
         </div>
 
         <el-tooltip class="item" effect="dark"
-          :content="tooltipContent(volumeData.todayOrderVolume, volumeData.yesterdayAmount)" placement="top">
+          :content="tooltipContent(volumeData.todayAmount, volumeData.yesterdayAmount)" placement="top">
           <div class="stat-item">
             <div class="stat-title">销售额</div>
-            <div class="stat-number" style="color: rgb(0, 91, 245)">{{ formatCurrencyFcn(volumeData.todayAmount) }}</div>
-            <div class="stat-compare">昨 {{ formatCurrencyFcn(volumeData.yesterdayAmount) }}</div>
+            <div class="stat-number" style="color: rgb(0, 91, 245)">{{ formatCurrency(volumeData.todayAmount) }}</div>
+            <div class="stat-compare">昨 {{ formatCurrency(volumeData.yesterdayAmount) }}</div>
           </div>
         </el-tooltip>
 
@@ -34,8 +34,8 @@
           :content="tooltipContent(volumeData.todayAvgPrice, volumeData.yesterdayAvgPrice)" placement="top">
           <div class="stat-item">
             <div class="stat-title">平均售价</div>
-            <div class="stat-number">{{ formatCurrencyFcn(volumeData.todayAvgPrice) }}</div>
-            <div class="stat-compare">昨 {{ formatCurrencyFcn(volumeData.yesterdayAvgPrice) }}</div>
+            <div class="stat-number">{{ formatCurrency(volumeData.todayAvgPrice) }}</div>
+            <div class="stat-compare">昨 {{ formatCurrency(volumeData.yesterdayAvgPrice) }}</div>
           </div>
         </el-tooltip>
 
@@ -61,17 +61,17 @@
           placement="top">
           <div class="stat-item">
             <div class="stat-title">广告花费</div>
-            <div class="stat-number">{{ formatCurrencyFcn(adData.todaySpend) }}</div>
-            <div class="stat-compare">昨 {{ formatCurrencyFcn(adData.yesterdaySpend) }}</div>
+            <div class="stat-number">{{ formatCurrency(adData.todaySpend) }}</div>
+            <div class="stat-compare">昨 {{ formatCurrency(adData.yesterdaySpend) }}</div>
           </div>
         </el-tooltip>
 
-        <el-tooltip class="item" effect="dark" :content="tooltipContent(adData.todayOrderVolume, adData.yesterdayAmount)"
+        <el-tooltip class="item" effect="dark" :content="tooltipContent(adData.todayAmount, adData.yesterdayAmount)"
           placement="top">
           <div class="stat-item">
             <div class="stat-title">广告销售额</div>
-            <div class="stat-number">{{ formatCurrencyFcn(adData.todayAmount) }}</div>
-            <div class="stat-compare">昨 {{ formatCurrencyFcn(adData.yesterdayAmount) }}</div>
+            <div class="stat-number">{{ formatCurrency(adData.todayAmount) }}</div>
+            <div class="stat-compare">昨 {{ formatCurrency(adData.yesterdayAmount) }}</div>
           </div>
         </el-tooltip>
 
@@ -145,10 +145,6 @@ function openDetails() {
   console.log('打开详情页面的逻辑');
 }
 
-function formatCurrencyFcn(amount) {
-  return formatCurrency(amount);
-}
-
 function tooltipContent(todayAmount, yesterdayAmount) {
   // 使用这些金额来生成tooltip的内容
   return `今：${convertCurrency(todayAmount, 'CNY')} ${convertCurrency(todayAmount, 'USD')} | 昨：${convertCurrency(yesterdayAmount, 'CNY')} ${convertCurrency(yesterdayAmount, 'USD')}`;
@@ -170,9 +166,9 @@ getAd();
 .stat-card {
   flex: 1;
   /* 使每个卡片都尽可能占满可用空间，你也可以根据需要给它们设置最大和最小宽度 */
-  margin: 0 12px;
+  margin: 0 8px;
   /* 根据需要调整，为卡片之间提供空间 */
-  border-radius: 12px;
+  border-radius: 6px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
