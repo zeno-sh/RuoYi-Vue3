@@ -25,3 +25,11 @@ export function indexAd(query) {
     params: query,
   });
 }
+
+export function volumeList(query) {
+  return request({
+    url: "/erp/report/volume/list",
+    method: "post",
+    data: query,
+  });
+}
