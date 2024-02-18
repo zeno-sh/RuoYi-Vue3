@@ -1,105 +1,106 @@
 <template>
   <div class="cards-wrapper">
-      <el-card class="stat-card">
-        <div class="stat-header">
-          <span class="header-title">实时销量</span>
-          <el-icon class="details-arrow" @click="openDetails">
-            <ArrowRight />
-          </el-icon>
+    <el-card class="stat-card">
+      <div class="stat-header">
+        <span class="header-title">实时销量</span>
+        <el-icon class="details-arrow" @click="openDetails">
+          <ArrowRight />
+        </el-icon>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-item">
+          <div class="stat-title">销量</div>
+          <div class="stat-number">{{ volumeData.todayOrderVolume }}</div>
+          <div class="stat-compare">昨 {{ volumeData.yesterdayOrderVolume }}</div>
         </div>
 
-        <div class="stat-row">
+        <el-tooltip class="item" effect="dark"
+          :content="tooltipContent(volumeData.todayOrderVolume, volumeData.yesterdayAmount)" placement="top">
           <div class="stat-item">
-            <div class="stat-title">销量</div>
-            <div class="stat-number">{{ volumeData.todayOrderVolume }}</div>
-            <div class="stat-compare">昨 {{ volumeData.yesterdayOrderVolume }}</div>
+            <div class="stat-title">销售额</div>
+            <div class="stat-number" style="color: rgb(0, 91, 245)">{{ formatCurrencyFcn(volumeData.todayAmount) }}</div>
+            <div class="stat-compare">昨 {{ formatCurrencyFcn(volumeData.yesterdayAmount) }}</div>
           </div>
+        </el-tooltip>
 
-          <el-tooltip class="item" effect="dark"
-            :content="tooltipContent(volumeData.todayOrderVolume, volumeData.yesterdayAmount)" placement="top">
-            <div class="stat-item">
-              <div class="stat-title">销售额</div>
-              <div class="stat-number" style="color: rgb(0, 91, 245)">{{ formatCurrency(volumeData.todayAmount) }}</div>
-              <div class="stat-compare">昨 {{ formatCurrency(volumeData.yesterdayAmount) }}</div>
-            </div>
-          </el-tooltip>
-
-          <div class="stat-item">
-            <div class="stat-title">订单量</div>
-            <div class="stat-number">{{ volumeData.todayProductVolume }}</div>
-            <div class="stat-compare">昨 {{ volumeData.yesterdayProductVolume }}</div>
-          </div>
-
-          <el-tooltip class="item" effect="dark"
-            :content="tooltipContent(volumeData.todayAvgPrice, volumeData.yesterdayAvgPrice)" placement="top">
-            <div class="stat-item">
-              <div class="stat-title">平均售价</div>
-              <div class="stat-number">{{ formatCurrency(volumeData.todayAvgPrice) }}</div>
-              <div class="stat-compare">昨 {{ formatCurrency(volumeData.yesterdayAvgPrice) }}</div>
-            </div>
-          </el-tooltip>
-
-          <div class="stat-item">
-            <div class="stat-title">取消订单数</div>
-            <div class="stat-number">{{ volumeData.todayCancelOrderVolume }}</div>
-            <div class="stat-compare">昨 {{ volumeData.yesterdayCancelOrderVolume }}</div>
-          </div>
-        </div>
-      </el-card>
-
-      <!-- 广告 -->
-      <el-card class="stat-card">
-        <div class="stat-header">
-          <span class="header-title">实时广告</span>
-          <el-icon class="details-arrow" @click="openDetails">
-            <ArrowRight />
-          </el-icon>
+        <div class="stat-item">
+          <div class="stat-title">订单量</div>
+          <div class="stat-number">{{ volumeData.todayProductVolume }}</div>
+          <div class="stat-compare">昨 {{ volumeData.yesterdayProductVolume }}</div>
         </div>
 
-        <div class="stat-row">
-          <el-tooltip class="item" effect="dark" :content="tooltipContent(adData.todaySpend, adData.yesterdaySpend)"
-            placement="top">
-            <div class="stat-item">
-              <div class="stat-title">广告花费</div>
-              <div class="stat-number">{{ formatCurrency(adData.todaySpend) }}</div>
-              <div class="stat-compare">昨 {{ formatCurrency(adData.yesterdaySpend) }}</div>
-            </div>
-          </el-tooltip>
-
-          <el-tooltip class="item" effect="dark"
-            :content="tooltipContent(adData.todayOrderVolume, adData.yesterdayAmount)" placement="top">
-            <div class="stat-item">
-              <div class="stat-title">广告销售额</div>
-              <div class="stat-number">{{ formatCurrency(adData.todayAmount) }}</div>
-              <div class="stat-compare">昨 {{ formatCurrency(adData.yesterdayAmount) }}</div>
-            </div>
-          </el-tooltip>
-
+        <el-tooltip class="item" effect="dark"
+          :content="tooltipContent(volumeData.todayAvgPrice, volumeData.yesterdayAvgPrice)" placement="top">
           <div class="stat-item">
-            <div class="stat-title">广告订单量</div>
-            <div class="stat-number">{{ adData.todayAdVolume }}</div>
-            <div class="stat-compare">昨 {{ adData.yesterdayAdVolume }}</div>
+            <div class="stat-title">平均售价</div>
+            <div class="stat-number">{{ formatCurrencyFcn(volumeData.todayAvgPrice) }}</div>
+            <div class="stat-compare">昨 {{ formatCurrencyFcn(volumeData.yesterdayAvgPrice) }}</div>
           </div>
+        </el-tooltip>
 
-          <div class="stat-item">
-            <div class="stat-title">ACOS</div>
-            <div class="stat-number">{{ (adData.todayAcos * 100).toFixed(2) + '%' }}</div>
-            <div class="stat-compare">昨 {{ (adData.yesterdayAcos * 100).toFixed(2) + '%' }}</div>
-          </div>
-
-          <div class="stat-item">
-            <div class="stat-title">ACoAS</div>
-            <div class="stat-number">{{ (adData.todayAcoas * 100).toFixed(2) + '%' }}</div>
-            <div class="stat-compare">昨 {{ (adData.yesterdayAcoas * 100).toFixed(2) + '%' }}</div>
-          </div>
+        <div class="stat-item">
+          <div class="stat-title">取消订单数</div>
+          <div class="stat-number">{{ volumeData.todayCancelOrderVolume }}</div>
+          <div class="stat-compare">昨 {{ volumeData.yesterdayCancelOrderVolume }}</div>
         </div>
-      </el-card>
-    </div>
+      </div>
+    </el-card>
+
+    <!-- 广告 -->
+    <el-card class="stat-card">
+      <div class="stat-header">
+        <span class="header-title">实时广告</span>
+        <el-icon class="details-arrow" @click="openDetails">
+          <ArrowRight />
+        </el-icon>
+      </div>
+
+      <div class="stat-row">
+        <el-tooltip class="item" effect="dark" :content="tooltipContent(adData.todaySpend, adData.yesterdaySpend)"
+          placement="top">
+          <div class="stat-item">
+            <div class="stat-title">广告花费</div>
+            <div class="stat-number">{{ formatCurrencyFcn(adData.todaySpend) }}</div>
+            <div class="stat-compare">昨 {{ formatCurrencyFcn(adData.yesterdaySpend) }}</div>
+          </div>
+        </el-tooltip>
+
+        <el-tooltip class="item" effect="dark" :content="tooltipContent(adData.todayOrderVolume, adData.yesterdayAmount)"
+          placement="top">
+          <div class="stat-item">
+            <div class="stat-title">广告销售额</div>
+            <div class="stat-number">{{ formatCurrencyFcn(adData.todayAmount) }}</div>
+            <div class="stat-compare">昨 {{ formatCurrencyFcn(adData.yesterdayAmount) }}</div>
+          </div>
+        </el-tooltip>
+
+        <div class="stat-item">
+          <div class="stat-title">广告订单量</div>
+          <div class="stat-number">{{ adData.todayAdVolume }}</div>
+          <div class="stat-compare">昨 {{ adData.yesterdayAdVolume }}</div>
+        </div>
+
+        <div class="stat-item">
+          <div class="stat-title">ACOS</div>
+          <div class="stat-number">{{ (adData.todayAcos * 100).toFixed(2) + '%' }}</div>
+          <div class="stat-compare">昨 {{ (adData.yesterdayAcos * 100).toFixed(2) + '%' }}</div>
+        </div>
+
+        <div class="stat-item">
+          <div class="stat-title">ACoAS</div>
+          <div class="stat-number">{{ (adData.todayAcoas * 100).toFixed(2) + '%' }}</div>
+          <div class="stat-compare">昨 {{ (adData.yesterdayAcoas * 100).toFixed(2) + '%' }}</div>
+        </div>
+      </div>
+    </el-card>
+  </div>
 </template>
 
 <script setup>
 import { defineProps } from "vue";
 import { indexVolume, indexAd } from "@/api/erp/report";
+import { formatCurrency, convertCurrency } from "@/utils/currencyFormat";
 
 
 const props = defineProps({
@@ -144,42 +145,14 @@ function openDetails() {
   console.log('打开详情页面的逻辑');
 }
 
-function formatCurrency(amount) {
-  return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(amount);
+function formatCurrencyFcn(amount) {
+  return formatCurrency(amount);
 }
 
 function tooltipContent(todayAmount, yesterdayAmount) {
   // 使用这些金额来生成tooltip的内容
   return `今：${convertCurrency(todayAmount, 'CNY')} ${convertCurrency(todayAmount, 'USD')} | 昨：${convertCurrency(yesterdayAmount, 'CNY')} ${convertCurrency(yesterdayAmount, 'USD')}`;
 };
-
-function convertCurrency(amount, currency) {
-  let locale;
-  switch (currency) {
-    case 'CNY':
-      locale = 'zh-CN'; // 对于人民币，使用中国的语言环境
-      break;
-    case 'USD':
-      locale = 'en-US'; // 对于美元，使用美国的语言环境
-      break;
-    default:
-      locale = 'ru-RU'; // 默认使用俄罗斯的语言环境
-      break;
-  }
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency: currency,
-    minimumFractionDigits: 2
-  }).format(amount * getExchangeRate(currency));
-}
-
-function getExchangeRate(currency) {
-  const rates = {
-    'CNY': 0.078,
-    'USD': 0.011
-  };
-  return rates[currency] || 0;
-}
 
 getVolume();
 getAd();

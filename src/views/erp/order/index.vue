@@ -303,8 +303,14 @@ function handleUpdate(row) {
 function createChat(row) {
   form.value.clientId = row.clientId;
   form.value.postingNumber = row.postingNumber;
+  loading.value = true;
   addChat(form.value).then(response => {
     proxy.$modal.msgSuccess("创建成功");
+    open.value = false;
+    getList();
+  }).catch(error => {
+    // 处理错误情况
+    loading.value = false;
   });
 }
 

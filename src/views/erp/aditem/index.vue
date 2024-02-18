@@ -7,30 +7,6 @@
       <el-form-item label="活动ID" prop="campaignId">
         <el-input v-model="queryParams.campaignId" placeholder="请输入活动ID" clearable @keyup.enter="handleQuery" />
       </el-form-item>
-      <el-form-item label="展示量" prop="views">
-        <el-input v-model="queryParams.views" placeholder="请输入展示量" clearable @keyup.enter="handleQuery" />
-      </el-form-item>
-      <el-form-item label="点击量" prop="clicks">
-        <el-input v-model="queryParams.clicks" placeholder="请输入点击量" clearable @keyup.enter="handleQuery" />
-      </el-form-item>
-      <el-form-item label="cr" prop="cr">
-        <el-input v-model="queryParams.cr" placeholder="请输入cr" clearable @keyup.enter="handleQuery" />
-      </el-form-item>
-      <el-form-item label="花费" prop="moneySpent">
-        <el-input v-model="queryParams.moneySpent" placeholder="请输入花费" clearable @keyup.enter="handleQuery" />
-      </el-form-item>
-      <el-form-item label="平均报价" prop="avgBid">
-        <el-input v-model="queryParams.avgBid" placeholder="请输入平均报价" clearable @keyup.enter="handleQuery" />
-      </el-form-item>
-      <el-form-item label="订单量" prop="orders">
-        <el-input v-model="queryParams.orders" placeholder="请输入订单量" clearable @keyup.enter="handleQuery" />
-      </el-form-item>
-      <el-form-item label="订单金额" prop="ordersMoney">
-        <el-input v-model="queryParams.ordersMoney" placeholder="请输入订单金额" clearable @keyup.enter="handleQuery" />
-      </el-form-item>
-      <el-form-item label="产品售价" prop="price">
-        <el-input v-model="queryParams.price" placeholder="请输入产品售价" clearable @keyup.enter="handleQuery" />
-      </el-form-item>
       <el-form-item label="日期" prop="date">
         <el-date-picker clearable v-model="queryParams.date" type="date" value-format="YYYY-MM-DD" placeholder="请选择日期">
         </el-date-picker>
@@ -42,7 +18,7 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
+      <!-- <el-col :span="1.5">
         <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['erp:aditem:add']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -52,7 +28,7 @@
       <el-col :span="1.5">
         <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete"
           v-hasPermi="['erp:aditem:remove']">删除</el-button>
-      </el-col>
+      </el-col> -->
       <el-col :span="1.5">
         <el-button type="warning" plain icon="Download" @click="handleExport"
           v-hasPermi="['erp:aditem:export']">导出</el-button>
@@ -60,9 +36,13 @@
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="aditemList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="${comment}" align="center" prop="id" />
+    <el-table v-loading="loading" :data="aditemList" @selection-change="handleSelectionChange" border>
+      <el-table-column type="index" align="center" />
+      <el-table-column label="日期" align="center" prop="date" width="180">
+        <template #default="scope">
+          <span>{{ parseTime(scope.row.date, '{y}-{m}-{d}') }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="平台Sku" align="center" prop="platformSkuId" />
       <el-table-column label="活动ID" align="center" prop="campaignId" />
       <el-table-column label="展示量" align="center" prop="views" />
@@ -73,19 +53,15 @@
       <el-table-column label="订单量" align="center" prop="orders" />
       <el-table-column label="订单金额" align="center" prop="ordersMoney" />
       <el-table-column label="产品售价" align="center" prop="price" />
-      <el-table-column label="日期" align="center" prop="date" width="180">
-        <template #default="scope">
-          <span>{{ parseTime(scope.row.date, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      
+      <!-- <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['erp:aditem:edit']">修改</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"
             v-hasPermi="['erp:aditem:remove']">删除</el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
 
     <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize"
@@ -159,6 +135,8 @@ const data = reactive({
   queryParams: {
     pageNum: 1,
     pageSize: 10,
+    orderByColumn: 'date',
+    isAsc: 'desc',
     platformSkuId: null,
     campaignId: null,
     views: null,

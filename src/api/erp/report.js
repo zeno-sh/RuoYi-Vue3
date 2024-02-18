@@ -33,3 +33,11 @@ export function volumeList(query) {
     data: query,
   });
 }
+
+export function productProfit(data) {
+  return request({
+    url: "/erp/report/product/profit",
+    method: "post",
+    data: data,
+  });
+}
