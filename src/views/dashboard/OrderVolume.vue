@@ -3,7 +3,7 @@
     <el-card class="date-picker-card">
       <template #header>
         <div class="card-header">
-          <span class="header-title">排行榜 TOP 10</span>
+          <span class="header-title">排行榜 TOP 50</span>
           <div class="date-shortcuts">
             <el-radio-group v-model="selectedShortcut" @change="selectShortcut" class="date-shortcuts">
               <el-radio-button label="today">今日</el-radio-button>

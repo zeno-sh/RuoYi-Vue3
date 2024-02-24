@@ -61,9 +61,14 @@
           {{ convertRate(scope.row.roi) }}
         </template>
       </el-table-column>
-      <el-table-column prop="acos" label="ACOS" align="right" width="90" sortable>
+      <el-table-column prop="acos" label="ACoS" align="right" width="90" sortable>
         <template #default="scope">
           {{ convertRate(scope.row.acos) }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="acoas" label="ACoAS" align="right" width="100" sortable>
+        <template #default="scope">
+          {{ convertRate(scope.row.acoas) }}
         </template>
       </el-table-column>
     </el-table>
@@ -83,7 +88,7 @@ const state = reactive({
   total: 0,
   queryParams: {
     pageNum: 1,
-    pageSize: 10,
+    pageSize: 50,
     clientId: '',
     beginDate: '',
     endDate: '',

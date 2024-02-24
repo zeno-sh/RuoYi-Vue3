@@ -11,8 +11,9 @@
       <div class="stat-row">
         <div class="stat-item">
           <div class="stat-title">销量</div>
-          <div class="stat-number">{{ volumeData.todayOrderVolume }}</div>
-          <div class="stat-compare">昨 {{ volumeData.yesterdayOrderVolume }}</div>
+          
+          <div class="stat-number">{{ volumeData.todayProductVolume }}</div>
+          <div class="stat-compare">昨 {{ volumeData.yesterdayProductVolume }}</div>
         </div>
 
         <el-tooltip class="item" effect="dark"
@@ -26,8 +27,8 @@
 
         <div class="stat-item">
           <div class="stat-title">订单量</div>
-          <div class="stat-number">{{ volumeData.todayProductVolume }}</div>
-          <div class="stat-compare">昨 {{ volumeData.yesterdayProductVolume }}</div>
+          <div class="stat-number">{{ volumeData.todayOrderVolume }}</div>
+          <div class="stat-compare">昨 {{ volumeData.yesterdayOrderVolume }}</div>
         </div>
 
         <el-tooltip class="item" effect="dark"
@@ -82,7 +83,7 @@
         </div>
 
         <div class="stat-item">
-          <div class="stat-title">ACOS</div>
+          <div class="stat-title">ACoS</div>
           <div class="stat-number">{{ (adData.todayAcos * 100).toFixed(2) + '%' }}</div>
           <div class="stat-compare">昨 {{ (adData.yesterdayAcos * 100).toFixed(2) + '%' }}</div>
         </div>
@@ -91,6 +92,12 @@
           <div class="stat-title">ACoAS</div>
           <div class="stat-number">{{ (adData.todayAcoas * 100).toFixed(2) + '%' }}</div>
           <div class="stat-compare">昨 {{ (adData.yesterdayAcoas * 100).toFixed(2) + '%' }}</div>
+        </div>
+
+        <div class="stat-item">
+          <div class="stat-title">广告销售占比</div>
+          <div class="stat-number">{{ (adData.todayAdRate * 100).toFixed(2) + '%' }}</div>
+          <div class="stat-compare">昨 {{ (adData.yesterdayAdRate * 100).toFixed(2) + '%' }}</div>
         </div>
       </div>
     </el-card>
