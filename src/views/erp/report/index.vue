@@ -83,7 +83,7 @@
         </el-table-column>
         <el-table-column label="平台服务费" align="center" prop="costPlatformService" width="120">
           <template #default="scope">
-            <FormattedCurrency :value="scope.row.costPlatfromService" />
+            <FormattedCurrency :value="scope.row.costPlatformService" />
           </template>
         </el-table-column>
         <el-table-column label="平台佣金" align="center" prop="costCommissions" width="120">

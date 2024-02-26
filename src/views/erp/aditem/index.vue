@@ -53,6 +53,7 @@
       <el-table-column label="订单量" align="center" prop="orders" />
       <el-table-column label="订单金额" align="center" prop="ordersMoney" />
       <el-table-column label="产品售价" align="center" prop="price" />
+      <el-table-column label="平台订单" align="center" prop="orderId" />
       
       <!-- <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
