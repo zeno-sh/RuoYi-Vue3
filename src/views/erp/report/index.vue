@@ -43,6 +43,11 @@
             {{ (scope.row.roi * 100).toFixed(2) + '%' }}
           </template>
         </el-table-column>
+        <el-table-column label="ACoS" align="center" prop="acos" width="120">
+          <template #default="scope">
+            {{ (scope.row.acos * 100).toFixed(2) + '%' }}
+          </template>
+        </el-table-column>
         <el-table-column label="ACoAS" align="center" prop="acoas" width="120">
           <template #default="scope">
             {{ (scope.row.acoas * 100).toFixed(2) + '%' }}
