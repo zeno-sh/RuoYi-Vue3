@@ -198,6 +198,10 @@
           <el-col :span="1.5">
             <el-button type="danger" icon="Delete" @click="handleDeleteDmTransportPlanItem">删除</el-button>
           </el-col>
+          <el-col :span="1.5">
+            <el-button type="warning" plain icon="Download" @click="handleItemExport"
+              v-hasPermi="['erp:transportplan:export']">导出</el-button>
+          </el-col>
         </el-row>
         <el-table :data="dmTransportPlanItemList" :row-class-name="rowDmTransportPlanItemIndex" show-summary
           @selection-change="handleDmTransportPlanItemSelectionChange" ref="dmTransportPlanItem">
@@ -482,6 +486,15 @@ function handleExport() {
   proxy.download('erp/transportplan/export', {
     ...queryParams.value
   }, `transportplan_${new Date().getTime()}.xlsx`)
+}
+
+
+/** 导出明细按钮操作 */
+function handleItemExport() {
+  queryParams.value.code = form.value.code;
+  proxy.download('erp/transportplan/exportItem', {
+    ...queryParams.value
+  }, `transportplan_item_${new Date().getTime()}.xlsx`)
 }
 
 function getPcsData(row) {
