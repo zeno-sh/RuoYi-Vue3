@@ -3,15 +3,15 @@
 
     <el-form :model="queryParams" ref="queryRef" :inline="true" label-width="58px">
       <el-form-item label="门店" prop="clientId">
-        <dm-shop-select v-model="queryParams.clientId" clearable disabled></dm-shop-select>
+        <dm-shop-select v-model:clientId="queryParams.clientId" clearable></dm-shop-select>
       </el-form-item>
     </el-form>
 
     <!-- 销量面板 -->
-    <panel-store :clientId="queryParams.clientId"></panel-store>
+    <panel-store :key="queryParams.clientId" :clientId="queryParams.clientId"></panel-store>
 
     <!-- Top产品 -->
-    <order-volume :clientId="queryParams.clientId"></order-volume>
+    <order-volume :key="queryParams.clientId" :clientId="queryParams.clientId"></order-volume>
   </div>
 </template>
 
@@ -25,7 +25,7 @@ const { proxy } = getCurrentInstance();
 const data = reactive({
   form: {},
   queryParams: {
-    clientId: '1633585',
+    clientId: '',
     beginDate: '',
     endDate: ''
   },

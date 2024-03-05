@@ -33,6 +33,11 @@
         </template>
       </el-table-column>
       <el-table-column label="活动ID" align="center" prop="campaignId" />
+      <el-table-column label="ACoS" align="center">
+        <template #default="scope">
+         {{ scope.row.ordersMoney > 0 ? ((scope.row.moneySpent / scope.row.ordersMoney) * 100).toFixed(2) + '%' : '0.00%' }}
+        </template>
+      </el-table-column>
       <el-table-column label="标题" align="center" prop="title" />
       <el-table-column label="展示量" align="center" prop="views" />
       <el-table-column label="点击数" align="center" prop="clicks" />
@@ -40,7 +45,7 @@
       <el-table-column label="平均报价" align="center" prop="avgBid" />
       <el-table-column label="订单数量" align="center" prop="orders" />
       <el-table-column label="订单金额" align="center" prop="ordersMoney" />
-      
+
       <!-- <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
@@ -51,8 +56,8 @@
       </el-table-column> -->
     </el-table>
 
-    <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize"
-      @pagination="getList" />
+    <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum"
+      v-model:limit="queryParams.pageSize" @pagination="getList" />
 
     <!-- 添加或修改广告活动对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
@@ -86,6 +91,7 @@
           </el-date-picker>
         </el-form-item>
       </el-form>
+
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="submitForm">确 定</el-button>

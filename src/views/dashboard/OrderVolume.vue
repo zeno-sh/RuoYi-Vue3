@@ -50,11 +50,11 @@ function selectShortcut(shortcut) {
       break;
     case 'last7Days':
       start = dayjs().subtract(7, 'day').format('YYYY-MM-DD');
-      end = dayjs().format('YYYY-MM-DD');
+      end = dayjs().subtract(1, 'day').format('YYYY-MM-DD');
       break;
     case 'last30Days':
       start = dayjs().subtract(30, 'day').format('YYYY-MM-DD');
-      end = dayjs().format('YYYY-MM-DD');
+      end = dayjs().subtract(1, 'day').format('YYYY-MM-DD');
       break;
   }
 

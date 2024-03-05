@@ -51,34 +51,45 @@
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="orderList" @selection-change="handleSelectionChange" border style="width: 100%">
+    <el-table v-loading="loading" :data="orderList" @selection-change="handleSelectionChange" border
+      style="width: 100%">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column type="index" label="序号" />
       <el-table-column label="门店" align="center" prop="clientId" />
+      <el-table-column label="订单类型" align="center" prop="fbs">
+        <template #default="scope">
+          <dict-tag :options="dm_order_type" :value="scope.row.fbs" />
+        </template>
+      </el-table-column>
       <el-table-column label="平台订单id" align="center" prop="orderId" />
       <el-table-column label="发货编号" align="center" prop="postingNumber" />
       <el-table-column label="订单编号" align="center" prop="orderNumber" />
       <el-table-column label="订单状态" align="center" prop="status">
+
         <template #default="scope">
           <dict-tag :options="dm_order_status" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column label="订单子状态" align="center" prop="substatus">
+
         <template #default="scope">
           <dict-tag :options="dm_order_substatus" :value="scope.row.substatus" />
         </template>
       </el-table-column>
       <el-table-column label="接单时间" align="center" prop="inProcessAt">
+
         <template #default="scope">
           <span>{{ parseTime(scope.row.inProcessAt, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="发运时间" align="center" prop="shipmentDate">
+
         <template #default="scope">
           <span>{{ parseTime(scope.row.shipmentDate, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="交货时间" align="center" prop="deliveringDate">
+
         <template #default="scope">
           <span>{{ parseTime(scope.row.deliveringDate, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
@@ -89,6 +100,7 @@
       <!-- <el-table-column label="仓库信息" align="center" prop="deliveryMethod" /> -->
       <el-table-column label="是否FBS" align="center" prop="fbs" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['erp:order:edit']">修改</el-button>
@@ -100,32 +112,33 @@
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize"
-      @pagination="getList" />
+    <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum"
+      v-model:limit="queryParams.pageSize" @pagination="getList" />
 
     <!-- 添加或修改订单信息对话框 -->
-    <el-dialog :title="title" v-model="open" width="500px" append-to-body>
-      <el-form ref="orderRef" :model="form" :rules="rules" label-width="80px">
+    <el-dialog :title="title" v-model="open" width="800px" append-to-body>
+      <el-form ref="orderRef" :model="form" :rules="rules" label-width="98px">
         <el-form-item label="平台门店id" prop="clientId">
           <el-input v-model="form.clientId" placeholder="请输入平台门店id" />
         </el-form-item>
         <el-form-item label="平台订单id" prop="orderId">
-          <el-input v-model="form.orderId" placeholder="请输入平台订单id" />
+          <el-input v-model="form.orderId" placeholder="请输入平台订单id" disabled/>
         </el-form-item>
         <el-form-item label="发货编号" prop="postingNumber">
-          <el-input v-model="form.postingNumber" placeholder="请输入发货编号" />
+          <el-input v-model="form.postingNumber" placeholder="请输入发货编号" disabled/>
         </el-form-item>
         <el-form-item label="订单编号" prop="orderNumber">
-          <el-input v-model="form.orderNumber" placeholder="请输入订单编号" />
+          <el-input v-model="form.orderNumber" placeholder="请输入订单编号" disabled/>
         </el-form-item>
         <el-form-item label="订单状态" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio v-for="dict in dm_order_status" :key="dict.value" :label="dict.value">{{ dict.label }}</el-radio>
-          </el-radio-group>
+          <el-select v-model="form.status" placeholder="请选择订单状态" disabled>
+            <el-option v-for="dict in dm_order_status" :key="dict.value" :label="dict.label"
+              :value="dict.value"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="接单时间" prop="inProcessAt">
           <el-date-picker clearable v-model="form.inProcessAt" type="date" value-format="YYYY-MM-DD"
-            placeholder="请选择接单时间">
+            placeholder="请选择接单时间" >
           </el-date-picker>
         </el-form-item>
         <el-form-item label="发运时间" prop="shipmentDate">
@@ -139,7 +152,7 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="订单销售金额" prop="accrualsForSale">
-          <el-input v-model="form.accrualsForSale" placeholder="请输入订单销售金额" />
+          <el-input v-model="form.accrualsForSale" placeholder="请输入订单销售金额" disabled/>
         </el-form-item>
         <el-form-item label="取消原因" prop="cancellation">
           <el-input v-model="form.cancellation" type="textarea" placeholder="请输入内容" />
@@ -151,14 +164,16 @@
           <el-input v-model="form.deliveryMethod" type="textarea" placeholder="请输入内容" />
         </el-form-item>
         <el-form-item label="是否FBS" prop="fbs">
-          <el-input v-model="form.fbs" placeholder="请输入是否FBS" />
+          <el-input v-model="form.fbs" placeholder="请输入是否FBS" disabled/>
         </el-form-item>
         <el-form-item label="订单子状态" prop="substatus">
-          <el-radio-group v-model="form.substatus">
-            <el-radio v-for="dict in dm_order_substatus" :key="dict.value" :label="dict.value">{{ dict.label }}</el-radio>
-          </el-radio-group>
+          <el-select v-model="form.substatus" placeholder="请选择订单子状态" disabled>
+            <el-option v-for="dict in dm_order_substatus" :key="dict.value" :label="dict.label"
+              :value="dict.value"></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
+
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -175,7 +190,7 @@ import { addChat } from "@/api/erp/chat";
 import DmShopSelect from '@/components/DmShopSelect';
 
 const { proxy } = getCurrentInstance();
-const { dm_order_status, dm_order_substatus } = proxy.useDict('dm_order_status', 'dm_order_substatus');
+const { dm_order_status, dm_order_substatus, dm_order_type } = proxy.useDict('dm_order_status', 'dm_order_substatus', 'dm_order_type');
 
 const orderList = ref([]);
 const open = ref(false);
@@ -194,7 +209,7 @@ const data = reactive({
     pageSize: 10,
     orderByColumn: 'in_process_at',
     isAsc: 'desc',
-    clientId: '1633585',
+    clientId: null,
     orderId: null,
     postingNumber: null,
     orderNumber: null,
