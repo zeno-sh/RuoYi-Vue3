@@ -71,6 +71,7 @@
         </template>
       </el-table-column>
       <el-table-column label="SKU" width="180" align="center" prop="skuId" fixed>
+
         <template #default="scope">
           <a @click="handleUpdate(scope.row)" class="hover-link">{{ scope.row.skuId }}</a>
         </template>
@@ -79,11 +80,13 @@
 
       <el-table-column label="产品名称" width="180" align="center" prop="skuName" />
       <el-table-column label="目标平台" align="center" prop="platform" width="120">
+
         <template #default="scope">
           <dict-tag :options="dm_platform" :value="scope.row.platform" />
         </template>
       </el-table-column>
       <el-table-column label="单位" align="center" prop="unit">
+
         <template #default="scope">
           <dict-tag :options="dm_unit_type" :value="scope.row.unit" />
         </template>
@@ -94,6 +97,7 @@
         </template>
       </el-table-column> -->
       <el-table-column label="售卖状态" align="center" prop="saleStatus">
+
         <template #default="scope">
           <dict-tag :options="dm_product_sale_status" :value="scope.row.saleStatus" />
         </template>
@@ -101,40 +105,48 @@
       <el-table-column label="品牌" align="center" prop="brandId" />
       <el-table-column label="类目" align="center" prop="categoryId" />
       <el-table-column label="类目佣金" align="center" prop="categoryCommission">
+
         <template #default="scope">
           {{ scope.row.categoryCommission }}%
         </template>
       </el-table-column>
       <el-table-column label="标签" align="center" prop="flagId">
+
         <template #default="scope">
           <dict-tag :options="dm_product_flag" :value="scope.row.flagId" />
         </template>
       </el-table-column>
       <el-table-column label="竞品趋势" align="center" width="250">
+
         <template #default="scope">
           <div v-for="trend in scope.row.dmProductPlatformTrendList" :key="trend.id">
             <div>skuId:{{ trend.competitorSkuId }} 销量：{{ trend.competitorSaleNumber }}</div>
-            <div>价格：{{ trend.competitorSalePrice }} 份额：{{ parseInt(trend.competitorSalePrice * trend.competitorSaleNumber)
-            }}</div>
+            <div>价格：{{ trend.competitorSalePrice }} 份额：{{ parseInt(trend.competitorSalePrice *
+      trend.competitorSaleNumber)
+              }}</div>
           </div>
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
+
         <template #default="scope">
           <dict-tag :options="record_status" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+
         <template #default="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="修改时间" align="center" prop="updateTime" width="180">
+
         <template #default="scope">
           <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
+
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['erp:product:edit']">修改</el-button>
@@ -144,8 +156,8 @@
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize"
-      @pagination="getList" />
+    <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum"
+      v-model:limit="queryParams.pageSize" @pagination="getList" />
 
     <!-- 添加或修改产品信息对话框 -->
     <el-dialog :title="title" v-model="open" width="95%" append-to-body :close-on-click-modal="false"
@@ -186,7 +198,8 @@
               <el-row type="flex">
                 <el-col :span="8">
                   <el-form-item label="SKU" prop="skuId">
-                    <el-input v-model="form.skuId" placeholder="请输入SKU" />
+                    <el-input v-model="form.skuId" :disabled="form.id" placeholder="请输入SKU">
+                    </el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
@@ -248,8 +261,8 @@
                         <span style="float: left">{{ item.platformName }}</span>
                         <span
                           style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{
-                            item.rate
-                          }}{{ '%' }}</span>
+      item.rate
+    }}{{ '%' }}</span>
                       </el-option>
                     </el-select>
                   </el-form-item>
@@ -259,8 +272,8 @@
               <el-form-item label="售卖状态" prop="saleStatus">
                 <el-radio-group v-model="form.saleStatus">
                   <el-radio v-for="dict in dm_product_sale_status" :key="dict.value" :label="parseInt(dict.value)">{{
-                    dict.label
-                  }}</el-radio>
+      dict.label
+    }}</el-radio>
                 </el-radio-group>
               </el-form-item>
 
@@ -273,7 +286,8 @@
                 </el-col>
                 <el-col :span="12">
                   <el-form-item label="产品描述" prop="description">
-                    <el-input v-model="form.description" type="textarea" placeholder="请输入内容" :autosize="{ minRows: 8 }" />
+                    <el-input v-model="form.description" type="textarea" placeholder="请输入内容"
+                      :autosize="{ minRows: 8 }" />
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -298,6 +312,7 @@
                 <el-table-column type="selection" width="50" align="center" />
                 <el-table-column label="序号" align="center" prop="index" width="50" />
                 <el-table-column label="平台" prop="platformId" width="150">
+
                   <template #default="scope">
                     <el-select v-model="scope.row.platformId" placeholder="请选择平台">
                       <el-option v-for="dict in dm_platform" :key="dict.value" :label="dict.label"
@@ -306,22 +321,26 @@
                   </template>
                 </el-table-column>
                 <el-table-column label="竞品链接" prop="competitorLink" width="150">
+
                   <template #default="scope">
                     <el-input v-model="scope.row.competitorLink" placeholder="请输入竞品竞品链接" />
                   </template>
                 </el-table-column>
                 <el-table-column label="竞品产品Id" prop="competitorSkuId" width="150">
+
                   <template #default="scope">
                     <el-input v-model="scope.row.competitorSkuId" placeholder="请输入竞品产品Id" />
                   </template>
                 </el-table-column>
                 <el-table-column label="竞品销量" prop="competitorSaleNumber" width="150">
+
                   <template #default="scope">
                     <el-input v-model="scope.row.competitorSaleNumber" placeholder="请输入竞品销量" />
                   </template>
                 </el-table-column>
 
                 <el-table-column label="竞品价格" prop="competitorSalePrice" width="150">
+
                   <template #default="scope">
                     <el-input v-model="scope.row.competitorSalePrice" placeholder="请输入竞品价格" />
                   </template>
@@ -346,6 +365,7 @@
                 <el-table-column type="selection" width="50" align="center" />
                 <el-table-column label="序号" align="center" prop="index" width="50" />
                 <el-table-column label="首选" prop="firstChoice" width="150">
+
                   <template #default="scope">
                     <el-radio-group v-model="scope.row.firstChoice">
                       <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
@@ -354,16 +374,19 @@
                   </template>
                 </el-table-column>
                 <el-table-column label="价格策略名称" prop="priceStrategyName" width="150">
+
                   <template #default="scope">
                     <el-input v-model="scope.row.priceStrategyName" placeholder="请输入价格策略名称" />
                   </template>
                 </el-table-column>
                 <el-table-column label="产品售价" prop="sellingPrice" width="150">
+
                   <template #default="scope">
                     <el-input v-model="scope.row.sellingPrice" placeholder="请输入产品售价" />
                   </template>
                 </el-table-column>
                 <el-table-column label="产品原价" prop="originalPrice" width="150">
+
                   <template #default="scope">
                     <el-input v-model="scope.row.originalPrice" placeholder="请输入产品原价" />
                   </template>
@@ -388,6 +411,7 @@
                 <el-table-column type="selection" width="50" align="center" />
                 <el-table-column label="序号" align="center" prop="index" width="50" />
                 <el-table-column label="首选" prop="firstChoice" width="150">
+
                   <template #default="scope">
                     <el-radio-group v-model="scope.row.firstChoice">
                       <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
@@ -396,11 +420,13 @@
                   </template>
                 </el-table-column>
                 <el-table-column label="箱规名称" prop="cartonSizeName" width="150">
+
                   <template #default="scope">
                     <el-input v-model="scope.row.cartonSizeName" placeholder="请输入箱规名称" />
                   </template>
                 </el-table-column>
                 <el-table-column label="外箱规格" width="280">
+
                   <template #default="scope">
                     <div class="input-group">
                       <el-input class="input-inner" v-model="scope.row.boxLength" placeholder="长" />
@@ -412,17 +438,20 @@
                 </el-table-column>
 
                 <el-table-column label="单箱数量pcs" prop="quantityPerBox" width="120">
+
                   <template #default="scope">
                     <el-input-number class="input-number" controls-position="right" :min="1"
                       v-model="scope.row.quantityPerBox" placeholder="单箱数量pcs" />
                   </template>
                 </el-table-column>
                 <el-table-column label="单箱重量g" prop="boxWeight" width="120">
+
                   <template #default="scope">
                     <el-input class="input-number" v-model="scope.row.boxWeight" placeholder="单箱重量g" />
                   </template>
                 </el-table-column>
                 <el-table-column label="包装规格" width="280">
+
                   <template #default="scope">
                     <div class="input-group">
                       <el-input class="input-inner" v-model="scope.row.length" placeholder="长" />
@@ -433,16 +462,19 @@
                   </template>
                 </el-table-column>
                 <el-table-column label="单品净重g" prop="netWeight" width="120">
+
                   <template #default="scope">
                     <el-input class="input-number" v-model="scope.row.netWeight" placeholder="单品净重g" />
                   </template>
                 </el-table-column>
                 <el-table-column label="单品毛重g" prop="grossWeight" width="120">
+
                   <template #default="scope">
                     <el-input class="input-number" v-model="scope.row.grossWeight" placeholder="单品毛重g" />
                   </template>
                 </el-table-column>
                 <el-table-column label="产品材质" prop="material" width="150">
+
                   <template #default="scope">
                     <el-input v-model="scope.row.material" placeholder="请输入产品材质" />
                   </template>
@@ -468,14 +500,17 @@
                 <el-table-column type="selection" width="50" align="center" />
                 <el-table-column label="序号" align="center" prop="index" width="50" />
                 <el-table-column label="首选" prop="firstChoice" width="150">
+
                   <template #default="scope">
                     <el-radio-group v-model="scope.row.firstChoice">
                       <el-radio v-for="dict in sys_yes_no" :key="dict.value" :label="dict.value"
-                        @change="() => updateFirstChoice(scope.row, dmSupplierPriceOfferList)">{{ dict.label }}</el-radio>
+                        @change="() => updateFirstChoice(scope.row, dmSupplierPriceOfferList)">{{ dict.label
+                        }}</el-radio>
                     </el-radio-group>
                   </template>
                 </el-table-column>
                 <el-table-column label="供应商" prop="supplierCode" width="150">
+
                   <template #default="scope">
                     <!-- <el-input v-model="scope.row.supplierCode" placeholder="请选择供应商" /> -->
                     <el-select v-model="scope.row.supplierCode" :multiple="false" filterable remote placeholder="请选择供应商"
@@ -485,12 +520,13 @@
                         <span style="float: left">{{ item.supplierName }}</span>
                         <span
                           style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; margin-left: 10px;">{{
-                            item.supplierCode }}</span>
+      item.supplierCode }}</span>
                       </el-option>
                     </el-select>
                   </template>
                 </el-table-column>
                 <el-table-column label="币种" prop="currency" width="150">
+
                   <template #default="scope">
                     <!-- <el-input v-model="scope.row.currency" placeholder="请输入币种" /> -->
                     <el-select v-model="scope.row.currency" placeholder="请选择币种">
@@ -498,13 +534,14 @@
                         :label="`${dict.label}` + ' / ' + `${dict.remark}`" :value="parseInt(dict.value)">
                         <span style="float: left">{{ dict.label }}</span>
                         <span style=" float: right; color: var(--el-text-color-secondary); font-size: 13px; ">{{
-                          dict.remark
-                        }}</span>
+      dict.remark
+    }}</span>
                       </el-option>
                     </el-select>
                   </template>
                 </el-table-column>
                 <el-table-column label="是否含税" prop="tax" width="110">
+
                   <template #default="scope">
                     <el-select v-model="scope.row.tax" placeholder="请选择">
                       <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
@@ -513,38 +550,45 @@
                   </template>
                 </el-table-column>
                 <el-table-column label="税率" prop="taxRate" width="100">
+
                   <template #default="scope">
                     <el-input v-model="scope.row.taxRate" placeholder="请输入税率" />
                   </template>
                 </el-table-column>
                 <el-table-column label="报价" prop="price" width="110">
+
                   <template #default="scope">
                     <el-input v-model="scope.row.price" placeholder="请输入报价" />
                   </template>
                 </el-table-column>
                 <el-table-column label="起订数量" prop="orderNumber" width="120">
+
                   <template #default="scope">
                     <el-input-number class="input-number" controls-position="right" :min="1"
                       v-model="scope.row.orderNumber" placeholder="请输入起订数量" />
                   </template>
                 </el-table-column>
                 <el-table-column label="交期" prop="deliveryTime" width="120">
+
                   <template #default="scope">
                     <el-input-number class="input-number" controls-position="right" :min="1"
                       v-model="scope.row.deliveryTime" placeholder="请输入交期" />
                   </template>
                 </el-table-column>
                 <el-table-column label="采购链接" prop="link" width="200">
+
                   <template #default="scope">
                     <el-input v-model="scope.row.link" placeholder="请输入采购链接" />
                   </template>
                 </el-table-column>
                 <el-table-column label="备注" prop="remark" width="300">
+
                   <template #default="scope">
                     <el-input v-model="scope.row.remark" type="textarea" placeholder="请输入内容" />
                   </template>
                 </el-table-column>
                 <el-table-column label="报价时间" prop="offerDate" width="240">
+
                   <template #default="scope">
                     <el-date-picker clearable v-model="scope.row.offerDate" type="date" value-format="YYYY-MM-DD"
                       placeholder="请选择报价时间">
@@ -573,21 +617,25 @@
                 <el-table-column type="selection" width="50" align="center" />
                 <el-table-column label="序号" align="center" prop="index" width="50" />
                 <el-table-column label="报关名称英文" prop="customsEn" width="150">
+
                   <template #default="scope">
                     <el-input v-model="scope.row.customsEn" placeholder="请输入报关名称英文" />
                   </template>
                 </el-table-column>
                 <el-table-column label="报关名称中文" prop="customsZh" width="150">
+
                   <template #default="scope">
                     <el-input v-model="scope.row.customsZh" placeholder="请输入报关名称中文" />
                   </template>
                 </el-table-column>
                 <el-table-column label="材质" prop="material" width="150">
+
                   <template #default="scope">
                     <el-input v-model="scope.row.material" placeholder="请输入材质" />
                   </template>
                 </el-table-column>
                 <el-table-column label="含电池" prop="hasBattery" width="150">
+
                   <template #default="scope">
                     <el-select v-model="scope.row.hasBattery" placeholder="请选择含电池">
                       <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
@@ -596,6 +644,7 @@
                   </template>
                 </el-table-column>
                 <el-table-column label="含液体" prop="hasLiquid" width="150">
+
                   <template #default="scope">
                     <el-select v-model="scope.row.hasLiquid" placeholder="请选择含液体">
                       <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
@@ -604,6 +653,7 @@
                   </template>
                 </el-table-column>
                 <el-table-column label="纺织品" prop="hasTextile" width="150">
+
                   <template #default="scope">
                     <el-select v-model="scope.row.hasTextile" placeholder="请选择纺织品">
                       <el-option v-for="dict in sys_yes_no" :key="dict.value" :label="dict.label"
@@ -612,6 +662,7 @@
                   </template>
                 </el-table-column>
                 <el-table-column label="报关价格" prop="price" width="150">
+
                   <template #default="scope">
                     <el-input v-model="scope.row.price" placeholder="请输入报关价格" />
                   </template>
@@ -655,6 +706,7 @@
           <el-input v-model="formPlan.forwarderPrice" placeholder="请输入本次货代头程报价（人民币）" />
         </el-form-item>
       </el-form>
+
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="submitFormPlan">确 定</el-button>
@@ -1257,6 +1309,7 @@ function routeEdit(skuId) {
 
 getList();
 </script>
+
 <style scope>
 /* 在你的组件样式中定义链接的默认和悬停状态 */
 .hover-link {
