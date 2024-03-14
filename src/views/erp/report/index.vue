@@ -101,11 +101,6 @@
             <FormattedCurrency :value="scope.row.costDelivery" />
           </template>
         </el-table-column>
-        <el-table-column label="广告费" align="center" prop="costAd" width="120">
-          <template #default="scope">
-            <FormattedCurrency :value="scope.row.costAd" />
-          </template>
-        </el-table-column>
         <el-table-column label="海外仓操作费" align="center" prop="costFbsWarehouse" width="120">
           <template #default="scope">
             <FormattedCurrency :value="scope.row.costFbsWarehouse" />
