@@ -9,20 +9,20 @@ export function listReport(query) {
   });
 }
 
-export function indexVolume(query) {
+export function indexVolume(data) {
   return request({
     url: "/erp/report/index/volume",
-    method: "get",
-    params: query,
+    method: "post",
+    data: data,
   });
 }
 
 
-export function indexAd(query) {
+export function indexAd(data) {
   return request({
     url: "/erp/report/index/ad",
-    method: "get",
-    params: query,
+    method: "post",
+    data: data,
   });
 }
 

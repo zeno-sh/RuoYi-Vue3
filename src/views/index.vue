@@ -8,10 +8,10 @@
     </el-form>
 
     <!-- 销量面板 -->
-    <panel-store :key="queryParams.clientId" :clientId="queryParams.clientId"></panel-store>
+    <panel-store v-if="queryParams.clientId" :key="queryParams.clientId" :clientId="queryParams.clientId"></panel-store>
 
     <!-- Top产品 -->
-    <order-volume :key="queryParams.clientId" :clientId="queryParams.clientId"></order-volume>
+    <order-volume v-if="queryParams.clientId" :key="queryParams.clientId" :clientId="queryParams.clientId"></order-volume>
   </div>
 </template>
 

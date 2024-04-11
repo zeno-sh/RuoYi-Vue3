@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="container">
     <el-card class="date-picker-card">
       <template #header>
         <div class="card-header">
@@ -91,6 +91,11 @@ function updateChildParams() {
 </script>
 
 <style scoped>
+.container {
+  padding: 10px;
+  /* 顶部、左侧和右侧的空间预留 */
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;

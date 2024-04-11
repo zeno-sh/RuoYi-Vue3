@@ -42,7 +42,7 @@
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="expressList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="expressList" @selection-change="handleSelectionChange" border>
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column type="index" width="50" label="序号" />
       <el-table-column label="货代公司名称" align="center" prop="forwarderName" width="120"/>

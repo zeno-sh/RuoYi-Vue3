@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <el-table v-loading="loading" :data="tableData" border>
+  <div class="container">
+    <el-table v-loading="loading" :data="tableData" border height="450">
       <el-table-column type="index" label="" align="center" width="50" />
       <el-table-column prop="offerId" label="商品" align="left" width="250">
         <template #default="scope">
@@ -132,6 +132,11 @@ defineExpose({ updateParams });
 </script>
 
 <style scoped>
+.container {
+  padding: 10px;
+  /* 顶部、左侧和右侧的空间预留 */
+}
+
 .caret-wrapper {
   flex-direction: column;
   align-items: center;

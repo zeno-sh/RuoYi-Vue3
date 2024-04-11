@@ -33,13 +33,13 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
+      <!-- <el-col :span="1.5">
         <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['erp:order:add']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate"
           v-hasPermi="['erp:order:edit']">修改</el-button>
-      </el-col>
+      </el-col> -->
       <!-- <el-col :span="1.5">
         <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete"
           v-hasPermi="['erp:order:remove']">删除</el-button>
@@ -51,55 +51,54 @@
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="orderList" @selection-change="handleSelectionChange" border
-      style="width: 100%">
+    <el-table v-loading="loading" :data="orderList" @selection-change="handleSelectionChange" border>
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column type="index" label="序号" />
-      <el-table-column label="门店" align="center" prop="clientId" />
-      <el-table-column label="订单类型" align="center" prop="fbs">
+      <el-table-column type="index" align="center" label="序号" />
+      <el-table-column label="门店" align="center" prop="clientId" width="90"/>
+      <el-table-column label="订单类型" align="center" prop="fbs" width="90">
         <template #default="scope">
           <dict-tag :options="dm_order_type" :value="scope.row.fbs" />
         </template>
       </el-table-column>
-      <el-table-column label="平台订单id" align="center" prop="orderId" />
-      <el-table-column label="发货编号" align="center" prop="postingNumber" />
-      <el-table-column label="订单编号" align="center" prop="orderNumber" />
-      <el-table-column label="订单状态" align="center" prop="status">
+      <el-table-column label="平台订单id" align="center" prop="orderId" width="120"/>
+      <el-table-column label="发货编号" align="center" prop="postingNumber" width="160"/>
+      <el-table-column label="订单编号" align="center" prop="orderNumber" width="160"/>
+      <el-table-column label="订单状态" align="center" prop="status" width="100">
 
         <template #default="scope">
           <dict-tag :options="dm_order_status" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column label="订单子状态" align="center" prop="substatus">
+      <el-table-column label="订单子状态" align="center" prop="substatus" width="100">
 
         <template #default="scope">
           <dict-tag :options="dm_order_substatus" :value="scope.row.substatus" />
         </template>
       </el-table-column>
-      <el-table-column label="接单时间" align="center" prop="inProcessAt">
+      <el-table-column label="接单时间" align="center" prop="inProcessAt" width="160">
 
         <template #default="scope">
           <span>{{ parseTime(scope.row.inProcessAt, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="发运时间" align="center" prop="shipmentDate">
+      <el-table-column label="发运时间" align="center" prop="shipmentDate" width="160">
 
         <template #default="scope">
           <span>{{ parseTime(scope.row.shipmentDate, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="交货时间" align="center" prop="deliveringDate">
+      <el-table-column label="交货时间" align="center" prop="deliveringDate" width="160">
 
         <template #default="scope">
           <span>{{ parseTime(scope.row.deliveringDate, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="订单销售金额" align="center" prop="accrualsForSale" />
+      <el-table-column label="订单销售金额" align="center" prop="accrualsForSale" width="100"/>
       <!-- <el-table-column label="取消原因" align="center" prop="cancellation" /> -->
       <!-- <el-table-column label="商品快照" align="center" prop="products" /> -->
       <!-- <el-table-column label="仓库信息" align="center" prop="deliveryMethod" /> -->
-      <el-table-column label="是否FBS" align="center" prop="fbs" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <!-- <el-table-column label="是否FBS" align="center" prop="fbs" /> -->
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="160">
 
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
@@ -119,7 +118,7 @@
     <el-dialog :title="title" v-model="open" width="800px" append-to-body>
       <el-form ref="orderRef" :model="form" :rules="rules" label-width="98px">
         <el-form-item label="平台门店id" prop="clientId">
-          <el-input v-model="form.clientId" placeholder="请输入平台门店id" />
+          <el-input v-model="form.clientId" placeholder="请输入平台门店id" disabled/>
         </el-form-item>
         <el-form-item label="平台订单id" prop="orderId">
           <el-input v-model="form.orderId" placeholder="请输入平台订单id" disabled/>
@@ -138,30 +137,30 @@
         </el-form-item>
         <el-form-item label="接单时间" prop="inProcessAt">
           <el-date-picker clearable v-model="form.inProcessAt" type="date" value-format="YYYY-MM-DD"
-            placeholder="请选择接单时间" >
+            placeholder="请选择接单时间" disabled>
           </el-date-picker>
         </el-form-item>
         <el-form-item label="发运时间" prop="shipmentDate">
           <el-date-picker clearable v-model="form.shipmentDate" type="date" value-format="YYYY-MM-DD"
-            placeholder="请选择发运时间">
+            placeholder="请选择发运时间" disabled>
           </el-date-picker>
         </el-form-item>
         <el-form-item label="交货时间" prop="deliveringDate">
           <el-date-picker clearable v-model="form.deliveringDate" type="date" value-format="YYYY-MM-DD"
-            placeholder="请选择交货时间">
+            placeholder="请选择交货时间" disabled>
           </el-date-picker>
         </el-form-item>
         <el-form-item label="订单销售金额" prop="accrualsForSale">
           <el-input v-model="form.accrualsForSale" placeholder="请输入订单销售金额" disabled/>
         </el-form-item>
         <el-form-item label="取消原因" prop="cancellation">
-          <el-input v-model="form.cancellation" type="textarea" placeholder="请输入内容" />
+          <el-input v-model="form.cancellation" type="textarea" placeholder="请输入内容" disabled/>
         </el-form-item>
         <el-form-item label="商品快照" prop="products">
-          <el-input v-model="form.products" type="textarea" placeholder="请输入内容" />
+          <el-input v-model="form.products" type="textarea" placeholder="请输入内容" disabled/>
         </el-form-item>
         <el-form-item label="仓库信息" prop="deliveryMethod">
-          <el-input v-model="form.deliveryMethod" type="textarea" placeholder="请输入内容" />
+          <el-input v-model="form.deliveryMethod" type="textarea" placeholder="请输入内容" disabled/>
         </el-form-item>
         <el-form-item label="是否FBS" prop="fbs">
           <el-input v-model="form.fbs" placeholder="请输入是否FBS" disabled/>
@@ -176,7 +175,7 @@
 
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="submitForm">确 定</el-button>
+          <!-- <el-button type="primary" @click="submitForm">确 定</el-button> -->
           <el-button @click="cancel">取 消</el-button>
         </div>
       </template>
